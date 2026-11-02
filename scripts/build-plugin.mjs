@@ -1,7 +1,7 @@
 import fs from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import { loadPetLibrary, publicPet, serializeNaturalMotion } from "./pet-library.mjs";
+import { loadPetLibrary, publicPet, serializeNaturalMotions } from "./pet-library.mjs";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const read = (relativePath, encoding = "utf8") => fs.readFile(path.join(root, relativePath), encoding);
@@ -33,8 +33,8 @@ const catalog = await Promise.all(pets.map(async (pet) => {
     const sprite = await fs.readFile(pet.spritePath);
     spriteUrl = `data:image/png;base64,${sprite.toString("base64")}`;
   }
-  const naturalMotion = await serializeNaturalMotion(pet, embedFrame);
-  return publicPet(pet, { spriteUrl, naturalMotion });
+  const naturalMotions = await serializeNaturalMotions(pet, embedFrame);
+  return publicPet(pet, { spriteUrl, naturalMotions });
 }));
 const catalogSource = [
   `globalThis.XIAODAI_MOTION_ASSETS = ${JSON.stringify(Object.fromEntries(embeddedFrameSources))};`,

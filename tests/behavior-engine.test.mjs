@@ -34,3 +34,11 @@ test("look direction has sixteen stable sectors and smoothing", () => {
   assert.equal(sectors.size, 16);
   assert.ok(smoothAngle(0, Math.PI / 2, 0.1) < Math.PI / 2);
 });
+
+test("getting up reverses the lying transition before returning to idle", () => {
+  assert.deepEqual(SEQUENCES.getUp.columns, [5, 4, 3, 2, 1, 0]);
+  const engine = new BehaviorEngine({ now: 0 });
+  engine.trigger("getUp", 0);
+  engine.tick(10_000);
+  assert.equal(engine.current.name, "idle");
+});

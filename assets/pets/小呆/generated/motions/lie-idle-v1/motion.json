@@ -1,0 +1,50 @@
+{
+  "schemaVersion": 1,
+  "id": "lie-idle-v1",
+  "petId": "xiaodai",
+  "intent": "idle",
+  "fromPose": "lie",
+  "toPose": "lie",
+  "canvas": { "width": 1536, "height": 1024 },
+  "identityBase": "../../concepts/identity-lie-v1.png",
+  "neutralFrame": "frames/frame-000-neutral.png",
+  "idleGapMs": [1200, 4200],
+  "transitionMs": 150,
+  "interruptible": true,
+  "variants": [
+    {
+      "id": "lie-slow-blink",
+      "weight": 5,
+      "cooldownMs": 5000,
+      "frames": [
+        { "file": "frames/frame-000-neutral.png", "durationMs": [1100, 3200] },
+        { "file": "frames/frame-010-half-blink.png", "durationMs": [180, 260] },
+        { "file": "frames/frame-020-eyes-closed.png", "durationMs": [180, 320] },
+        { "file": "frames/frame-010-half-blink.png", "durationMs": [200, 300] },
+        { "file": "frames/frame-000-neutral.png", "durationMs": [1000, 3000] }
+      ]
+    },
+    {
+      "id": "lie-ear-listen",
+      "weight": 2.2,
+      "cooldownMs": 7000,
+      "frames": [
+        { "file": "frames/frame-000-neutral.png", "durationMs": [900, 2400] },
+        { "file": "frames/frame-050-ear-listen.png", "durationMs": [550, 1100] },
+        { "file": "frames/frame-000-neutral.png", "durationMs": [1200, 3200] }
+      ]
+    },
+    {
+      "id": "lower-head-and-nap",
+      "weight": 0.9,
+      "cooldownMs": 24000,
+      "frames": [
+        { "file": "frames/frame-000-neutral.png", "durationMs": [1200, 2800] },
+        { "file": "frames/frame-030-head-lowered.png", "durationMs": [420, 680] },
+        { "file": "frames/frame-040-head-resting.png", "durationMs": [5000, 16000] },
+        { "file": "frames/frame-030-head-lowered.png", "durationMs": [480, 760] },
+        { "file": "frames/frame-000-neutral.png", "durationMs": [1800, 4200] }
+      ]
+    }
+  ]
+}

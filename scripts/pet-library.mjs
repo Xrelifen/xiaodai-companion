@@ -22,12 +22,16 @@ export async function loadPetLibrary(root) {
     const manifest = JSON.parse(await fs.readFile(manifestPath, "utf8"));
     const spritePath = path.join(folderPath, manifest.spriteSheet || "generated/sprite-sheet.png");
     const previewPath = path.join(folderPath, manifest.previewGif || "generated/preview.gif");
-    const naturalMotionPath = manifest.naturalMotion ? path.join(folderPath, manifest.naturalMotion) : null;
-    let naturalMotionData = null;
-    if (naturalMotionPath && await exists(naturalMotionPath)) {
+    const motionReferences = Array.isArray(manifest.naturalMotions)
+      ? manifest.naturalMotions
+      : (manifest.naturalMotion ? [manifest.naturalMotion] : []);
+    const naturalMotionPaths = motionReferences.map((reference) => path.join(folderPath, reference));
+    const naturalMotionData = [];
+    for (const naturalMotionPath of naturalMotionPaths) {
+      if (!(await exists(naturalMotionPath))) continue;
       const motion = JSON.parse(await fs.readFile(naturalMotionPath, "utf8"));
       const motionDirectory = path.dirname(naturalMotionPath);
-      naturalMotionData = {
+      naturalMotionData.push({
         ...motion,
         neutralFramePath: motion.neutralFrame ? path.join(motionDirectory, motion.neutralFrame) : null,
         variants: (motion.variants || []).map((variant) => ({
@@ -37,14 +41,14 @@ export async function loadPetLibrary(root) {
             framePath: path.join(motionDirectory, frame.file),
           })),
         })),
-      };
+      });
     }
     pets.push({
       ...manifest,
       folder: entry.name,
       spritePath: await exists(spritePath) ? spritePath : null,
       previewPath: await exists(previewPath) ? previewPath : null,
-      naturalMotionPath,
+      naturalMotionPaths,
       naturalMotionData,
     });
   }
@@ -59,13 +63,12 @@ export async function loadPetLibrary(root) {
   return pets;
 }
 
-export async function serializeNaturalMotion(pet, resolveFrameUrl) {
-  if (!pet.naturalMotionData) return null;
+async function serializeMotion(motionData, resolveFrameUrl) {
   const {
     neutralFramePath,
     variants,
     ...motion
-  } = pet.naturalMotionData;
+  } = motionData;
   return {
     ...motion,
     neutralFrameUrl: neutralFramePath ? await resolveFrameUrl(neutralFramePath) : null,
@@ -79,15 +82,25 @@ export async function serializeNaturalMotion(pet, resolveFrameUrl) {
   };
 }
 
+export async function serializeNaturalMotions(pet, resolveFrameUrl) {
+  return Promise.all((pet.naturalMotionData || []).map((motion) => serializeMotion(motion, resolveFrameUrl)));
+}
+
+export async function serializeNaturalMotion(pet, resolveFrameUrl) {
+  const motions = await serializeNaturalMotions(pet, resolveFrameUrl);
+  return motions[0] || null;
+}
+
 export function publicPet(pet, options = {}) {
-  const { spriteUrl = null, naturalMotion = null } = options;
+  const { spriteUrl = null, naturalMotion = null, naturalMotions = naturalMotion ? [naturalMotion] : [] } = options;
   const {
     spritePath: _spritePath,
     previewPath: _previewPath,
-    naturalMotionPath: _naturalMotionPath,
+    naturalMotionPaths: _naturalMotionPaths,
     naturalMotionData: _naturalMotionData,
     naturalMotion: _naturalMotionManifestPath,
+    naturalMotions: _naturalMotionsManifestPaths,
     ...manifest
   } = pet;
-  return { ...manifest, spriteUrl, naturalMotion };
+  return { ...manifest, spriteUrl, naturalMotion: naturalMotions[0] || null, naturalMotions };
 }

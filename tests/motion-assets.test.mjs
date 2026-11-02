@@ -3,6 +3,7 @@ import { access, readFile } from "node:fs/promises";
 import test from "node:test";
 
 const motionUrl = new URL("../assets/pets/%E5%B0%8F%E5%91%86/generated/motions/sit-idle-v1/motion.json", import.meta.url);
+const lieMotionUrl = new URL("../assets/pets/%E5%B0%8F%E5%91%86/generated/motions/lie-idle-v1/motion.json", import.meta.url);
 
 function pngMetadata(buffer) {
   const signature = "89504e470d0a1a0a";
@@ -35,6 +36,23 @@ test("sit idle motion references valid transparent PNG frames", async () => {
       motion.canvas,
       `${file} must match the motion canvas`,
     );
+    assert.ok([4, 6].includes(metadata.colorType), `${file} must contain an alpha channel`);
+  }
+});
+
+test("lying idle motion references valid transparent PNG frames", async () => {
+  const motion = JSON.parse(await readFile(lieMotionUrl, "utf8"));
+  assert.equal(motion.fromPose, "lie");
+  assert.equal(motion.toPose, "lie");
+  assert.ok(motion.variants.some((variant) => variant.id === "lower-head-and-nap"));
+
+  const files = new Set(motion.variants.flatMap((variant) => variant.frames.map((frame) => frame.file)));
+  assert.equal(files.size, 6);
+  for (const file of files) {
+    const url = new URL(file, lieMotionUrl);
+    await access(url);
+    const metadata = pngMetadata(await readFile(url));
+    assert.deepEqual({ width: metadata.width, height: metadata.height }, motion.canvas);
     assert.ok([4, 6].includes(metadata.colorType), `${file} must contain an alpha channel`);
   }
 });

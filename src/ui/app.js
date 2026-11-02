@@ -60,6 +60,9 @@
   let naturalMotionPlayer = null;
   let naturalMotionReady = false;
   let naturalLoadToken = 0;
+  const naturalMotionByPose = new Map();
+  let naturalPose = "sit";
+  let naturalPoseUntil = 0;
 
   const pet = {
     x: canvas.width / 2,
@@ -82,6 +85,7 @@
     idle: "安靜陪著你",
     lookAround: "正在四處看看",
     lieDown: "趴著休息一下",
+    getUp: "慢慢坐起來",
     standTurnSit: "站起來巡視",
     wave: "跟你揮揮手",
     jump: "開心跳了一下",
@@ -96,6 +100,9 @@
     "look-viewer-left": "看看左邊",
     "look-viewer-right": "看看右邊",
     "ear-listen": "豎耳聽聽",
+    "lie-slow-blink": "趴著慢慢眨眼",
+    "lie-ear-listen": "趴著聽聽聲音",
+    "lower-head-and-nap": "靠著前掌小睡",
   };
 
   function setStatus(text) {
@@ -190,7 +197,25 @@
   }
 
   function render(now) {
+    if (naturalPose === "lie" && engine.current.name === "idle") {
+      if (now >= naturalPoseUntil) {
+        engine.trigger("getUp", now, { reason: "natural-pose-change" });
+      } else {
+        engine.nextIdleActionAt = Number.POSITIVE_INFINITY;
+      }
+    }
+    const sequenceBeforeTick = engine.current.name;
     const frame = engine.tick(now);
+    if (sequenceBeforeTick !== engine.current.name && engine.current.name === "idle") {
+      if (sequenceBeforeTick === "lieDown" && naturalMotionByPose.has("lie")) {
+        activateNaturalPose("lie", now);
+        naturalPoseUntil = now + core.randomBetween(25_000, 75_000);
+        engine.nextIdleActionAt = Number.POSITIVE_INFINITY;
+      } else if (sequenceBeforeTick === "getUp") {
+        activateNaturalPose("sit", now);
+        engine.scheduleNextIdle(now);
+      }
+    }
     const lookFrame = currentLookFrame(now);
     let naturalState = null;
     let drewNaturalFrame = false;
@@ -356,18 +381,30 @@
     syncInputs();
   });
 
-  function prepareNaturalMotion(motion) {
+  function activateNaturalPose(pose, now = performance.now()) {
+    const motion = naturalMotionByPose.get(pose) || naturalMotionByPose.get("sit") || naturalMotionByPose.values().next().value;
+    naturalPose = motion?.fromPose || "sit";
+    naturalMotionPlayer = motion && motionCore
+      ? new motionCore.NaturalMotionPlayer(motion, { now })
+      : null;
+  }
+
+  function prepareNaturalMotions(motions) {
     const token = ++naturalLoadToken;
     naturalImages.clear();
+    naturalMotionByPose.clear();
     naturalMotionReady = false;
-    naturalMotionPlayer = motion && motionCore
-      ? new motionCore.NaturalMotionPlayer(motion, { now: performance.now() })
-      : null;
+    for (const motion of motions || []) {
+      if (motion?.fromPose) naturalMotionByPose.set(motion.fromPose, motion);
+    }
+    activateNaturalPose("sit");
     if (!naturalMotionPlayer) return;
 
     const urls = new Set([
-      motion.neutralFrameUrl,
-      ...(motion.variants || []).flatMap((variant) => (variant.frames || []).map((frame) => frame.url)),
+      ...(motions || []).flatMap((motion) => [
+        motion.neutralFrameUrl,
+        ...(motion.variants || []).flatMap((variant) => (variant.frames || []).map((frame) => frame.url)),
+      ]),
     ].filter(Boolean));
     Promise.all([...urls].map((url) => new Promise((resolve, reject) => {
       const image = new Image();
@@ -389,7 +426,7 @@
     activePet = catalog.find((item) => item.id === petId) || catalog[0] || activePet;
     localStorage.setItem(ACTIVE_PET_KEY, activePet.id);
     document.documentElement.style.setProperty("--orange", activePet.accentColor || "#df8c43");
-    prepareNaturalMotion(activePet.naturalMotion);
+    prepareNaturalMotions(activePet.naturalMotions || [activePet.naturalMotion].filter(Boolean));
     spriteReady = false;
     if (activePet.spriteUrl) {
       sprite.src = activePet.spriteUrl;

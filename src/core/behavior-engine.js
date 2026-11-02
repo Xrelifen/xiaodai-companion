@@ -41,6 +41,7 @@
     jump: state(4, [0, 1, 2, 3, 4], [180, 150, 240, 170, 520], { loop: false, returnToIdle: true }),
     sad: state(5, [0, 1, 2, 3, 4, 5, 6, 7], [220, 220, 220, 220, 220, 220, 220, 600], { loop: false, returnToIdle: true }),
     lieDown: state(6, [0, 1, 2, 3, 4, 5], [520, 380, 760, 300, 840, 680], { loop: false, returnToIdle: true }),
+    getUp: state(6, [5, 4, 3, 2, 1, 0], [680, 840, 300, 760, 380, 520], { loop: false, returnToIdle: true }),
     focused: state(7, [0, 1, 2, 3, 4, 5], [360, 240, 620, 260, 500, 680], { loop: false, returnToIdle: true }),
     standTurnSit: state(8, [0, 1, 2, 3, 4, 5], [420, 380, 520, 520, 420, 900], { loop: false, returnToIdle: true }),
     lookAround: {
