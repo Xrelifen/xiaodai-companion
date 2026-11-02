@@ -3,11 +3,13 @@
 
   const core = globalThis.XiaodaiCore;
   if (!core) throw new Error("XiaodaiCore is unavailable");
+  const motionCore = globalThis.XiaodaiMotion;
 
   const STORAGE_KEY = "xiaodai-companion:settings:v1";
   const AFFECTION_KEY = "xiaodai-companion:affection:v1";
   const ACTIVE_PET_KEY = "xiaodai-companion:active-pet:v1";
   const catalog = Array.isArray(globalThis.XIAODAI_PET_CATALOG) ? globalThis.XIAODAI_PET_CATALOG : [];
+  const embeddedMotionAssets = globalThis.XIAODAI_MOTION_ASSETS || {};
   const isDesktop = Boolean(globalThis.xiaodaiDesktop) || new URLSearchParams(location.search).get("mode") === "desktop";
   document.body.classList.toggle("desktop-mode", isDesktop);
 
@@ -54,6 +56,10 @@
   const sprite = new Image();
   sprite.decoding = "async";
   let spriteReady = false;
+  const naturalImages = new Map();
+  let naturalMotionPlayer = null;
+  let naturalMotionReady = false;
+  let naturalLoadToken = 0;
 
   const pet = {
     x: canvas.width / 2,
@@ -83,6 +89,13 @@
     sad: "有一點沮喪",
     walkRight: "往右邊走",
     walkLeft: "往左邊走",
+  };
+
+  const naturalActionLabels = {
+    "slow-blink": "慢慢眨眼",
+    "look-viewer-left": "看看左邊",
+    "look-viewer-right": "看看右邊",
+    "ear-listen": "豎耳聽聽",
   };
 
   function setStatus(text) {
@@ -126,6 +139,31 @@
     context.drawImage(sprite, sourceX, sourceY, frameWidth, frameHeight, drawX, drawY, drawWidth, drawHeight);
   }
 
+  function drawNaturalLayer(image, alpha, breathScale) {
+    if (!image?.complete || !image.naturalWidth || alpha <= 0) return;
+    const scale = Math.min(pet.width / image.naturalWidth, pet.height / image.naturalHeight);
+    const drawWidth = image.naturalWidth * scale;
+    const baseHeight = image.naturalHeight * scale;
+    const drawHeight = baseHeight * breathScale;
+    const groundY = pet.y + pet.height / 2;
+    const drawX = pet.x - drawWidth / 2;
+    const drawY = groundY - drawHeight;
+    context.save();
+    context.globalAlpha = alpha;
+    context.drawImage(image, drawX, drawY, drawWidth, drawHeight);
+    context.restore();
+  }
+
+  function drawNaturalFrame(state) {
+    const current = naturalImages.get(state?.url);
+    if (!current) return false;
+    context.clearRect(0, 0, canvas.width, canvas.height);
+    const previous = naturalImages.get(state.previousUrl);
+    if (previous) drawNaturalLayer(previous, 1 - state.blend, state.breathScale);
+    drawNaturalLayer(current, previous ? state.blend : 1, state.breathScale);
+    return true;
+  }
+
   function drawPlaceholder() {
     const color = activePet.accentColor || "#df8c43";
     context.save();
@@ -154,8 +192,17 @@
   function render(now) {
     const frame = engine.tick(now);
     const lookFrame = currentLookFrame(now);
-    drawFrame(lookFrame || frame);
-    setStatus(`${activePet.name}・${sequenceLabel()}`);
+    let naturalState = null;
+    let drewNaturalFrame = false;
+    if (engine.current.name === "idle" && naturalMotionReady && naturalMotionPlayer) {
+      naturalState = naturalMotionPlayer.tick(now, { enabled: true });
+      drewNaturalFrame = drawNaturalFrame(naturalState);
+    } else if (naturalMotionPlayer) {
+      naturalMotionPlayer.tick(now, { enabled: false });
+    }
+    if (!drewNaturalFrame) drawFrame(lookFrame || frame);
+    const naturalLabel = naturalActionLabels[naturalState?.variantId];
+    setStatus(`${activePet.name}・${naturalLabel || sequenceLabel()}`);
     maybeRoam(now);
     requestAnimationFrame(render);
   }
@@ -309,10 +356,40 @@
     syncInputs();
   });
 
+  function prepareNaturalMotion(motion) {
+    const token = ++naturalLoadToken;
+    naturalImages.clear();
+    naturalMotionReady = false;
+    naturalMotionPlayer = motion && motionCore
+      ? new motionCore.NaturalMotionPlayer(motion, { now: performance.now() })
+      : null;
+    if (!naturalMotionPlayer) return;
+
+    const urls = new Set([
+      motion.neutralFrameUrl,
+      ...(motion.variants || []).flatMap((variant) => (variant.frames || []).map((frame) => frame.url)),
+    ].filter(Boolean));
+    Promise.all([...urls].map((url) => new Promise((resolve, reject) => {
+      const image = new Image();
+      image.decoding = "async";
+      image.addEventListener("load", () => {
+        naturalImages.set(url, image);
+        resolve();
+      }, { once: true });
+      image.addEventListener("error", reject, { once: true });
+      image.src = embeddedMotionAssets[url] || url;
+    }))).then(() => {
+      if (token === naturalLoadToken) naturalMotionReady = true;
+    }).catch(() => {
+      if (token === naturalLoadToken) naturalMotionReady = false;
+    });
+  }
+
   function loadPet(petId) {
     activePet = catalog.find((item) => item.id === petId) || catalog[0] || activePet;
     localStorage.setItem(ACTIVE_PET_KEY, activePet.id);
     document.documentElement.style.setProperty("--orange", activePet.accentColor || "#df8c43");
+    prepareNaturalMotion(activePet.naturalMotion);
     spriteReady = false;
     if (activePet.spriteUrl) {
       sprite.src = activePet.spriteUrl;

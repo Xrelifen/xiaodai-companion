@@ -1,0 +1,66 @@
+{
+  "schemaVersion": 1,
+  "id": "sit-idle-v1",
+  "petId": "xiaodai",
+  "intent": "idle",
+  "fromPose": "sit",
+  "toPose": "sit",
+  "canvas": { "width": 1161, "height": 1354 },
+  "identityBase": "../../concepts/identity-sit-v1.png",
+  "neutralFrame": "frames/frame-000-neutral.png",
+  "idleGapMs": [800, 3200],
+  "transitionMs": 135,
+  "interruptible": true,
+  "variants": [
+    {
+      "id": "slow-blink",
+      "weight": 5,
+      "cooldownMs": 4500,
+      "frames": [
+        { "file": "frames/frame-000-neutral.png", "durationMs": [900, 2600] },
+        { "file": "frames/frame-010-half-blink.png", "durationMs": 170 },
+        { "file": "frames/frame-020-eyes-closed.png", "durationMs": [110, 180] },
+        { "file": "frames/frame-010-half-blink.png", "durationMs": 190 },
+        { "file": "frames/frame-000-neutral.png", "durationMs": [800, 2200] }
+      ]
+    },
+    {
+      "id": "look-viewer-left",
+      "weight": 2.4,
+      "cooldownMs": 7000,
+      "frames": [
+        { "file": "frames/frame-000-neutral.png", "durationMs": [700, 1800] },
+        { "file": "frames/frame-025-look-viewer-left-half.png", "durationMs": [180, 270] },
+        { "file": "frames/frame-030-look-viewer-left.png", "durationMs": [900, 2200] },
+        { "file": "frames/frame-025-look-viewer-left-half.png", "durationMs": [210, 320] },
+        { "file": "frames/frame-000-neutral.png", "durationMs": [900, 2400] }
+      ]
+    },
+    {
+      "id": "look-viewer-right",
+      "weight": 2.4,
+      "cooldownMs": 7000,
+      "frames": [
+        { "file": "frames/frame-000-neutral.png", "durationMs": [700, 1800] },
+        { "file": "frames/frame-035-look-viewer-right-half.png", "durationMs": [180, 270] },
+        { "file": "frames/frame-040-look-viewer-right.png", "durationMs": [900, 2200] },
+        { "file": "frames/frame-035-look-viewer-right-half.png", "durationMs": [210, 320] },
+        { "file": "frames/frame-000-neutral.png", "durationMs": [900, 2400] }
+      ]
+    },
+    {
+      "id": "ear-listen",
+      "weight": 1.7,
+      "cooldownMs": 6500,
+      "frames": [
+        { "file": "frames/frame-000-neutral.png", "durationMs": [600, 1600] },
+        { "file": "frames/frame-050-ear-listen.png", "durationMs": [420, 760] },
+        { "file": "frames/frame-000-neutral.png", "durationMs": [1000, 2600] }
+      ]
+    }
+  ],
+  "runtimeNotes": {
+    "breathing": "Apply a subtle 0.4–0.8% vertical chest/body scale in the renderer; do not generate a separate high-amplitude breathing frame.",
+    "transition": "Cross-fade or interpolate over 90–160 ms where a direct head-pose change is visually abrupt."
+  }
+}
