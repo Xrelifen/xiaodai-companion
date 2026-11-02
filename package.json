@@ -39,6 +39,7 @@
       "src/desktop/**/*",
       "src/ui/**/*",
       "assets/**/*",
+      "!assets/pets/*/source/**/*",
       "package.json"
     ],
     "win": {

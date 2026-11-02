@@ -26,7 +26,20 @@ jobs:
           $stage = Join-Path $env:RUNNER_TEMP "xiaodai-plugin"
           New-Item -ItemType Directory -Path $stage -Force | Out-Null
           Copy-Item plugin.json,mcp.json,LICENSE,README.md -Destination $stage
-          Copy-Item skills,src,assets,config,dist -Destination $stage -Recurse
+          Copy-Item skills,src,config,dist -Destination $stage -Recurse
+          $assetStage = Join-Path $stage "assets"
+          $petStage = Join-Path $assetStage "pets"
+          New-Item -ItemType Directory -Path $petStage -Force | Out-Null
+          Copy-Item assets/app-icon.png,assets/icon.png -Destination $assetStage
+          Get-ChildItem assets/pets -Directory | ForEach-Object {
+            $destination = Join-Path $petStage $_.Name
+            New-Item -ItemType Directory -Path $destination -Force | Out-Null
+            Copy-Item (Join-Path $_.FullName "pet.json"),(Join-Path $_.FullName "README.md") -Destination $destination
+            $generated = Join-Path $_.FullName "generated"
+            if (Test-Path $generated) {
+              Copy-Item $generated -Destination $destination -Recurse
+            }
+          }
           Compress-Archive -Path (Join-Path $stage "*") -DestinationPath "release/xiaodai-companion-plugin.zip" -Force
       - uses: softprops/action-gh-release@v2
         with:

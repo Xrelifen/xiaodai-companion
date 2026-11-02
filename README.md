@@ -27,6 +27,8 @@
 - 缺少角色圖時安全降級，不影響設定與互動邏輯
 - ChatGPT local plugin manifests、MCP server 與互動式 MCP App resource
 
+自然行為與高寫實度素材的下一階段規格，見 [行為與角色資產 v2 設計](docs/behavior-and-assets-v2.md)。
+
 ## 一般使用者下載
 
 在 [GitHub Releases](https://github.com/Xrelifen/xiaodai-companion/releases/latest) 選擇：
@@ -66,7 +68,7 @@ assets/pets/
 └─ 牧牧/                       同樣結構
 ```
 
-標準動畫表為 8 欄 × 11 列，每格 192×208 px。尚未製作角色動畫時，只要先把照片傳進該角色的 `source/`；核心程式不會讀取或公開原始照片。新增或替換素材後執行：
+標準動畫表為 8 欄 × 11 列，每格 192×208 px。尚未製作角色動畫時，只要先把照片傳進該角色的 `source/`；核心程式不會在執行階段讀取原始照片，Windows 安裝檔與 plugin ZIP 也會排除 `source/`。新增或替換素材後執行：
 
 ```powershell
 npm run sync:pets
@@ -130,7 +132,7 @@ tests/                   Node 原生測試
 
 ## 隱私
 
-公開 repo 預設只放 `generated/` 中可散布的成品；個人生活照請先放在 `source/`，並在公開前確認是否要提交。三隻寵物的素材彼此分離。
+Windows 安裝檔與 plugin ZIP 只包含程式及 `generated/` 成品，不包含 `source/`。不過，手動上傳或強制提交到公開 GitHub repo 的 `source/` 照片仍然是公開檔案；`.gitignore` 只能避免尚未追蹤的新照片被一般 `git add` 加入，無法讓已提交的檔案變私密。三隻寵物的素材彼此分離。
 
 ## License
 
