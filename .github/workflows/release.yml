@@ -1,0 +1,44 @@
+name: Build public downloads
+
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: write
+
+jobs:
+  windows-release:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run check
+      - run: npm run dist:windows
+      - name: Package ChatGPT plugin
+        shell: pwsh
+        run: |
+          $stage = Join-Path $env:RUNNER_TEMP "xiaodai-plugin"
+          New-Item -ItemType Directory -Path $stage -Force | Out-Null
+          Copy-Item plugin.json,mcp.json,LICENSE,README.md -Destination $stage
+          Copy-Item skills,src,assets,config,dist -Destination $stage -Recurse
+          Compress-Archive -Path (Join-Path $stage "*") -DestinationPath "release/xiaodai-companion-plugin.zip" -Force
+      - uses: softprops/action-gh-release@v2
+        with:
+          generate_release_notes: true
+          body: |
+            ## 下載小呆
+
+            - `Xiaodai-Companion-Setup-*.exe`：推薦，一般 Windows 安裝程式。
+            - `Xiaodai-Companion-Portable-*.exe`：免安裝版。
+            - `xiaodai-companion-plugin.zip`：ChatGPT / Codex 本機外掛包。
+
+            Windows 可能顯示未簽章應用程式提醒；這個專案完全開源，可先檢查原始碼與自動建置紀錄。
+          files: |
+            release/*.exe
+            release/xiaodai-companion-plugin.zip

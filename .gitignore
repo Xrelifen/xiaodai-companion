@@ -1,0 +1,11 @@
+node_modules/
+release/
+.DS_Store
+Thumbs.db
+*.log
+coverage/
+
+# 原始生活照預設不推上公開 repo；只保留空資料夾。
+assets/pets/*/source/*
+!assets/pets/*/source/.gitkeep
+

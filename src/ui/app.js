@@ -1,0 +1,380 @@
+(function startXiaodaiCompanion() {
+  "use strict";
+
+  const core = globalThis.XiaodaiCore;
+  if (!core) throw new Error("XiaodaiCore is unavailable");
+
+  const STORAGE_KEY = "xiaodai-companion:settings:v1";
+  const AFFECTION_KEY = "xiaodai-companion:affection:v1";
+  const ACTIVE_PET_KEY = "xiaodai-companion:active-pet:v1";
+  const catalog = Array.isArray(globalThis.XIAODAI_PET_CATALOG) ? globalThis.XIAODAI_PET_CATALOG : [];
+  const isDesktop = Boolean(globalThis.xiaodaiDesktop) || new URLSearchParams(location.search).get("mode") === "desktop";
+  document.body.classList.toggle("desktop-mode", isDesktop);
+
+  const canvas = document.querySelector("#pet-canvas");
+  const context = canvas.getContext("2d", { alpha: true });
+  const stage = document.querySelector("#pet-stage");
+  const statusPill = document.querySelector("#status-pill");
+  const reaction = document.querySelector("#reaction");
+  const settingsPanel = document.querySelector("#settings-panel");
+  const settingsToggle = document.querySelector("#settings-toggle");
+  const settingsClose = document.querySelector("#settings-close");
+  const affectionLabel = document.querySelector("#affection");
+  const desktopRoamRow = document.querySelector(".desktop-setting");
+  const closeCompanion = document.querySelector("#close-companion");
+  const petSelect = document.querySelector("#pet-select");
+
+  desktopRoamRow.hidden = !isDesktop;
+  closeCompanion.hidden = !isDesktop;
+
+  function loadSavedSettings() {
+    try {
+      return JSON.parse(localStorage.getItem(STORAGE_KEY) || "null") || {};
+    } catch {
+      return {};
+    }
+  }
+
+  function saveSettings() {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(engine.config));
+  }
+
+  let affection = Number(localStorage.getItem(AFFECTION_KEY) || 0);
+  let config = core.deepMerge(core.DEFAULT_CONFIG, loadSavedSettings());
+  const engine = new core.BehaviorEngine({ config, now: performance.now() });
+  let activePet = catalog.find((item) => item.id === localStorage.getItem(ACTIVE_PET_KEY)) || catalog[0] || {
+    id: "placeholder",
+    name: "寵物",
+    placeholderEmoji: "🐾",
+    accentColor: "#df8c43",
+    frame: { width: 192, height: 208 },
+    spriteUrl: null,
+  };
+
+  const sprite = new Image();
+  sprite.decoding = "async";
+  let spriteReady = false;
+
+  const pet = {
+    x: canvas.width / 2,
+    y: canvas.height / 2,
+    width: 320,
+    height: 346.6667,
+    dragging: false,
+    pointerId: null,
+    lastPointer: null,
+    dragDistance: 0,
+    lookAngle: -Math.PI / 2,
+    targetLookAngle: -Math.PI / 2,
+    pointerInside: false,
+    lastInteractionAt: performance.now(),
+    nextRoamAt: 0,
+    roamUntil: 0,
+  };
+
+  const actionLabels = {
+    idle: "安靜陪著你",
+    lookAround: "正在四處看看",
+    lieDown: "趴著休息一下",
+    standTurnSit: "站起來巡視",
+    wave: "跟你揮揮手",
+    jump: "開心跳了一下",
+    focused: "正在專心觀察",
+    sad: "有一點沮喪",
+    walkRight: "往右邊走",
+    walkLeft: "往左邊走",
+  };
+
+  function setStatus(text) {
+    statusPill.textContent = text;
+  }
+
+  function showReaction(text) {
+    reaction.textContent = text;
+    reaction.classList.remove("show");
+    void reaction.offsetWidth;
+    reaction.classList.add("show");
+  }
+
+  function addAffection(amount = 1) {
+    affection += amount;
+    localStorage.setItem(AFFECTION_KEY, String(affection));
+    affectionLabel.textContent = `親密度 ${affection}`;
+  }
+
+  function sequenceLabel() {
+    return actionLabels[engine.current.name] || engine.current.name;
+  }
+
+  function drawFrame(frame) {
+    context.clearRect(0, 0, canvas.width, canvas.height);
+    if (!spriteReady || !sprite.complete || !sprite.naturalWidth) {
+      drawPlaceholder();
+      return;
+    }
+
+    const frameWidth = activePet.frame?.width || 192;
+    const frameHeight = activePet.frame?.height || 208;
+    const sourceX = frame.column * frameWidth;
+    const sourceY = frame.row * frameHeight;
+    const scale = Math.min(pet.width / frameWidth, pet.height / frameHeight);
+    const drawWidth = frameWidth * scale;
+    const drawHeight = frameHeight * scale;
+    const drawX = pet.x - drawWidth / 2;
+    const drawY = pet.y - drawHeight / 2;
+
+    context.drawImage(sprite, sourceX, sourceY, frameWidth, frameHeight, drawX, drawY, drawWidth, drawHeight);
+  }
+
+  function drawPlaceholder() {
+    const color = activePet.accentColor || "#df8c43";
+    context.save();
+    context.translate(pet.x, pet.y);
+    context.fillStyle = `${color}22`;
+    context.beginPath();
+    context.arc(0, 0, 132, 0, Math.PI * 2);
+    context.fill();
+    context.textAlign = "center";
+    context.textBaseline = "middle";
+    context.font = "96px 'Segoe UI Emoji', sans-serif";
+    context.fillText(activePet.placeholderEmoji || "🐾", 0, -22);
+    context.fillStyle = color;
+    context.font = "700 30px system-ui, sans-serif";
+    context.fillText(activePet.name, 0, 78);
+    context.restore();
+  }
+
+  function currentLookFrame(now) {
+    const idleLongEnough = now - pet.lastInteractionAt > 600;
+    if (!pet.pointerInside || pet.dragging || engine.current.name !== "idle" || !idleLongEnough) return null;
+    pet.lookAngle = core.smoothAngle(pet.lookAngle, pet.targetLookAngle, engine.config.lookSmoothing);
+    return core.lookFrameForAngle(pet.lookAngle);
+  }
+
+  function render(now) {
+    const frame = engine.tick(now);
+    const lookFrame = currentLookFrame(now);
+    drawFrame(lookFrame || frame);
+    setStatus(`${activePet.name}・${sequenceLabel()}`);
+    maybeRoam(now);
+    requestAnimationFrame(render);
+  }
+
+  function canvasPoint(event) {
+    const rect = canvas.getBoundingClientRect();
+    return {
+      x: (event.clientX - rect.left) * (canvas.width / rect.width),
+      y: (event.clientY - rect.top) * (canvas.height / rect.height),
+    };
+  }
+
+  function pointerVelocity(current, previous) {
+    if (!previous) return { speed: 0, dx: 0, dy: 0 };
+    const dt = Math.max(1, current.time - previous.time);
+    const dx = current.x - previous.x;
+    const dy = current.y - previous.y;
+    return { speed: Math.hypot(dx, dy) / dt * 1000, dx, dy };
+  }
+
+  canvas.addEventListener("pointerdown", (event) => {
+    const point = canvasPoint(event);
+    pet.dragging = true;
+    pet.pointerId = event.pointerId;
+    pet.lastPointer = { ...point, screenX: event.screenX, screenY: event.screenY, time: performance.now() };
+    pet.dragDistance = 0;
+    pet.lastInteractionAt = performance.now();
+    canvas.setPointerCapture(event.pointerId);
+    globalThis.xiaodaiDesktop?.beginDrag?.({ screenX: event.screenX, screenY: event.screenY });
+  });
+
+  canvas.addEventListener("pointermove", (event) => {
+    const now = performance.now();
+    const point = canvasPoint(event);
+    const petScreenX = canvas.getBoundingClientRect().left + canvas.getBoundingClientRect().width / 2;
+    const petScreenY = canvas.getBoundingClientRect().top + canvas.getBoundingClientRect().height / 2;
+    pet.targetLookAngle = Math.atan2(event.clientY - petScreenY, event.clientX - petScreenX);
+    pet.pointerInside = true;
+
+    if (!pet.dragging || event.pointerId !== pet.pointerId) return;
+    const current = { ...point, screenX: event.screenX, screenY: event.screenY, time: now };
+    const velocity = pointerVelocity(current, pet.lastPointer);
+    pet.dragDistance += Math.hypot(velocity.dx, velocity.dy);
+    const direction = velocity.dx < 0 ? "left" : "right";
+    engine.setDragState(direction, velocity.speed, now);
+
+    if (isDesktop) {
+      globalThis.xiaodaiDesktop?.updateDrag?.({ screenX: event.screenX, screenY: event.screenY });
+    } else {
+      const dx = current.x - pet.lastPointer.x;
+      const dy = current.y - pet.lastPointer.y;
+      pet.x = core.clamp(pet.x + dx, pet.width / 2, canvas.width - pet.width / 2);
+      pet.y = core.clamp(pet.y + dy, pet.height / 2, canvas.height - pet.height / 2);
+    }
+    pet.lastPointer = current;
+  });
+
+  function finishDrag(event) {
+    if (!pet.dragging || event.pointerId !== pet.pointerId) return;
+    const wasClick = pet.dragDistance < 8;
+    pet.dragging = false;
+    pet.pointerId = null;
+    pet.lastPointer = null;
+    globalThis.xiaodaiDesktop?.endDrag?.();
+    engine.releaseDrag(performance.now());
+    if (wasClick) {
+      addAffection(1);
+      engine.trigger(affection % 4 === 0 ? "jump" : "wave", performance.now(), { reason: "pet" });
+      showReaction(affection % 4 === 0 ? "♡ 好開心" : "♡ 呼嚕");
+    }
+  }
+
+  canvas.addEventListener("pointerup", finishDrag);
+  canvas.addEventListener("pointercancel", finishDrag);
+  canvas.addEventListener("pointerleave", () => {
+    if (!pet.dragging) pet.pointerInside = false;
+  });
+  stage.addEventListener("pointermove", (event) => {
+    const rect = canvas.getBoundingClientRect();
+    pet.targetLookAngle = Math.atan2(event.clientY - (rect.top + rect.height / 2), event.clientX - (rect.left + rect.width / 2));
+    pet.pointerInside = true;
+  });
+  stage.addEventListener("pointerleave", () => {
+    if (!pet.dragging) pet.pointerInside = false;
+  });
+
+  document.querySelector("[data-action='pet']").addEventListener("click", () => {
+    addAffection(1);
+    engine.trigger("wave", performance.now(), { reason: "button:pet" });
+    showReaction("♡ 呼嚕呼嚕");
+  });
+  document.querySelector("[data-action='call']").addEventListener("click", () => {
+    engine.trigger("jump", performance.now(), { reason: "button:call" });
+    showReaction("喵？");
+  });
+  document.querySelector("[data-action='rest']").addEventListener("click", () => {
+    engine.trigger("lieDown", performance.now(), { reason: "button:rest" });
+    showReaction("好～休息一下");
+  });
+
+  function toggleSettings(force) {
+    const open = force ?? settingsPanel.hidden;
+    settingsPanel.hidden = !open;
+    settingsToggle.setAttribute("aria-expanded", String(open));
+    globalThis.xiaodaiDesktop?.setExpanded?.(open);
+  }
+
+  settingsToggle.addEventListener("click", () => toggleSettings());
+  settingsClose.addEventListener("click", () => toggleSettings(false));
+  closeCompanion.addEventListener("click", () => globalThis.xiaodaiDesktop?.close?.());
+
+  const inputs = {
+    idleMin: document.querySelector("#idle-min"),
+    idleMax: document.querySelector("#idle-max"),
+    look: document.querySelector("#look-smoothing"),
+    repeat: document.querySelector("#prevent-repeat"),
+    roam: document.querySelector("#desktop-roam"),
+  };
+
+  function syncInputs() {
+    inputs.idleMin.value = String(engine.config.idleDelay.minMs / 1000);
+    inputs.idleMax.value = String(engine.config.idleDelay.maxMs / 1000);
+    inputs.look.value = String(engine.config.lookSmoothing);
+    inputs.repeat.checked = engine.config.preventImmediateRepeat;
+    inputs.roam.checked = engine.config.desktop.roamEnabled;
+    document.querySelector("#idle-min-output").value = `${inputs.idleMin.value} 秒`;
+    document.querySelector("#idle-max-output").value = `${inputs.idleMax.value} 秒`;
+    document.querySelector("#look-output").value = Number(inputs.look.value).toFixed(2);
+    affectionLabel.textContent = `親密度 ${affection}`;
+  }
+
+  function readInputs() {
+    const minMs = Number(inputs.idleMin.value) * 1000;
+    const maxMs = Math.max(minMs + 500, Number(inputs.idleMax.value) * 1000);
+    engine.updateConfig({
+      idleDelay: { minMs, maxMs },
+      lookSmoothing: Number(inputs.look.value),
+      preventImmediateRepeat: inputs.repeat.checked,
+      desktop: { roamEnabled: inputs.roam.checked },
+    });
+    engine.scheduleNextIdle(performance.now());
+    saveSettings();
+    syncInputs();
+  }
+
+  Object.values(inputs).forEach((input) => input.addEventListener("input", readInputs));
+  document.querySelector("#reset-settings").addEventListener("click", () => {
+    localStorage.removeItem(STORAGE_KEY);
+    engine.config = core.deepMerge(core.DEFAULT_CONFIG, {});
+    engine.scheduleNextIdle(performance.now());
+    syncInputs();
+  });
+
+  function loadPet(petId) {
+    activePet = catalog.find((item) => item.id === petId) || catalog[0] || activePet;
+    localStorage.setItem(ACTIVE_PET_KEY, activePet.id);
+    document.documentElement.style.setProperty("--orange", activePet.accentColor || "#df8c43");
+    spriteReady = false;
+    if (activePet.spriteUrl) {
+      sprite.src = activePet.spriteUrl;
+      setStatus(`正在叫醒${activePet.name}…`);
+    } else {
+      sprite.removeAttribute("src");
+      setStatus(`${activePet.name}等待動畫圖檔`);
+    }
+  }
+
+  for (const item of catalog) {
+    const option = document.createElement("option");
+    option.value = item.id;
+    option.textContent = item.name;
+    petSelect.append(option);
+  }
+  petSelect.value = activePet.id;
+  petSelect.addEventListener("change", () => {
+    loadPet(petSelect.value);
+    engine.trigger("idle", performance.now(), { reason: "pet-change" });
+    showReaction(`${activePet.name}來了`);
+  });
+
+  function scheduleDesktopRoam(now) {
+    pet.nextRoamAt = now + core.randomBetween(
+      engine.config.desktop.roamMinDelayMs,
+      engine.config.desktop.roamMaxDelayMs,
+    );
+  }
+
+  async function maybeRoam(now) {
+    if (!isDesktop || !engine.config.desktop.roamEnabled || pet.dragging || !globalThis.xiaodaiDesktop?.roam) return;
+    if (!pet.nextRoamAt) scheduleDesktopRoam(now);
+    if (now < pet.nextRoamAt || now < pet.roamUntil || engine.current.name !== "idle") return;
+    const direction = Math.random() < 0.5 ? "left" : "right";
+    const distance = Math.round(core.randomBetween(90, 260));
+    const duration = Math.round(core.randomBetween(2400, 5200));
+    pet.roamUntil = now + duration;
+    engine.trigger(direction === "left" ? "walkLeft" : "walkRight", now, {
+      reason: "desktop-roam",
+      playbackRate: 0.72,
+    });
+    try {
+      await globalThis.xiaodaiDesktop.roam({ dx: direction === "left" ? -distance : distance, duration });
+    } finally {
+      engine.releaseDrag(performance.now());
+      scheduleDesktopRoam(performance.now());
+    }
+  }
+
+  sprite.addEventListener("load", () => {
+    spriteReady = true;
+    setStatus(`${activePet.name}醒來了`);
+  });
+  sprite.addEventListener("error", () => {
+    spriteReady = false;
+    setStatus(`${activePet.name}等待動畫圖檔`);
+  });
+
+  syncInputs();
+  scheduleDesktopRoam(performance.now());
+  loadPet(activePet.id);
+  requestAnimationFrame(render);
+})();
+

@@ -1,0 +1,11 @@
+{
+  "id": "xiaodai",
+  "name": "小呆",
+  "folder": "小呆",
+  "accentColor": "#df8c43",
+  "placeholderEmoji": "🐈",
+  "spriteSheet": "generated/sprite-sheet.png",
+  "previewGif": "generated/preview.gif",
+  "frame": { "width": 192, "height": 208, "columns": 8, "rows": 11 },
+  "animationProfile": "natural-v2"
+}

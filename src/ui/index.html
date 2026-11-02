@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="zh-Hant">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="color-scheme" content="light dark" />
+    <title>小呆 Companion</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <main class="companion-shell" aria-label="小呆 Companion">
+      <section class="pet-stage" id="pet-stage" aria-label="小呆的活動空間">
+        <div class="ambient ambient-one"></div>
+        <div class="ambient ambient-two"></div>
+        <div class="status-pill" id="status-pill" aria-live="polite">正在醒來…</div>
+        <canvas id="pet-canvas" width="576" height="624" aria-label="互動式橘色虎斑貓小呆"></canvas>
+        <div class="reaction" id="reaction" aria-live="polite"></div>
+        <div class="desktop-hint" id="desktop-hint">拖曳小呆移動・點一下摸摸牠</div>
+      </section>
+
+      <nav class="action-bar" aria-label="和小呆互動">
+        <label class="pet-picker">
+          <span class="sr-only">選擇寵物</span>
+          <select id="pet-select" aria-label="選擇寵物"></select>
+        </label>
+        <button type="button" data-action="pet">摸摸</button>
+        <button type="button" data-action="call">叫小呆</button>
+        <button type="button" data-action="rest">休息</button>
+        <button type="button" class="icon-button" id="settings-toggle" aria-label="打開設定" aria-expanded="false">⚙</button>
+        <button type="button" class="icon-button desktop-only" id="close-companion" aria-label="關閉小呆">×</button>
+      </nav>
+
+      <aside class="settings-panel" id="settings-panel" hidden>
+        <div class="settings-heading">
+          <div>
+            <p class="eyebrow">行為設定</p>
+            <h1>讓小呆按照你的節奏生活</h1>
+          </div>
+          <button type="button" class="icon-button" id="settings-close" aria-label="關閉設定">×</button>
+        </div>
+
+        <label>
+          <span>最短待機時間 <output id="idle-min-output"></output></span>
+          <input id="idle-min" type="range" min="1" max="20" step="0.5" />
+        </label>
+        <label>
+          <span>最長待機時間 <output id="idle-max-output"></output></span>
+          <input id="idle-max" type="range" min="3" max="45" step="0.5" />
+        </label>
+        <label>
+          <span>轉頭平滑度 <output id="look-output"></output></span>
+          <input id="look-smoothing" type="range" min="0.03" max="0.35" step="0.01" />
+        </label>
+        <label class="check-row">
+          <span>避免連續重複動作</span>
+          <input id="prevent-repeat" type="checkbox" />
+        </label>
+        <label class="check-row desktop-setting">
+          <span>允許在桌面偶爾漫步</span>
+          <input id="desktop-roam" type="checkbox" />
+        </label>
+
+        <div class="settings-footer">
+          <button type="button" id="reset-settings" class="secondary">恢復預設</button>
+          <span id="affection">親密度 0</span>
+        </div>
+      </aside>
+    </main>
+
+    <script src="../core/behavior-engine.js"></script>
+    <script src="./pet-catalog.generated.js"></script>
+    <script src="./app.js"></script>
+  </body>
+</html>
+

@@ -1,0 +1,37 @@
+{
+  "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
+  "name": "xiaodai-companion",
+  "version": "0.1.0",
+  "description": "Open an interactive Xiaodai companion with configurable natural idle actions and simple pet interactions.",
+  "author": {
+    "name": "Xiaodai Companion contributors"
+  },
+  "license": "MIT",
+  "keywords": [
+    "pet",
+    "companion",
+    "interactive",
+    "xiaodai"
+  ],
+  "extensions": {
+    "com.openai": {
+      "onboardingSkill": "./skills/xiaodai-companion/SKILL.md",
+      "interface": {
+        "displayName": "小呆 Companion",
+        "shortDescription": "陪你生活的互動小呆",
+        "longDescription": "在 ChatGPT 開啟互動式小呆面板，或啟動 Windows 透明桌面寵物；支援自然待機、隨機動作、拖曳、摸頭與可調整的動作節奏。",
+        "developerName": "Xiaodai Companion contributors",
+        "category": "Other",
+        "capabilities": [
+          "Interactive"
+        ],
+        "defaultPrompt": [
+          "打開小呆 Companion",
+          "讓小呆跟我打招呼",
+          "顯示小呆目前的設定"
+        ]
+      }
+    }
+  }
+}
+
