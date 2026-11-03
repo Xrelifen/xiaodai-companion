@@ -4,6 +4,7 @@ import test from "node:test";
 
 const motionUrl = new URL("../assets/pets/%E5%B0%8F%E5%91%86/generated/motions/sit-idle-v1/motion.json", import.meta.url);
 const lieMotionUrl = new URL("../assets/pets/%E5%B0%8F%E5%91%86/generated/motions/lie-idle-v1/motion.json", import.meta.url);
+const transitionMotionUrl = new URL("../assets/pets/%E5%B0%8F%E5%91%86/generated/motions/sit-to-lie-v1/motion.json", import.meta.url);
 
 function pngMetadata(buffer) {
   const signature = "89504e470d0a1a0a";
@@ -53,6 +54,24 @@ test("lying idle motion references valid transparent PNG frames", async () => {
     await access(url);
     const metadata = pngMetadata(await readFile(url));
     assert.deepEqual({ width: metadata.width, height: metadata.height }, motion.canvas);
+    assert.ok([4, 6].includes(metadata.colorType), `${file} must contain an alpha channel`);
+  }
+});
+
+test("sit-to-lie transition connects the approved endpoints with transparent frames", async () => {
+  const motion = JSON.parse(await readFile(transitionMotionUrl, "utf8"));
+  assert.equal(motion.intent, "transition");
+  assert.equal(motion.fromPose, "sit");
+  assert.equal(motion.toPose, "lie");
+  const files = motion.variants[0].frames.map((frame) => frame.file);
+  assert.match(files[0], /sit-idle-v1/);
+  assert.match(files.at(-1), /lie-idle-v1/);
+  assert.ok(files.length >= 4);
+  for (const file of files) {
+    const url = new URL(file, transitionMotionUrl);
+    await access(url);
+    const metadata = pngMetadata(await readFile(url));
+    assert.ok(metadata.width > 0 && metadata.height > 0);
     assert.ok([4, 6].includes(metadata.colorType), `${file} must contain an alpha channel`);
   }
 });

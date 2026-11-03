@@ -6,10 +6,12 @@ import { loadPetLibrary, serializeNaturalMotions } from "../scripts/pet-library.
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 
-test("Xiaodai exposes separate seated and lying natural motion packs", async () => {
+test("Xiaodai exposes seated, lying, and pose-transition motion packs", async () => {
   const pets = await loadPetLibrary(root);
   const xiaodai = pets.find((pet) => pet.id === "xiaodai");
   const motions = await serializeNaturalMotions(xiaodai, async (framePath) => framePath);
-  assert.deepEqual(motions.map((motion) => motion.fromPose), ["sit", "lie"]);
+  assert.deepEqual(motions.map((motion) => motion.fromPose), ["sit", "lie", "sit"]);
+  assert.equal(motions[2].intent, "transition");
+  assert.equal(motions[2].toPose, "lie");
   assert.ok(motions.every((motion) => motion.neutralFrameUrl));
 });

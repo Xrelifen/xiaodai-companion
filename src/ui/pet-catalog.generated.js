@@ -549,6 +549,55 @@ globalThis.XIAODAI_PET_CATALOG = [
             ]
           }
         ]
+      },
+      {
+        "schemaVersion": 1,
+        "id": "sit-to-lie-v1",
+        "petId": "xiaodai",
+        "intent": "transition",
+        "fromPose": "sit",
+        "toPose": "lie",
+        "canvas": {
+          "width": 1536,
+          "height": 1354
+        },
+        "identityBase": "../../concepts/identity-sit-v1.png",
+        "neutralFrame": "../sit-idle-v1/frames/frame-000-neutral.png",
+        "transitionMs": 170,
+        "interruptible": false,
+        "runtimeNotes": {
+          "reverse": "The same sequence is played in reverse for lie-to-sit so identity and timing stay consistent.",
+          "grounding": "Keep every frame bottom-aligned; use a short cross-fade because the source aspect ratios differ."
+        },
+        "neutralFrameUrl": "../../assets/pets/%E5%B0%8F%E5%91%86/generated/motions/sit-idle-v1/frames/frame-000-neutral.png",
+        "variants": [
+          {
+            "id": "sit-to-lie",
+            "weight": 1,
+            "frames": [
+              {
+                "file": "../sit-idle-v1/frames/frame-000-neutral.png",
+                "durationMs": 720,
+                "url": "../../assets/pets/%E5%B0%8F%E5%91%86/generated/motions/sit-idle-v1/frames/frame-000-neutral.png"
+              },
+              {
+                "file": "frames/frame-010-lean-forward.png",
+                "durationMs": 560,
+                "url": "../../assets/pets/%E5%B0%8F%E5%91%86/generated/motions/sit-to-lie-v1/frames/frame-010-lean-forward.png"
+              },
+              {
+                "file": "frames/frame-020-chest-lowered.png",
+                "durationMs": 760,
+                "url": "../../assets/pets/%E5%B0%8F%E5%91%86/generated/motions/sit-to-lie-v1/frames/frame-020-chest-lowered.png"
+              },
+              {
+                "file": "../lie-idle-v1/frames/frame-000-neutral.png",
+                "durationMs": 1440,
+                "url": "../../assets/pets/%E5%B0%8F%E5%91%86/generated/motions/lie-idle-v1/frames/frame-000-neutral.png"
+              }
+            ]
+          }
+        ]
       }
     ]
   },

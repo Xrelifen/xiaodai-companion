@@ -162,7 +162,64 @@
     }
   }
 
-  const api = { NaturalMotionPlayer, clamp, sampleDuration, weightedChoice };
+  class NaturalSequencePlayer {
+    constructor(motion, options = {}) {
+      this.rng = options.rng ?? Math.random;
+      this.motion = motion || null;
+      this.transitionMs = Math.max(0, Number(motion?.transitionMs) || 150);
+      const sourceFrames = motion?.variants?.[0]?.frames || [];
+      const orderedFrames = options.reverse ? [...sourceFrames].reverse() : sourceFrames;
+      this.frames = orderedFrames.map((frame) => ({
+        ...frame,
+        sampledDurationMs: Math.max(1, sampleDuration(frame.durationMs, this.rng)),
+      }));
+      this.frameIndex = 0;
+      this.currentUrl = this.frames[0]?.url || motion?.neutralFrameUrl || null;
+      this.previousUrl = null;
+      this.transitionStartedAt = options.now ?? 0;
+      this.frameEndsAt = (options.now ?? 0) + (this.frames[0]?.sampledDurationMs || 1);
+      this.complete = this.frames.length === 0;
+    }
+
+    enterFrame(index, now) {
+      const frame = this.frames[index];
+      const nextUrl = frame?.url || this.currentUrl;
+      if (nextUrl && nextUrl !== this.currentUrl) {
+        this.previousUrl = this.currentUrl;
+        this.currentUrl = nextUrl;
+        this.transitionStartedAt = now;
+      }
+      this.frameIndex = index;
+      this.frameEndsAt = now + (frame?.sampledDurationMs || 1);
+    }
+
+    tick(now) {
+      let safety = 0;
+      while (!this.complete && now >= this.frameEndsAt && safety < 32) {
+        safety += 1;
+        const nextIndex = this.frameIndex + 1;
+        if (nextIndex >= this.frames.length) {
+          this.complete = true;
+          break;
+        }
+        this.enterFrame(nextIndex, this.frameEndsAt);
+      }
+      const blend = this.previousUrl
+        ? clamp((now - this.transitionStartedAt) / Math.max(1, this.transitionMs), 0, 1)
+        : 1;
+      if (blend >= 1) this.previousUrl = null;
+      return {
+        url: this.currentUrl,
+        previousUrl: this.previousUrl,
+        blend,
+        frameIndex: this.frameIndex,
+        breathScale: 1,
+        complete: this.complete,
+      };
+    }
+  }
+
+  const api = { NaturalMotionPlayer, NaturalSequencePlayer, clamp, sampleDuration, weightedChoice };
   global.XiaodaiMotion = api;
   if (typeof module !== "undefined" && module.exports) module.exports = api;
 })(typeof globalThis !== "undefined" ? globalThis : window);

@@ -8,7 +8,8 @@
   "previewGif": "generated/preview.gif",
   "naturalMotions": [
     "generated/motions/sit-idle-v1/motion.json",
-    "generated/motions/lie-idle-v1/motion.json"
+    "generated/motions/lie-idle-v1/motion.json",
+    "generated/motions/sit-to-lie-v1/motion.json"
   ],
   "frame": { "width": 192, "height": 208, "columns": 8, "rows": 11 },
   "animationProfile": "natural-v2"

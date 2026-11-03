@@ -61,6 +61,9 @@
   let naturalMotionReady = false;
   let naturalLoadToken = 0;
   const naturalMotionByPose = new Map();
+  const naturalTransitionByKey = new Map();
+  let naturalTransitionPlayer = null;
+  let lastEngineSequence = engine.current.name;
   let naturalPose = "sit";
   let naturalPoseUntil = 0;
 
@@ -216,10 +219,23 @@
         engine.scheduleNextIdle(now);
       }
     }
+    if (engine.current.name !== lastEngineSequence) {
+      if (engine.current.name === "lieDown") {
+        activateNaturalTransition("sit", "lie", false, now);
+      } else if (engine.current.name === "getUp") {
+        activateNaturalTransition("sit", "lie", true, now);
+      } else {
+        naturalTransitionPlayer = null;
+      }
+      lastEngineSequence = engine.current.name;
+    }
     const lookFrame = currentLookFrame(now);
     let naturalState = null;
     let drewNaturalFrame = false;
-    if (engine.current.name === "idle" && naturalMotionReady && naturalMotionPlayer) {
+    if (naturalMotionReady && naturalTransitionPlayer && ["lieDown", "getUp"].includes(engine.current.name)) {
+      naturalState = naturalTransitionPlayer.tick(now);
+      drewNaturalFrame = drawNaturalFrame(naturalState);
+    } else if (engine.current.name === "idle" && naturalMotionReady && naturalMotionPlayer) {
       naturalState = naturalMotionPlayer.tick(now, { enabled: true });
       drewNaturalFrame = drawNaturalFrame(naturalState);
     } else if (naturalMotionPlayer) {
@@ -389,13 +405,29 @@
       : null;
   }
 
+  function transitionKey(fromPose, toPose) {
+    return `${fromPose}->${toPose}`;
+  }
+
+  function activateNaturalTransition(fromPose, toPose, reverse, now = performance.now()) {
+    const motion = naturalTransitionByKey.get(transitionKey(fromPose, toPose));
+    naturalTransitionPlayer = motion && motionCore?.NaturalSequencePlayer
+      ? new motionCore.NaturalSequencePlayer(motion, { now, reverse })
+      : null;
+  }
+
   function prepareNaturalMotions(motions) {
     const token = ++naturalLoadToken;
     naturalImages.clear();
     naturalMotionByPose.clear();
+    naturalTransitionByKey.clear();
     naturalMotionReady = false;
     for (const motion of motions || []) {
-      if (motion?.fromPose) naturalMotionByPose.set(motion.fromPose, motion);
+      if (motion?.intent === "transition" && motion?.fromPose && motion?.toPose) {
+        naturalTransitionByKey.set(transitionKey(motion.fromPose, motion.toPose), motion);
+      } else if (motion?.fromPose) {
+        naturalMotionByPose.set(motion.fromPose, motion);
+      }
     }
     activateNaturalPose("sit");
     if (!naturalMotionPlayer) return;

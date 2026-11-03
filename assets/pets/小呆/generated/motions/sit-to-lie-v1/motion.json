@@ -1,0 +1,29 @@
+{
+  "schemaVersion": 1,
+  "id": "sit-to-lie-v1",
+  "petId": "xiaodai",
+  "intent": "transition",
+  "fromPose": "sit",
+  "toPose": "lie",
+  "canvas": { "width": 1536, "height": 1354 },
+  "identityBase": "../../concepts/identity-sit-v1.png",
+  "neutralFrame": "../sit-idle-v1/frames/frame-000-neutral.png",
+  "transitionMs": 170,
+  "interruptible": false,
+  "variants": [
+    {
+      "id": "sit-to-lie",
+      "weight": 1,
+      "frames": [
+        { "file": "../sit-idle-v1/frames/frame-000-neutral.png", "durationMs": 720 },
+        { "file": "frames/frame-010-lean-forward.png", "durationMs": 560 },
+        { "file": "frames/frame-020-chest-lowered.png", "durationMs": 760 },
+        { "file": "../lie-idle-v1/frames/frame-000-neutral.png", "durationMs": 1440 }
+      ]
+    }
+  ],
+  "runtimeNotes": {
+    "reverse": "The same sequence is played in reverse for lie-to-sit so identity and timing stay consistent.",
+    "grounding": "Keep every frame bottom-aligned; use a short cross-fade because the source aspect ratios differ."
+  }
+}
