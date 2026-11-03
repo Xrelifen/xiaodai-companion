@@ -219,7 +219,70 @@
     }
   }
 
-  const api = { NaturalMotionPlayer, NaturalSequencePlayer, clamp, sampleDuration, weightedChoice };
+  class NaturalCyclePlayer {
+    constructor(motion, options = {}) {
+      this.rng = options.rng ?? Math.random;
+      this.motion = motion || null;
+      this.transitionMs = Math.max(0, Number(motion?.transitionMs) || 70);
+      this.frames = (motion?.variants?.[0]?.frames || []).map((frame) => ({
+        ...frame,
+        sampledDurationMs: Math.max(1, sampleDuration(frame.durationMs, this.rng)),
+      }));
+      this.totalDurationMs = this.frames.reduce((sum, frame) => sum + frame.sampledDurationMs, 0);
+      this.frameIndex = 0;
+      this.currentUrl = this.frames[0]?.url || motion?.neutralFrameUrl || null;
+      this.previousUrl = options.previousUrl || null;
+      this.transitionStartedAt = options.now ?? 0;
+      this.phaseMs = 0;
+      this.lastTickAt = options.now ?? 0;
+    }
+
+    frameAtPhase() {
+      if (!this.frames.length || this.totalDurationMs <= 0) return { frame: null, index: 0 };
+      let cursor = this.phaseMs % this.totalDurationMs;
+      for (let index = 0; index < this.frames.length; index += 1) {
+        const frame = this.frames[index];
+        if (cursor < frame.sampledDurationMs) return { frame, index };
+        cursor -= frame.sampledDurationMs;
+      }
+      return { frame: this.frames.at(-1), index: this.frames.length - 1 };
+    }
+
+    tick(now, options = {}) {
+      const playbackRate = clamp(Number(options.playbackRate) || 1, 0.2, 3);
+      const elapsed = Math.max(0, now - this.lastTickAt);
+      this.lastTickAt = now;
+      this.phaseMs += elapsed * playbackRate;
+      const { frame, index } = this.frameAtPhase();
+      const nextUrl = frame?.url || this.currentUrl;
+      if (nextUrl && nextUrl !== this.currentUrl) {
+        this.previousUrl = this.currentUrl;
+        this.currentUrl = nextUrl;
+        this.transitionStartedAt = now;
+      }
+      this.frameIndex = index;
+      const blend = this.previousUrl
+        ? clamp((now - this.transitionStartedAt) / Math.max(1, this.transitionMs), 0, 1)
+        : 1;
+      if (blend >= 1) this.previousUrl = null;
+      return {
+        url: this.currentUrl,
+        previousUrl: this.previousUrl,
+        blend,
+        frameIndex: this.frameIndex,
+        breathScale: 1,
+      };
+    }
+  }
+
+  const api = {
+    NaturalMotionPlayer,
+    NaturalSequencePlayer,
+    NaturalCyclePlayer,
+    clamp,
+    sampleDuration,
+    weightedChoice,
+  };
   global.XiaodaiMotion = api;
   if (typeof module !== "undefined" && module.exports) module.exports = api;
 })(typeof globalThis !== "undefined" ? globalThis : window);

@@ -8,6 +8,7 @@
     drag: {
       walkThreshold: 80,
       runThreshold: 350,
+      runExitThreshold: 280,
       maximumPlaybackRate: 1.8,
     },
     desktop: {
@@ -156,6 +157,7 @@
       this.cooldowns = new Map();
       this.nextIdleActionAt = 0;
       this.history = [];
+      this.dragGait = "walk";
       this.scheduleNextIdle(options.now ?? 0);
     }
 
@@ -235,7 +237,14 @@
 
     setDragState(direction, speed, now) {
       const { walkThreshold, runThreshold, maximumPlaybackRate } = this.config.drag;
+      const runExitThreshold = Math.min(
+        runThreshold,
+        Number(this.config.drag.runExitThreshold) || runThreshold * 0.8,
+      );
       const normalizedSpeed = Math.max(0, speed);
+      this.dragGait = this.dragGait === "run"
+        ? (normalizedSpeed < runExitThreshold ? "walk" : "run")
+        : (normalizedSpeed >= runThreshold ? "run" : "walk");
       const playbackRate = normalizedSpeed < walkThreshold
         ? 0.65
         : clamp(0.78 + normalizedSpeed / Math.max(1, runThreshold) * 0.55, 0.78, maximumPlaybackRate);
@@ -245,10 +254,11 @@
       } else {
         this.current.playbackRate = playbackRate;
       }
-      return { name, playbackRate, gait: normalizedSpeed >= runThreshold ? "run" : "walk" };
+      return { name, playbackRate, gait: this.dragGait };
     }
 
     releaseDrag(now) {
+      this.dragGait = "walk";
       this.trigger("idle", now, { reason: "drag-release" });
       this.scheduleNextIdle(now);
     }

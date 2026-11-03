@@ -2,7 +2,12 @@ import assert from "node:assert/strict";
 import test from "node:test";
 
 await import("../src/core/natural-motion-player.js");
-const { NaturalMotionPlayer, NaturalSequencePlayer, sampleDuration } = globalThis.XiaodaiMotion;
+const {
+  NaturalMotionPlayer,
+  NaturalSequencePlayer,
+  NaturalCyclePlayer,
+  sampleDuration,
+} = globalThis.XiaodaiMotion;
 
 function fixture() {
   return {
@@ -58,4 +63,20 @@ test("pose transitions can play forward and reverse with the same frames", () =>
   const reverse = new NaturalSequencePlayer(motion, { now: 0, reverse: true });
   assert.equal(reverse.tick(0).url, "lie.png");
   assert.equal(reverse.tick(21).url, "sit.png");
+});
+
+test("locomotion cycles preserve phase while playback speed changes", () => {
+  const motion = {
+    transitionMs: 20,
+    variants: [{
+      frames: [
+        { url: "a.png", durationMs: 100 },
+        { url: "b.png", durationMs: 100 },
+      ],
+    }],
+  };
+  const player = new NaturalCyclePlayer(motion, { now: 0 });
+  assert.equal(player.tick(50, { playbackRate: 1 }).url, "a.png");
+  assert.equal(player.tick(80, { playbackRate: 2 }).url, "b.png");
+  assert.equal(player.tick(130, { playbackRate: 2 }).url, "a.png");
 });

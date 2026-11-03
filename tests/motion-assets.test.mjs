@@ -5,6 +5,8 @@ import test from "node:test";
 const motionUrl = new URL("../assets/pets/%E5%B0%8F%E5%91%86/generated/motions/sit-idle-v1/motion.json", import.meta.url);
 const lieMotionUrl = new URL("../assets/pets/%E5%B0%8F%E5%91%86/generated/motions/lie-idle-v1/motion.json", import.meta.url);
 const transitionMotionUrl = new URL("../assets/pets/%E5%B0%8F%E5%91%86/generated/motions/sit-to-lie-v1/motion.json", import.meta.url);
+const walkMotionUrl = new URL("../assets/pets/%E5%B0%8F%E5%91%86/generated/motions/walk-cycle-v1/motion.json", import.meta.url);
+const runMotionUrl = new URL("../assets/pets/%E5%B0%8F%E5%91%86/generated/motions/run-cycle-v1/motion.json", import.meta.url);
 
 function pngMetadata(buffer) {
   const signature = "89504e470d0a1a0a";
@@ -75,3 +77,21 @@ test("sit-to-lie transition connects the approved endpoints with transparent fra
     assert.ok([4, 6].includes(metadata.colorType), `${file} must contain an alpha channel`);
   }
 });
+
+for (const [gait, motionUrl] of [["walk", walkMotionUrl], ["run", runMotionUrl]]) {
+  test(`${gait} locomotion cycle has four consistent transparent frames`, async () => {
+    const motion = JSON.parse(await readFile(motionUrl, "utf8"));
+    assert.equal(motion.intent, "locomotion");
+    assert.equal(motion.gait, gait);
+    assert.equal(motion.facing, "left");
+    const files = motion.variants[0].frames.map((frame) => frame.file);
+    assert.equal(files.length, 4);
+    for (const file of files) {
+      const url = new URL(file, motionUrl);
+      await access(url);
+      const metadata = pngMetadata(await readFile(url));
+      assert.deepEqual({ width: metadata.width, height: metadata.height }, motion.canvas);
+      assert.ok([4, 6].includes(metadata.colorType), `${file} must contain an alpha channel`);
+    }
+  });
+}

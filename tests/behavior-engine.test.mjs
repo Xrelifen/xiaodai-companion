@@ -22,6 +22,8 @@ test("drag speed selects walking or running playback", () => {
   const engine = new BehaviorEngine({ now: 0 });
   assert.equal(engine.setDragState("right", 120, 10).gait, "walk");
   assert.equal(engine.setDragState("left", 600, 20).gait, "run");
+  assert.equal(engine.setDragState("left", 330, 30).gait, "run");
+  assert.equal(engine.setDragState("left", 250, 40).gait, "walk");
   assert.equal(engine.current.name, "walkLeft");
 });
 

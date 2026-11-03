@@ -9,7 +9,9 @@
   "naturalMotions": [
     "generated/motions/sit-idle-v1/motion.json",
     "generated/motions/lie-idle-v1/motion.json",
-    "generated/motions/sit-to-lie-v1/motion.json"
+    "generated/motions/sit-to-lie-v1/motion.json",
+    "generated/motions/walk-cycle-v1/motion.json",
+    "generated/motions/run-cycle-v1/motion.json"
   ],
   "frame": { "width": 192, "height": 208, "columns": 8, "rows": 11 },
   "animationProfile": "natural-v2"

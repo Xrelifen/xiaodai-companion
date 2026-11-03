@@ -62,7 +62,12 @@
   let naturalLoadToken = 0;
   const naturalMotionByPose = new Map();
   const naturalTransitionByKey = new Map();
+  const naturalLocomotionByGait = new Map();
   let naturalTransitionPlayer = null;
+  let naturalLocomotionPlayer = null;
+  let activeNaturalGait = null;
+  let lastDrawnNaturalUrl = null;
+  let lastDrawnNaturalMirror = false;
   let lastEngineSequence = engine.current.name;
   let naturalPose = "sit";
   let naturalPoseUntil = 0;
@@ -82,6 +87,7 @@
     lastInteractionAt: performance.now(),
     nextRoamAt: 0,
     roamUntil: 0,
+    gait: "walk",
   };
 
   const actionLabels = {
@@ -149,7 +155,7 @@
     context.drawImage(sprite, sourceX, sourceY, frameWidth, frameHeight, drawX, drawY, drawWidth, drawHeight);
   }
 
-  function drawNaturalLayer(image, alpha, breathScale) {
+  function drawNaturalLayer(image, alpha, breathScale, mirror = false) {
     if (!image?.complete || !image.naturalWidth || alpha <= 0) return;
     const scale = Math.min(pet.width / image.naturalWidth, pet.height / image.naturalHeight);
     const drawWidth = image.naturalWidth * scale;
@@ -160,7 +166,13 @@
     const drawY = groundY - drawHeight;
     context.save();
     context.globalAlpha = alpha;
-    context.drawImage(image, drawX, drawY, drawWidth, drawHeight);
+    if (mirror) {
+      context.translate(drawX + drawWidth / 2, 0);
+      context.scale(-1, 1);
+      context.drawImage(image, -drawWidth / 2, drawY, drawWidth, drawHeight);
+    } else {
+      context.drawImage(image, drawX, drawY, drawWidth, drawHeight);
+    }
     context.restore();
   }
 
@@ -169,8 +181,10 @@
     if (!current) return false;
     context.clearRect(0, 0, canvas.width, canvas.height);
     const previous = naturalImages.get(state.previousUrl);
-    if (previous) drawNaturalLayer(previous, 1 - state.blend, state.breathScale);
-    drawNaturalLayer(current, previous ? state.blend : 1, state.breathScale);
+    if (previous) drawNaturalLayer(previous, 1 - state.blend, state.breathScale, state.mirror);
+    drawNaturalLayer(current, previous ? state.blend : 1, state.breathScale, state.mirror);
+    lastDrawnNaturalUrl = state.url;
+    lastDrawnNaturalMirror = Boolean(state.mirror);
     return true;
   }
 
@@ -220,19 +234,41 @@
       }
     }
     if (engine.current.name !== lastEngineSequence) {
+      const previousEngineSequence = lastEngineSequence;
       if (engine.current.name === "lieDown") {
         activateNaturalTransition("sit", "lie", false, now);
       } else if (engine.current.name === "getUp") {
         activateNaturalTransition("sit", "lie", true, now);
+      } else if (engine.current.name === "idle" && ["walkLeft", "walkRight"].includes(previousEngineSequence)) {
+        activateNaturalPose("sit", now);
+        if (naturalMotionPlayer && lastDrawnNaturalUrl && !lastDrawnNaturalMirror) {
+          naturalMotionPlayer.previousUrl = lastDrawnNaturalUrl;
+          naturalMotionPlayer.transitionStartedAt = now;
+        }
       } else {
         naturalTransitionPlayer = null;
       }
       lastEngineSequence = engine.current.name;
     }
+    const locomotionDirection = engine.current.name === "walkLeft"
+      ? "left"
+      : (engine.current.name === "walkRight" ? "right" : null);
+    if (locomotionDirection) {
+      if (!naturalLocomotionPlayer || activeNaturalGait !== pet.gait) {
+        activateNaturalLocomotion(pet.gait, now);
+      }
+    } else {
+      naturalLocomotionPlayer = null;
+      activeNaturalGait = null;
+    }
     const lookFrame = currentLookFrame(now);
     let naturalState = null;
     let drewNaturalFrame = false;
-    if (naturalMotionReady && naturalTransitionPlayer && ["lieDown", "getUp"].includes(engine.current.name)) {
+    if (naturalMotionReady && naturalLocomotionPlayer && locomotionDirection) {
+      naturalState = naturalLocomotionPlayer.tick(now, { playbackRate: engine.current.playbackRate });
+      naturalState.mirror = locomotionDirection === "right";
+      drewNaturalFrame = drawNaturalFrame(naturalState);
+    } else if (naturalMotionReady && naturalTransitionPlayer && ["lieDown", "getUp"].includes(engine.current.name)) {
       naturalState = naturalTransitionPlayer.tick(now);
       drewNaturalFrame = drawNaturalFrame(naturalState);
     } else if (engine.current.name === "idle" && naturalMotionReady && naturalMotionPlayer) {
@@ -288,7 +324,8 @@
     const velocity = pointerVelocity(current, pet.lastPointer);
     pet.dragDistance += Math.hypot(velocity.dx, velocity.dy);
     const direction = velocity.dx < 0 ? "left" : "right";
-    engine.setDragState(direction, velocity.speed, now);
+    const dragState = engine.setDragState(direction, velocity.speed, now);
+    pet.gait = dragState.gait;
 
     if (isDesktop) {
       globalThis.xiaodaiDesktop?.updateDrag?.({ screenX: event.screenX, screenY: event.screenY });
@@ -309,6 +346,7 @@
     pet.lastPointer = null;
     globalThis.xiaodaiDesktop?.endDrag?.();
     engine.releaseDrag(performance.now());
+    pet.gait = "walk";
     if (wasClick) {
       addAffection(1);
       engine.trigger(affection % 4 === 0 ? "jump" : "wave", performance.now(), { reason: "pet" });
@@ -416,15 +454,31 @@
       : null;
   }
 
+  function activateNaturalLocomotion(gait, now = performance.now()) {
+    const motion = naturalLocomotionByGait.get(gait) || naturalLocomotionByGait.get("walk");
+    activeNaturalGait = motion?.gait || gait;
+    naturalLocomotionPlayer = motion && motionCore?.NaturalCyclePlayer
+      ? new motionCore.NaturalCyclePlayer(motion, {
+        now,
+        previousUrl: lastDrawnNaturalUrl || naturalMotionPlayer?.currentUrl || null,
+      })
+      : null;
+  }
+
   function prepareNaturalMotions(motions) {
     const token = ++naturalLoadToken;
     naturalImages.clear();
+    lastDrawnNaturalUrl = null;
+    lastDrawnNaturalMirror = false;
     naturalMotionByPose.clear();
     naturalTransitionByKey.clear();
+    naturalLocomotionByGait.clear();
     naturalMotionReady = false;
     for (const motion of motions || []) {
       if (motion?.intent === "transition" && motion?.fromPose && motion?.toPose) {
         naturalTransitionByKey.set(transitionKey(motion.fromPose, motion.toPose), motion);
+      } else if (motion?.intent === "locomotion" && motion?.gait) {
+        naturalLocomotionByGait.set(motion.gait, motion);
       } else if (motion?.fromPose) {
         naturalMotionByPose.set(motion.fromPose, motion);
       }
@@ -497,6 +551,7 @@
     const distance = Math.round(core.randomBetween(90, 260));
     const duration = Math.round(core.randomBetween(2400, 5200));
     pet.roamUntil = now + duration;
+    pet.gait = "walk";
     engine.trigger(direction === "left" ? "walkLeft" : "walkRight", now, {
       reason: "desktop-roam",
       playbackRate: 0.72,

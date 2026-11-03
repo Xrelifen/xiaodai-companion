@@ -1,0 +1,31 @@
+{
+  "schemaVersion": 1,
+  "id": "walk-cycle-v1",
+  "petId": "xiaodai",
+  "intent": "locomotion",
+  "gait": "walk",
+  "fromPose": "stand",
+  "toPose": "stand",
+  "facing": "left",
+  "canvas": { "width": 1536, "height": 1024 },
+  "identityBase": "../../concepts/identity-stand-profile-v1.png",
+  "neutralFrame": "frames/frame-000-contact.png",
+  "transitionMs": 72,
+  "interruptible": true,
+  "variants": [
+    {
+      "id": "natural-walk",
+      "weight": 1,
+      "frames": [
+        { "file": "frames/frame-000-contact.png", "durationMs": 180 },
+        { "file": "frames/frame-010-down.png", "durationMs": 150 },
+        { "file": "frames/frame-020-opposite-contact.png", "durationMs": 180 },
+        { "file": "frames/frame-030-up.png", "durationMs": 150 }
+      ]
+    }
+  ],
+  "runtimeNotes": {
+    "direction": "Source frames face left; mirror the rendered canvas for rightward travel.",
+    "speed": "Scale the cycle with smoothed drag velocity; do not exceed the configured playback-rate cap."
+  }
+}

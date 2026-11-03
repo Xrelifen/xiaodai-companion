@@ -598,6 +598,108 @@ globalThis.XIAODAI_PET_CATALOG = [
             ]
           }
         ]
+      },
+      {
+        "schemaVersion": 1,
+        "id": "walk-cycle-v1",
+        "petId": "xiaodai",
+        "intent": "locomotion",
+        "gait": "walk",
+        "fromPose": "stand",
+        "toPose": "stand",
+        "facing": "left",
+        "canvas": {
+          "width": 1536,
+          "height": 1024
+        },
+        "identityBase": "../../concepts/identity-stand-profile-v1.png",
+        "neutralFrame": "frames/frame-000-contact.png",
+        "transitionMs": 72,
+        "interruptible": true,
+        "runtimeNotes": {
+          "direction": "Source frames face left; mirror the rendered canvas for rightward travel.",
+          "speed": "Scale the cycle with smoothed drag velocity; do not exceed the configured playback-rate cap."
+        },
+        "neutralFrameUrl": "../../assets/pets/%E5%B0%8F%E5%91%86/generated/motions/walk-cycle-v1/frames/frame-000-contact.png",
+        "variants": [
+          {
+            "id": "natural-walk",
+            "weight": 1,
+            "frames": [
+              {
+                "file": "frames/frame-000-contact.png",
+                "durationMs": 180,
+                "url": "../../assets/pets/%E5%B0%8F%E5%91%86/generated/motions/walk-cycle-v1/frames/frame-000-contact.png"
+              },
+              {
+                "file": "frames/frame-010-down.png",
+                "durationMs": 150,
+                "url": "../../assets/pets/%E5%B0%8F%E5%91%86/generated/motions/walk-cycle-v1/frames/frame-010-down.png"
+              },
+              {
+                "file": "frames/frame-020-opposite-contact.png",
+                "durationMs": 180,
+                "url": "../../assets/pets/%E5%B0%8F%E5%91%86/generated/motions/walk-cycle-v1/frames/frame-020-opposite-contact.png"
+              },
+              {
+                "file": "frames/frame-030-up.png",
+                "durationMs": 150,
+                "url": "../../assets/pets/%E5%B0%8F%E5%91%86/generated/motions/walk-cycle-v1/frames/frame-030-up.png"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "schemaVersion": 1,
+        "id": "run-cycle-v1",
+        "petId": "xiaodai",
+        "intent": "locomotion",
+        "gait": "run",
+        "fromPose": "stand",
+        "toPose": "stand",
+        "facing": "left",
+        "canvas": {
+          "width": 1536,
+          "height": 1024
+        },
+        "identityBase": "../../concepts/identity-stand-profile-v1.png",
+        "neutralFrame": "frames/frame-000-extension.png",
+        "transitionMs": 58,
+        "interruptible": true,
+        "runtimeNotes": {
+          "direction": "Source frames face left; mirror the rendered canvas for rightward travel.",
+          "gaitSwitch": "Enter at runThreshold and exit below runExitThreshold to prevent flicker near the boundary."
+        },
+        "neutralFrameUrl": "../../assets/pets/%E5%B0%8F%E5%91%86/generated/motions/run-cycle-v1/frames/frame-000-extension.png",
+        "variants": [
+          {
+            "id": "natural-run",
+            "weight": 1,
+            "frames": [
+              {
+                "file": "frames/frame-000-extension.png",
+                "durationMs": 110,
+                "url": "../../assets/pets/%E5%B0%8F%E5%91%86/generated/motions/run-cycle-v1/frames/frame-000-extension.png"
+              },
+              {
+                "file": "frames/frame-010-front-landing.png",
+                "durationMs": 90,
+                "url": "../../assets/pets/%E5%B0%8F%E5%91%86/generated/motions/run-cycle-v1/frames/frame-010-front-landing.png"
+              },
+              {
+                "file": "frames/frame-020-gathered.png",
+                "durationMs": 105,
+                "url": "../../assets/pets/%E5%B0%8F%E5%91%86/generated/motions/run-cycle-v1/frames/frame-020-gathered.png"
+              },
+              {
+                "file": "frames/frame-030-propulsion.png",
+                "durationMs": 95,
+                "url": "../../assets/pets/%E5%B0%8F%E5%91%86/generated/motions/run-cycle-v1/frames/frame-030-propulsion.png"
+              }
+            ]
+          }
+        ]
       }
     ]
   },
