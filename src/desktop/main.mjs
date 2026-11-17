@@ -11,6 +11,7 @@ let companionWindow;
 let dragState = null;
 let dragTimer = null;
 let roamTimer = null;
+let expanded = false;
 
 function clamp(value, min, max) {
   return Math.min(max, Math.max(min, value));
@@ -25,6 +26,17 @@ function clampToDisplay(bounds, x, y) {
   };
 }
 
+function intendedSize() {
+  return expanded ? expandedSize : compactSize;
+}
+
+function moveWithFixedSize(x, y) {
+  if (!companionWindow) return;
+  const size = intendedSize();
+  const position = clampToDisplay(size, x, y);
+  companionWindow.setBounds({ ...position, ...size }, false);
+}
+
 function stopRoam() {
   if (roamTimer) clearInterval(roamTimer);
   roamTimer = null;
@@ -37,6 +49,7 @@ function stopDrag() {
 }
 
 function createWindow() {
+  expanded = false;
   companionWindow = new BrowserWindow({
     ...compactSize,
     transparent: true,
@@ -62,7 +75,11 @@ function createWindow() {
   companionWindow.loadFile(path.join(here, "..", "ui", "index.html"), {
     query: { mode: "desktop" },
   });
-  companionWindow.once("ready-to-show", () => companionWindow.show());
+  companionWindow.once("ready-to-show", () => {
+    const [x, y] = companionWindow.getPosition();
+    moveWithFixedSize(x, y);
+    companionWindow.show();
+  });
   companionWindow.on("closed", () => {
     stopDrag();
     stopRoam();
@@ -75,8 +92,9 @@ ipcMain.on("xiaodai:drag-start", () => {
   stopRoam();
   stopDrag();
   const now = Date.now();
+  const [x, y] = companionWindow.getPosition();
   dragState = createNativeDragState(
-    companionWindow.getBounds(),
+    { x, y, ...intendedSize() },
     screen.getCursorScreenPoint(),
     now,
   );
@@ -86,11 +104,8 @@ ipcMain.on("xiaodai:drag-start", () => {
       return;
     }
     const sample = sampleNativeDrag(dragState, screen.getCursorScreenPoint(), Date.now());
-    const next = clampToDisplay(dragState.bounds, sample.x, sample.y);
-    const [currentX, currentY] = companionWindow.getPosition();
-    if (next.x !== currentX || next.y !== currentY) {
-      companionWindow.setPosition(next.x, next.y, false);
-    }
+    const next = clampToDisplay(intendedSize(), sample.x, sample.y);
+    moveWithFixedSize(next.x, next.y);
     companionWindow.webContents.send("xiaodai:drag-sample", {
       ...sample,
       x: next.x,
@@ -101,13 +116,19 @@ ipcMain.on("xiaodai:drag-start", () => {
 
 ipcMain.on("xiaodai:drag-end", () => {
   stopDrag();
+  if (companionWindow) {
+    const [x, y] = companionWindow.getPosition();
+    moveWithFixedSize(x, y);
+  }
 });
 
-ipcMain.on("xiaodai:set-expanded", (_event, expanded) => {
+ipcMain.on("xiaodai:set-expanded", (_event, shouldExpand) => {
   if (!companionWindow) return;
-  const current = companionWindow.getBounds();
-  const target = expanded ? expandedSize : compactSize;
-  const next = clampToDisplay(target, current.x, current.y + current.height - target.height);
+  const [x, y] = companionWindow.getPosition();
+  const previousHeight = intendedSize().height;
+  expanded = Boolean(shouldExpand);
+  const target = intendedSize();
+  const next = clampToDisplay(target, x, y + previousHeight - target.height);
   companionWindow.setBounds({ ...next, ...target }, true);
 });
 
@@ -116,7 +137,8 @@ ipcMain.on("xiaodai:close", () => companionWindow?.close());
 ipcMain.handle("xiaodai:roam", async (_event, request = {}) => {
   if (!companionWindow) return false;
   stopRoam();
-  const start = companionWindow.getBounds();
+  const [x, y] = companionWindow.getPosition();
+  const start = { x, y, ...intendedSize() };
   const targetPoint = clampToDisplay(start, start.x + Number(request.dx || 0), start.y);
   const duration = clamp(Number(request.duration || 3000), 500, 12000);
   const startedAt = Date.now();
@@ -132,10 +154,9 @@ ipcMain.handle("xiaodai:roam", async (_event, request = {}) => {
       const eased = progress < 0.5
         ? 2 * progress * progress
         : 1 - Math.pow(-2 * progress + 2, 2) / 2;
-      companionWindow.setPosition(
+      moveWithFixedSize(
         Math.round(start.x + (targetPoint.x - start.x) * eased),
         start.y,
-        false,
       );
       if (progress >= 1) {
         stopRoam();
@@ -148,7 +169,8 @@ ipcMain.handle("xiaodai:roam", async (_event, request = {}) => {
 
 ipcMain.handle("xiaodai:plan-roam", (_event, request = {}) => {
   if (!companionWindow) return { direction: null, dx: 0, distance: 0, duration: 0 };
-  const bounds = companionWindow.getBounds();
+  const [x, y] = companionWindow.getPosition();
+  const bounds = { x, y, ...intendedSize() };
   const area = screen.getDisplayNearestPoint({ x: bounds.x, y: bounds.y }).workArea;
   return planRoam(bounds, area, request);
 });
