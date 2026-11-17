@@ -8,13 +8,13 @@
   "toPose": "stand",
   "facing": "left",
   "canvas": {
-    "width": 1536,
-    "height": 1024
+    "width": 1280,
+    "height": 1354
   },
   "identityBase": "../../concepts/identity-stand-profile-v1.png",
   "neutralFrame": "frames/frame-000-contact.webp",
   "displayScale": 0.89,
-  "transitionMs": 72,
+  "transitionMs": 76,
   "interruptible": true,
   "variants": [
     {

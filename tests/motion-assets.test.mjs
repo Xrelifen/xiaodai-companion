@@ -27,7 +27,7 @@ test("sit idle motion references valid transparent WebP frames", async () => {
   assert.equal(files.size, 8);
   assert.ok(motion.neutralFrame);
   assert.ok(Array.isArray(motion.idleGapMs));
-  assert.ok(motion.transitionMs >= 90 && motion.transitionMs <= 180);
+  assert.ok(motion.transitionMs >= 90 && motion.transitionMs <= 240);
 
   for (const file of files) {
     const url = new URL(file, motionUrl);

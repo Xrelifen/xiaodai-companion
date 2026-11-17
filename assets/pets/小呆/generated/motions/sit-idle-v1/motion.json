@@ -6,7 +6,7 @@
   "fromPose": "sit",
   "toPose": "sit",
   "canvas": {
-    "width": 1161,
+    "width": 1280,
     "height": 1354
   },
   "identityBase": "../../concepts/identity-sit-v1.png",
@@ -15,7 +15,7 @@
     800,
     3200
   ],
-  "transitionMs": 180,
+  "transitionMs": 220,
   "interruptible": true,
   "variants": [
     {

@@ -89,6 +89,25 @@ test("locomotion cycles preserve phase while playback speed changes", () => {
   assert.equal(player.tick(130, { playbackRate: 2 }).url, "a.png");
 });
 
+test("a stationary held drag freezes the current locomotion frame", () => {
+  const motion = {
+    transitionMs: 20,
+    variants: [{
+      frames: [
+        { url: "a.png", durationMs: 100 },
+        { url: "b.png", durationMs: 100 },
+      ],
+    }],
+  };
+  const player = new NaturalCyclePlayer(motion, { now: 0 });
+  assert.equal(player.tick(120, { playbackRate: 1 }).url, "b.png");
+  const held = player.tick(5_000, { playbackRate: 1, paused: true });
+  assert.equal(held.url, "b.png");
+  assert.equal(held.previousUrl, null);
+  assert.equal(player.tick(5_050, { playbackRate: 1 }).url, "b.png");
+  assert.equal(player.tick(5_100, { playbackRate: 1 }).url, "a.png");
+});
+
 test("locomotion frames expose per-frame display scale without accumulating it", () => {
   const motion = {
     transitionMs: 20,

@@ -25,6 +25,12 @@ test("desktop controls stay hidden until the pet is explicitly right-clicked", a
   assert.match(styles, /body\.desktop-mode \.action-bar\s*\{\s*display: none;/);
 });
 
+test("natural pets do not fall back to mismatched legacy idle frames", async () => {
+  const app = await readFile(new URL("../src/ui/app.js", import.meta.url), "utf8");
+  assert.match(app, /naturalOnlyActions/);
+  assert.match(app, /action\.sequence === "lieDown"/);
+});
+
 test("release workflow does not copy the complete assets tree", async () => {
   const workflow = await readFile(new URL("../.github/workflows/release.yml", import.meta.url), "utf8");
   assert.doesNotMatch(workflow, /Copy-Item\s+skills,src,assets,/);

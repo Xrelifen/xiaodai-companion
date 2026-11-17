@@ -6,8 +6,8 @@
   "fromPose": "lie",
   "toPose": "lie",
   "canvas": {
-    "width": 1536,
-    "height": 1024
+    "width": 1280,
+    "height": 1354
   },
   "identityBase": "../../concepts/identity-lie-v1.png",
   "neutralFrame": "frames/frame-000-neutral.webp",
@@ -15,7 +15,7 @@
     1200,
     4200
   ],
-  "transitionMs": 180,
+  "transitionMs": 220,
   "interruptible": true,
   "variants": [
     {

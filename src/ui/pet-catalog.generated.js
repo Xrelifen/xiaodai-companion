@@ -23,7 +23,7 @@ globalThis.XIAODAI_PET_CATALOG = [
       "fromPose": "sit",
       "toPose": "sit",
       "canvas": {
-        "width": 1161,
+        "width": 1280,
         "height": 1354
       },
       "identityBase": "../../concepts/identity-sit-v1.png",
@@ -32,7 +32,7 @@ globalThis.XIAODAI_PET_CATALOG = [
         800,
         3200
       ],
-      "transitionMs": 180,
+      "transitionMs": 220,
       "interruptible": true,
       "runtimeNotes": {
         "breathing": "Apply a subtle 0.4–0.8% vertical chest/body scale in the renderer; do not generate a separate high-amplitude breathing frame.",
@@ -217,7 +217,7 @@ globalThis.XIAODAI_PET_CATALOG = [
         "fromPose": "sit",
         "toPose": "sit",
         "canvas": {
-          "width": 1161,
+          "width": 1280,
           "height": 1354
         },
         "identityBase": "../../concepts/identity-sit-v1.png",
@@ -226,7 +226,7 @@ globalThis.XIAODAI_PET_CATALOG = [
           800,
           3200
         ],
-        "transitionMs": 180,
+        "transitionMs": 220,
         "interruptible": true,
         "runtimeNotes": {
           "breathing": "Apply a subtle 0.4–0.8% vertical chest/body scale in the renderer; do not generate a separate high-amplitude breathing frame.",
@@ -410,8 +410,8 @@ globalThis.XIAODAI_PET_CATALOG = [
         "fromPose": "lie",
         "toPose": "lie",
         "canvas": {
-          "width": 1536,
-          "height": 1024
+          "width": 1280,
+          "height": 1354
         },
         "identityBase": "../../concepts/identity-lie-v1.png",
         "neutralFrame": "frames/frame-000-neutral.webp",
@@ -419,7 +419,7 @@ globalThis.XIAODAI_PET_CATALOG = [
           1200,
           4200
         ],
-        "transitionMs": 180,
+        "transitionMs": 220,
         "interruptible": true,
         "neutralFrameUrl": "../../assets/pets/%E5%B0%8F%E5%91%86/generated/motions/lie-idle-v1/frames/frame-000-neutral.webp",
         "variants": [
@@ -558,12 +558,12 @@ globalThis.XIAODAI_PET_CATALOG = [
         "fromPose": "sit",
         "toPose": "lie",
         "canvas": {
-          "width": 1536,
+          "width": 1280,
           "height": 1354
         },
         "identityBase": "../../concepts/identity-sit-v1.png",
         "neutralFrame": "../sit-idle-v1/frames/frame-000-neutral.webp",
-        "transitionMs": 170,
+        "transitionMs": 260,
         "interruptible": false,
         "runtimeNotes": {
           "reverse": "The same sequence is played in reverse for lie-to-sit so identity and timing stay consistent.",
@@ -609,13 +609,13 @@ globalThis.XIAODAI_PET_CATALOG = [
         "toPose": "stand",
         "facing": "left",
         "canvas": {
-          "width": 1536,
-          "height": 1024
+          "width": 1280,
+          "height": 1354
         },
         "identityBase": "../../concepts/identity-stand-profile-v1.png",
         "neutralFrame": "frames/frame-000-contact.webp",
         "displayScale": 0.89,
-        "transitionMs": 72,
+        "transitionMs": 76,
         "interruptible": true,
         "runtimeNotes": {
           "direction": "Source frames face left; mirror the rendered canvas for rightward travel.",
@@ -661,13 +661,13 @@ globalThis.XIAODAI_PET_CATALOG = [
         "toPose": "stand",
         "facing": "left",
         "canvas": {
-          "width": 1536,
-          "height": 1024
+          "width": 1280,
+          "height": 1354
         },
         "identityBase": "../../concepts/identity-stand-profile-v1.png",
         "neutralFrame": "frames/frame-000-extension.webp",
         "displayScale": 0.89,
-        "transitionMs": 58,
+        "transitionMs": 68,
         "interruptible": true,
         "runtimeNotes": {
           "direction": "Source frames face left; mirror the rendered canvas for rightward travel.",

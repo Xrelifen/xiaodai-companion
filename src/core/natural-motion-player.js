@@ -292,7 +292,12 @@
       const playbackRate = clamp(Number(options.playbackRate) || 1, 0.2, 3);
       const elapsed = Math.max(0, now - this.lastTickAt);
       this.lastTickAt = now;
-      this.phaseMs += elapsed * playbackRate;
+      if (!options.paused) this.phaseMs += elapsed * playbackRate;
+      if (options.paused) {
+        this.previousUrl = null;
+        this.previousDisplayScale = this.currentDisplayScale;
+        this.transitionStartedAt = now;
+      }
       const { frame, index } = this.frameAtPhase();
       const nextUrl = frame?.url || this.currentUrl;
       if (nextUrl && nextUrl !== this.currentUrl) {

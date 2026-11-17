@@ -1,6 +1,6 @@
 {
   "name": "xiaodai-companion",
-  "version": "0.1.5",
+  "version": "0.1.6",
   "private": true,
   "type": "module",
   "main": "src/desktop/main.mjs",
@@ -17,6 +17,7 @@
     "check": "npm run build:plugin && node scripts/validate-project.mjs && npm test",
     "desktop": "npm run sync:pets && electron src/desktop/main.mjs",
     "dist:windows": "electron-builder --win nsis portable --publish never",
+    "normalize:motions": "node scripts/normalize-motion-assets.mjs",
     "optimize:motions": "node scripts/optimize-motion-assets.mjs",
     "preview": "node scripts/preview-server.mjs",
     "sync:pets": "node scripts/sync-pet-catalog.mjs",

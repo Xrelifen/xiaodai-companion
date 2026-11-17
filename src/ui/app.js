@@ -93,6 +93,8 @@
     roamUntil: 0,
     gait: "walk",
     dragDirection: "right",
+    dragLastMovedAt: 0,
+    dragStationary: true,
   };
 
   const actionLabels = {
@@ -290,7 +292,10 @@
     let naturalState = null;
     let drewNaturalFrame = false;
     if (naturalMotionReady && naturalLocomotionPlayer && locomotionDirection) {
-      naturalState = naturalLocomotionPlayer.tick(now, { playbackRate: engine.current.playbackRate });
+      naturalState = naturalLocomotionPlayer.tick(now, {
+        playbackRate: engine.current.playbackRate,
+        paused: pet.dragStationary,
+      });
       naturalState.mirror = locomotionDirection === "right";
       drewNaturalFrame = drawNaturalFrame(naturalState);
     } else if (naturalMotionReady && naturalTransitionPlayer && ["lieDown", "getUp"].includes(engine.current.name)) {
@@ -325,6 +330,8 @@
     pet.lastPointer = { ...point, screenX: event.screenX, screenY: event.screenY, time: performance.now() };
     pet.dragDistance = 0;
     pet.lastInteractionAt = performance.now();
+    pet.dragLastMovedAt = pet.lastInteractionAt;
+    pet.dragStationary = true;
     canvas.setPointerCapture(event.pointerId);
     globalThis.xiaodaiDesktop?.beginDrag?.();
   });
@@ -356,16 +363,24 @@
   globalThis.xiaodaiDesktop?.onDragSample?.((sample) => {
     if (!pet.dragging) return;
     const now = performance.now();
-    pet.dragDistance += Math.hypot(sample.dx, sample.dy);
-    pet.dragDirection = core.stableDragDirection(pet.dragDirection, sample.dx);
-    const dragState = engine.setDragState(pet.dragDirection, sample.speed, now);
-    pet.gait = dragState.gait;
+    const distance = Math.hypot(sample.dx, sample.dy);
+    pet.dragDistance += distance;
+    if (distance > 0.15) {
+      pet.dragLastMovedAt = now;
+      pet.dragStationary = false;
+      pet.dragDirection = core.stableDragDirection(pet.dragDirection, sample.dx);
+      const dragState = engine.setDragState(pet.dragDirection, sample.speed, now);
+      pet.gait = dragState.gait;
+    } else if (now - pet.dragLastMovedAt >= 220) {
+      pet.dragStationary = true;
+    }
   });
 
   function finishDrag(event) {
     if (!pet.dragging || event.pointerId !== pet.pointerId) return;
     const wasClick = pet.dragDistance < 8;
     pet.dragging = false;
+    pet.dragStationary = true;
     pet.pointerId = null;
     pet.lastPointer = null;
     globalThis.xiaodaiDesktop?.endDrag?.();
@@ -549,7 +564,13 @@
     activePet = catalog.find((item) => item.id === petId) || catalog[0] || activePet;
     localStorage.setItem(ACTIVE_PET_KEY, activePet.id);
     document.documentElement.style.setProperty("--orange", activePet.accentColor || "#df8c43");
-    prepareNaturalMotions(activePet.naturalMotions || [activePet.naturalMotion].filter(Boolean));
+    const naturalMotions = activePet.naturalMotions || [activePet.naturalMotion].filter(Boolean);
+    const naturalOnlyActions = core.DEFAULT_CONFIG.actions.filter((action) => action.sequence === "lieDown");
+    engine.updateConfig({
+      actions: naturalMotions.length ? naturalOnlyActions : structuredClone(core.DEFAULT_CONFIG.actions),
+    });
+    engine.scheduleNextIdle(performance.now());
+    prepareNaturalMotions(naturalMotions);
     spriteReady = false;
     if (activePet.spriteUrl) {
       sprite.src = activePet.spriteUrl;

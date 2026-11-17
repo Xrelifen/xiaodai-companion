@@ -6,12 +6,12 @@
   "fromPose": "sit",
   "toPose": "lie",
   "canvas": {
-    "width": 1536,
+    "width": 1280,
     "height": 1354
   },
   "identityBase": "../../concepts/identity-sit-v1.png",
   "neutralFrame": "../sit-idle-v1/frames/frame-000-neutral.webp",
-  "transitionMs": 170,
+  "transitionMs": 260,
   "interruptible": false,
   "variants": [
     {
