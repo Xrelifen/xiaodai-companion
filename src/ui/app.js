@@ -16,6 +16,18 @@
   const canvas = document.querySelector("#pet-canvas");
   const context = canvas.getContext("2d", { alpha: true });
   const stage = document.querySelector("#pet-stage");
+  if (isDesktop) {
+    const fitCanvasWithoutDistortion = () => {
+      const { width, height } = stage.getBoundingClientRect();
+      if (width <= 0 || height <= 0) return;
+      const aspect = canvas.width / canvas.height;
+      const displayWidth = Math.min(width * 0.88, height * 0.82 * aspect);
+      canvas.style.width = `${displayWidth}px`;
+      canvas.style.height = `${displayWidth / aspect}px`;
+    };
+    new ResizeObserver(fitCanvasWithoutDistortion).observe(stage);
+    fitCanvasWithoutDistortion();
+  }
   const statusPill = document.querySelector("#status-pill");
   const reaction = document.querySelector("#reaction");
   const settingsPanel = document.querySelector("#settings-panel");
