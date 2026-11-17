@@ -34,6 +34,14 @@ test("natural idle avoids immediately repeating the same variant", () => {
   assert.equal(player.tick(12).variantId, "listen");
 });
 
+test("a subtle interaction can request a specific natural variant", () => {
+  const player = new NaturalMotionPlayer(fixture(), { now: 0, rng: () => 0 });
+  const reaction = player.startVariantById("listen", 100);
+  assert.equal(reaction.id, "listen");
+  assert.equal(player.variant.id, "listen");
+  assert.equal(player.frameIndex, 0);
+});
+
 test("frame changes expose a short cross-fade instead of snapping", () => {
   const player = new NaturalMotionPlayer(fixture(), { rng: () => 0, now: 0 });
   const start = player.tick(0);

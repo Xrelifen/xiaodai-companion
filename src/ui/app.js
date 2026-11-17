@@ -5,7 +5,7 @@
   if (!core) throw new Error("XiaodaiCore is unavailable");
   const motionCore = globalThis.XiaodaiMotion;
 
-  const STORAGE_KEY = "xiaodai-companion:settings:v2";
+  const STORAGE_KEY = "xiaodai-companion:settings:v3";
   const AFFECTION_KEY = "xiaodai-companion:affection:v1";
   const ACTIVE_PET_KEY = "xiaodai-companion:active-pet:v1";
   const catalog = Array.isArray(globalThis.XIAODAI_PET_CATALOG) ? globalThis.XIAODAI_PET_CATALOG : [];
@@ -73,6 +73,7 @@
   let lastEngineSequence = engine.current.name;
   let naturalPose = "sit";
   let naturalPoseUntil = 0;
+  let pendingNaturalReaction = null;
 
   const pet = {
     x: canvas.width / 2,
@@ -90,6 +91,7 @@
     nextRoamAt: 0,
     roamUntil: 0,
     gait: "walk",
+    dragDirection: "right",
   };
 
   const actionLabels = {
@@ -263,6 +265,10 @@
       naturalLocomotionPlayer = null;
       activeNaturalGait = null;
     }
+    if (pendingNaturalReaction && engine.current.name === "idle" && naturalMotionReady && naturalMotionPlayer) {
+      naturalMotionPlayer.startVariantById?.(pendingNaturalReaction, now, { startIndex: 1 });
+      pendingNaturalReaction = null;
+    }
     const lookFrame = currentLookFrame(now);
     let naturalState = null;
     let drewNaturalFrame = false;
@@ -294,14 +300,6 @@
     };
   }
 
-  function pointerVelocity(current, previous) {
-    if (!previous) return { speed: 0, dx: 0, dy: 0 };
-    const dt = Math.max(1, current.time - previous.time);
-    const dx = current.x - previous.x;
-    const dy = current.y - previous.y;
-    return { speed: Math.hypot(dx, dy) / dt * 1000, dx, dy };
-  }
-
   canvas.addEventListener("pointerdown", (event) => {
     if (event.button !== 0) return;
     const point = canvasPoint(event);
@@ -324,10 +322,10 @@
 
     if (!pet.dragging || event.pointerId !== pet.pointerId) return;
     const current = { ...point, screenX: event.screenX, screenY: event.screenY, time: now };
-    const velocity = pointerVelocity(current, pet.lastPointer);
+    const velocity = core.pointerVelocity(current, pet.lastPointer);
     pet.dragDistance += Math.hypot(velocity.dx, velocity.dy);
-    const direction = velocity.dx < 0 ? "left" : "right";
-    const dragState = engine.setDragState(direction, velocity.speed, now);
+    pet.dragDirection = core.stableDragDirection(pet.dragDirection, velocity.dx);
+    const dragState = engine.setDragState(pet.dragDirection, velocity.speed, now);
     pet.gait = dragState.gait;
 
     if (isDesktop) {
@@ -350,8 +348,10 @@
     globalThis.xiaodaiDesktop?.endDrag?.();
     engine.releaseDrag(performance.now());
     pet.gait = "walk";
+    pet.dragDirection = lastDrawnNaturalMirror ? "right" : "left";
     if (wasClick) {
       addAffection(1);
+      pendingNaturalReaction = naturalPose === "lie" ? "lie-slow-blink" : "slow-blink";
     }
   }
 
@@ -562,20 +562,28 @@
   }
 
   async function maybeRoam(now) {
-    if (!isDesktop || !engine.config.desktop.roamEnabled || pet.dragging || !globalThis.xiaodaiDesktop?.roam) return;
+    if (!isDesktop || !engine.config.desktop.roamEnabled || pet.dragging || !globalThis.xiaodaiDesktop?.roam || !globalThis.xiaodaiDesktop?.planRoam) return;
     if (!pet.nextRoamAt) scheduleDesktopRoam(now);
     if (now < pet.nextRoamAt || now < pet.roamUntil || engine.current.name !== "idle") return;
-    const direction = Math.random() < 0.5 ? "left" : "right";
-    const distance = Math.round(core.randomBetween(90, 260));
-    const duration = Math.round(core.randomBetween(2400, 5200));
-    pet.roamUntil = now + duration;
+    const preferredDirection = Math.random() < 0.5 ? "left" : "right";
+    const plan = await globalThis.xiaodaiDesktop.planRoam({
+      direction: preferredDirection,
+      distance: Math.round(core.randomBetween(240, 720)),
+      duration: Math.round(core.randomBetween(6000, 14000)),
+      minimumDistance: 36,
+    });
+    if (!plan?.direction || !plan.duration || !plan.dx) {
+      scheduleDesktopRoam(performance.now());
+      return;
+    }
+    pet.roamUntil = now + plan.duration;
     pet.gait = "walk";
-    engine.trigger(direction === "left" ? "walkLeft" : "walkRight", now, {
+    engine.trigger(plan.direction === "left" ? "walkLeft" : "walkRight", now, {
       reason: "desktop-roam",
       playbackRate: 0.72,
     });
     try {
-      await globalThis.xiaodaiDesktop.roam({ dx: direction === "left" ? -distance : distance, duration });
+      await globalThis.xiaodaiDesktop.roam({ dx: plan.dx, duration: plan.duration });
     } finally {
       engine.releaseDrag(performance.now());
       scheduleDesktopRoam(performance.now());

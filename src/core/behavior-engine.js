@@ -2,7 +2,7 @@
   "use strict";
 
   const DEFAULT_CONFIG = {
-    idleDelay: { minMs: 3500, maxMs: 11000 },
+    idleDelay: { minMs: 8000, maxMs: 24000 },
     preventImmediateRepeat: true,
     lookSmoothing: 0.11,
     drag: {
@@ -13,8 +13,8 @@
     },
     desktop: {
       roamEnabled: true,
-      roamMinDelayMs: 18000,
-      roamMaxDelayMs: 42000,
+      roamMinDelayMs: 45000,
+      roamMaxDelayMs: 120000,
     },
     actions: [
       { id: "look-around", label: "四處看看", weight: 34, cooldownMs: 4500, sequence: "lookAround" },
@@ -137,6 +137,28 @@
 
   function smoothAngle(current, target, smoothing) {
     return current + angleDelta(current, target) * clamp(smoothing, 0, 1);
+  }
+
+  function pointerVelocity(current, previous) {
+    if (!previous) return { speed: 0, dx: 0, dy: 0 };
+    const useScreenCoordinates = Number.isFinite(current?.screenX)
+      && Number.isFinite(current?.screenY)
+      && Number.isFinite(previous?.screenX)
+      && Number.isFinite(previous?.screenY);
+    const currentX = useScreenCoordinates ? current.screenX : current.x;
+    const currentY = useScreenCoordinates ? current.screenY : current.y;
+    const previousX = useScreenCoordinates ? previous.screenX : previous.x;
+    const previousY = useScreenCoordinates ? previous.screenY : previous.y;
+    const dt = Math.max(1, current.time - previous.time);
+    const dx = currentX - previousX;
+    const dy = currentY - previousY;
+    return { speed: Math.hypot(dx, dy) / dt * 1000, dx, dy };
+  }
+
+  function stableDragDirection(previousDirection, dx, deadZone = 1.5) {
+    if (dx < -Math.abs(deadZone)) return "left";
+    if (dx > Math.abs(deadZone)) return "right";
+    return previousDirection === "left" ? "left" : "right";
   }
 
   function lookFrameForAngle(angle) {
@@ -273,9 +295,11 @@
     frameAt,
     lookFrameForAngle,
     normalizeSequence,
+    pointerVelocity,
     randomBetween,
     sequenceDuration,
     smoothAngle,
+    stableDragDirection,
     weightedChoice,
   };
 

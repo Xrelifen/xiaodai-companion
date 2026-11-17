@@ -79,14 +79,25 @@
         this.scheduleNext(now);
         return null;
       }
+      return this.beginVariant(variant, now);
+    }
+
+    beginVariant(variant, now, options = {}) {
       this.variant = variant;
       this.frames = variant.frames.map((frame) => ({
         ...frame,
         sampledDurationMs: Math.max(1, sampleDuration(frame.durationMs, this.rng)),
       }));
-      this.frameIndex = 0;
-      this.enterFrame(0, now);
+      const startIndex = clamp(Number(options.startIndex) || 0, 0, this.frames.length - 1);
+      this.frameIndex = startIndex;
+      this.enterFrame(startIndex, now);
       return variant;
+    }
+
+    startVariantById(variantId, now, options = {}) {
+      const variant = (this.motion?.variants || []).find((item) => item.id === variantId);
+      if (!variant?.frames?.length) return null;
+      return this.beginVariant(variant, now, options);
     }
 
     enterFrame(index, now) {

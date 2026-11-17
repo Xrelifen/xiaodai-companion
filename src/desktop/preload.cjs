@@ -7,6 +7,7 @@ contextBridge.exposeInMainWorld("xiaodaiDesktop", {
   updateDrag: (point) => ipcRenderer.send("xiaodai:drag-move", point),
   endDrag: () => ipcRenderer.send("xiaodai:drag-end"),
   setExpanded: (expanded) => ipcRenderer.send("xiaodai:set-expanded", Boolean(expanded)),
+  planRoam: (request) => ipcRenderer.invoke("xiaodai:plan-roam", request),
   roam: (request) => ipcRenderer.invoke("xiaodai:roam", request),
   close: () => ipcRenderer.send("xiaodai:close"),
 });

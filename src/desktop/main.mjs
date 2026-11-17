@@ -1,6 +1,7 @@
 import { app, BrowserWindow, ipcMain, screen } from "electron";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import { planRoam } from "./roam-planner.mjs";
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const compactSize = { width: 360, height: 390 };
@@ -119,6 +120,13 @@ ipcMain.handle("xiaodai:roam", async (_event, request = {}) => {
     }, 16);
   });
   return true;
+});
+
+ipcMain.handle("xiaodai:plan-roam", (_event, request = {}) => {
+  if (!companionWindow) return { direction: null, dx: 0, distance: 0, duration: 0 };
+  const bounds = companionWindow.getBounds();
+  const area = screen.getDisplayNearestPoint({ x: bounds.x, y: bounds.y }).workArea;
+  return planRoam(bounds, area, request);
 });
 
 app.whenReady().then(() => {
