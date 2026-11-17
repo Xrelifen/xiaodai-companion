@@ -9,12 +9,12 @@ const referencePath = path.join(motionsRoot, "sit-idle-v1", "frames", "frame-000
 const canvas = { width: 1280, height: 1354, groundY: 1320 };
 
 const profiles = {
-  "sit-idle-v1": { axis: "height", extent: 1260 },
-  "lie-idle-v1": { axis: "width", extent: 1210 },
-  "walk-cycle-v1": { axis: "width", extent: 1190 },
-  "run-cycle-v1": { axis: "width", extent: 1190 },
-  "sit-to-lie-v1/frames/frame-010": { axis: "height", extent: 1190 },
-  "sit-to-lie-v1/frames/frame-020": { axis: "width", extent: 1195 },
+  "sit-idle-v1": { axis: "height", extent: 1260, grade: { brightness: 1, saturation: 1, hue: 0 } },
+  "lie-idle-v1": { axis: "width", extent: 1210, grade: { brightness: 1.002, saturation: 0.957, hue: -0.9 } },
+  "walk-cycle-v1": { axis: "width", extent: 1190, grade: { brightness: 1.006, saturation: 0.967, hue: -1.45 } },
+  "run-cycle-v1": { axis: "width", extent: 1190, grade: { brightness: 1.012, saturation: 0.951, hue: -1.1 } },
+  "sit-to-lie-v1/frames/frame-010": { axis: "height", extent: 1190, grade: { brightness: 1.01, saturation: 0.981, hue: -0.5 } },
+  "sit-to-lie-v1/frames/frame-020": { axis: "width", extent: 1195, grade: { brightness: 1.01, saturation: 0.981, hue: -0.5 } },
 };
 
 function clamp(value, min, max) {
@@ -123,9 +123,9 @@ async function normalizeFrame(filePath, reference) {
   const relativePath = path.relative(motionsRoot, filePath);
   const profile = profileFor(relativePath);
   const [bounds, stats] = await Promise.all([alphaBounds(filePath), furStats(filePath)]);
-  const brightness = clamp(reference.value / Math.max(0.01, stats.value), 0.90, 1.10);
-  const saturation = clamp(reference.saturation / Math.max(0.01, stats.saturation), 0.86, 1.14);
-  const hue = clamp(reference.hue - stats.hue, -4, 4);
+  const brightness = clamp(reference.value / Math.max(0.01, stats.value), 0.90, 1.10) * profile.grade.brightness;
+  const saturation = clamp(reference.saturation / Math.max(0.01, stats.saturation), 0.86, 1.14) * profile.grade.saturation;
+  const hue = clamp(reference.hue - stats.hue, -4, 4) + profile.grade.hue;
   const hueRotation = Math.round((hue + 360) % 360);
   const aspect = bounds.width / bounds.height;
   let targetWidth = profile.axis === "width" ? profile.extent : Math.round(profile.extent * aspect);
