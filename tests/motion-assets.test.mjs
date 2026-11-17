@@ -83,7 +83,8 @@ for (const [gait, motionUrl] of [["walk", walkMotionUrl], ["run", runMotionUrl]]
     const frames = motion.variants[0].frames;
     const files = frames.map((frame) => frame.file);
     assert.equal(files.length, 4);
-    assert.ok(frames.every((frame) => frame.displayScale >= 0.8 && frame.displayScale <= 1));
+    assert.equal(motion.displayScale, 0.89);
+    assert.ok(frames.every((frame) => frame.displayScale === undefined));
     for (const file of files) {
       const url = new URL(file, motionUrl);
       await access(url);

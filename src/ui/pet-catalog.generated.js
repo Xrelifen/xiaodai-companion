@@ -614,6 +614,7 @@ globalThis.XIAODAI_PET_CATALOG = [
         },
         "identityBase": "../../concepts/identity-stand-profile-v1.png",
         "neutralFrame": "frames/frame-000-contact.webp",
+        "displayScale": 0.89,
         "transitionMs": 72,
         "interruptible": true,
         "runtimeNotes": {
@@ -629,25 +630,21 @@ globalThis.XIAODAI_PET_CATALOG = [
               {
                 "file": "frames/frame-000-contact.webp",
                 "durationMs": 180,
-                "displayScale": 0.894,
                 "url": "../../assets/pets/%E5%B0%8F%E5%91%86/generated/motions/walk-cycle-v1/frames/frame-000-contact.webp"
               },
               {
                 "file": "frames/frame-010-down.webp",
                 "durationMs": 150,
-                "displayScale": 0.901,
                 "url": "../../assets/pets/%E5%B0%8F%E5%91%86/generated/motions/walk-cycle-v1/frames/frame-010-down.webp"
               },
               {
                 "file": "frames/frame-020-opposite-contact.webp",
                 "durationMs": 180,
-                "displayScale": 0.891,
                 "url": "../../assets/pets/%E5%B0%8F%E5%91%86/generated/motions/walk-cycle-v1/frames/frame-020-opposite-contact.webp"
               },
               {
                 "file": "frames/frame-030-up.webp",
                 "durationMs": 150,
-                "displayScale": 0.924,
                 "url": "../../assets/pets/%E5%B0%8F%E5%91%86/generated/motions/walk-cycle-v1/frames/frame-030-up.webp"
               }
             ]
@@ -669,6 +666,7 @@ globalThis.XIAODAI_PET_CATALOG = [
         },
         "identityBase": "../../concepts/identity-stand-profile-v1.png",
         "neutralFrame": "frames/frame-000-extension.webp",
+        "displayScale": 0.89,
         "transitionMs": 58,
         "interruptible": true,
         "runtimeNotes": {
@@ -684,25 +682,21 @@ globalThis.XIAODAI_PET_CATALOG = [
               {
                 "file": "frames/frame-000-extension.webp",
                 "durationMs": 110,
-                "displayScale": 0.859,
                 "url": "../../assets/pets/%E5%B0%8F%E5%91%86/generated/motions/run-cycle-v1/frames/frame-000-extension.webp"
               },
               {
                 "file": "frames/frame-010-front-landing.webp",
                 "durationMs": 90,
-                "displayScale": 0.883,
                 "url": "../../assets/pets/%E5%B0%8F%E5%91%86/generated/motions/run-cycle-v1/frames/frame-010-front-landing.webp"
               },
               {
                 "file": "frames/frame-020-gathered.webp",
                 "durationMs": 105,
-                "displayScale": 0.909,
                 "url": "../../assets/pets/%E5%B0%8F%E5%91%86/generated/motions/run-cycle-v1/frames/frame-020-gathered.webp"
               },
               {
                 "file": "frames/frame-030-propulsion.webp",
                 "durationMs": 95,
-                "displayScale": 0.88,
                 "url": "../../assets/pets/%E5%B0%8F%E5%91%86/generated/motions/run-cycle-v1/frames/frame-030-propulsion.webp"
               }
             ]

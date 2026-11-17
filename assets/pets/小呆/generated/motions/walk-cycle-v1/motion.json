@@ -13,6 +13,7 @@
   },
   "identityBase": "../../concepts/identity-stand-profile-v1.png",
   "neutralFrame": "frames/frame-000-contact.webp",
+  "displayScale": 0.89,
   "transitionMs": 72,
   "interruptible": true,
   "variants": [
@@ -22,23 +23,19 @@
       "frames": [
         {
           "file": "frames/frame-000-contact.webp",
-          "durationMs": 180,
-          "displayScale": 0.894
+          "durationMs": 180
         },
         {
           "file": "frames/frame-010-down.webp",
-          "durationMs": 150,
-          "displayScale": 0.901
+          "durationMs": 150
         },
         {
           "file": "frames/frame-020-opposite-contact.webp",
-          "durationMs": 180,
-          "displayScale": 0.891
+          "durationMs": 180
         },
         {
           "file": "frames/frame-030-up.webp",
-          "durationMs": 150,
-          "displayScale": 0.924
+          "durationMs": 150
         }
       ]
     }

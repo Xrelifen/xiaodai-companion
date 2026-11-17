@@ -13,6 +13,7 @@
   },
   "identityBase": "../../concepts/identity-stand-profile-v1.png",
   "neutralFrame": "frames/frame-000-extension.webp",
+  "displayScale": 0.89,
   "transitionMs": 58,
   "interruptible": true,
   "variants": [
@@ -22,23 +23,19 @@
       "frames": [
         {
           "file": "frames/frame-000-extension.webp",
-          "durationMs": 110,
-          "displayScale": 0.859
+          "durationMs": 110
         },
         {
           "file": "frames/frame-010-front-landing.webp",
-          "durationMs": 90,
-          "displayScale": 0.883
+          "durationMs": 90
         },
         {
           "file": "frames/frame-020-gathered.webp",
-          "durationMs": 105,
-          "displayScale": 0.909
+          "durationMs": 105
         },
         {
           "file": "frames/frame-030-propulsion.webp",
-          "durationMs": 95,
-          "displayScale": 0.88
+          "durationMs": 95
         }
       ]
     }

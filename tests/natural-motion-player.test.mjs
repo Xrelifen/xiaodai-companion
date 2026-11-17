@@ -104,3 +104,21 @@ test("locomotion frames expose per-frame display scale without accumulating it",
   assert.equal(player.tick(101).displayScale, 0.85);
   assert.equal(player.tick(201).displayScale, 0.9);
 });
+
+test("a motion-level display scale never drifts during a long drag", () => {
+  const motion = {
+    displayScale: 0.89,
+    transitionMs: 20,
+    variants: [{
+      frames: [
+        { url: "a.png", durationMs: 80 },
+        { url: "b.png", durationMs: 120 },
+        { url: "c.png", durationMs: 100 },
+      ],
+    }],
+  };
+  const player = new NaturalCyclePlayer(motion, { now: 0 });
+  for (let now = 0; now <= 120_000; now += 137) {
+    assert.equal(player.tick(now, { playbackRate: now % 2000 < 1000 ? 0.65 : 1.8 }).displayScale, 0.89);
+  }
+});

@@ -270,7 +270,7 @@
       this.frameIndex = 0;
       this.currentUrl = this.frames[0]?.url || motion?.neutralFrameUrl || null;
       this.previousUrl = options.previousUrl || null;
-      this.currentDisplayScale = Number(this.frames[0]?.displayScale) || 1;
+      this.currentDisplayScale = Number(this.frames[0]?.displayScale) || Number(motion?.displayScale) || 1;
       this.previousDisplayScale = Number(options.previousDisplayScale) || 1;
       this.transitionStartedAt = options.now ?? 0;
       this.phaseMs = 0;
@@ -299,7 +299,7 @@
         this.previousUrl = this.currentUrl;
         this.previousDisplayScale = this.currentDisplayScale;
         this.currentUrl = nextUrl;
-        this.currentDisplayScale = Number(frame?.displayScale) || 1;
+        this.currentDisplayScale = Number(frame?.displayScale) || Number(this.motion?.displayScale) || 1;
         this.transitionStartedAt = now;
       }
       this.frameIndex = index;
