@@ -88,3 +88,19 @@ test("locomotion cycles preserve phase while playback speed changes", () => {
   assert.equal(player.tick(80, { playbackRate: 2 }).url, "b.png");
   assert.equal(player.tick(130, { playbackRate: 2 }).url, "a.png");
 });
+
+test("locomotion frames expose per-frame display scale without accumulating it", () => {
+  const motion = {
+    transitionMs: 20,
+    variants: [{
+      frames: [
+        { url: "a.png", durationMs: 100, displayScale: 0.9 },
+        { url: "b.png", durationMs: 100, displayScale: 0.85 },
+      ],
+    }],
+  };
+  const player = new NaturalCyclePlayer(motion, { now: 0 });
+  assert.equal(player.tick(0).displayScale, 0.9);
+  assert.equal(player.tick(101).displayScale, 0.85);
+  assert.equal(player.tick(201).displayScale, 0.9);
+});

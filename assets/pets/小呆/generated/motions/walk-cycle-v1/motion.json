@@ -22,19 +22,23 @@
       "frames": [
         {
           "file": "frames/frame-000-contact.webp",
-          "durationMs": 180
+          "durationMs": 180,
+          "displayScale": 0.894
         },
         {
           "file": "frames/frame-010-down.webp",
-          "durationMs": 150
+          "durationMs": 150,
+          "displayScale": 0.901
         },
         {
           "file": "frames/frame-020-opposite-contact.webp",
-          "durationMs": 180
+          "durationMs": 180,
+          "displayScale": 0.891
         },
         {
           "file": "frames/frame-030-up.webp",
-          "durationMs": 150
+          "durationMs": 150,
+          "displayScale": 0.924
         }
       ]
     }

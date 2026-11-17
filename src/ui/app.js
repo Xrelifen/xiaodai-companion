@@ -70,6 +70,7 @@
   let activeNaturalGait = null;
   let lastDrawnNaturalUrl = null;
   let lastDrawnNaturalMirror = false;
+  let lastDrawnNaturalScale = 1;
   let lastEngineSequence = engine.current.name;
   let naturalPose = "sit";
   let naturalPoseUntil = 0;
@@ -159,9 +160,9 @@
     context.drawImage(sprite, sourceX, sourceY, frameWidth, frameHeight, drawX, drawY, drawWidth, drawHeight);
   }
 
-  function drawNaturalLayer(image, alpha, breathScale, mirror = false) {
+  function drawNaturalLayer(image, alpha, breathScale, mirror = false, displayScale = 1) {
     if (!image?.complete || !image.naturalWidth || alpha <= 0) return;
-    const scale = Math.min(pet.width / image.naturalWidth, pet.height / image.naturalHeight);
+    const scale = Math.min(pet.width / image.naturalWidth, pet.height / image.naturalHeight) * displayScale;
     const drawWidth = image.naturalWidth * scale;
     const baseHeight = image.naturalHeight * scale;
     const drawHeight = baseHeight * breathScale;
@@ -185,10 +186,25 @@
     if (!current) return false;
     context.clearRect(0, 0, canvas.width, canvas.height);
     const previous = naturalImages.get(state.previousUrl);
-    if (previous) drawNaturalLayer(previous, 1 - state.blend, state.breathScale, state.mirror);
-    drawNaturalLayer(current, previous ? state.blend : 1, state.breathScale, state.mirror);
+    if (previous) {
+      drawNaturalLayer(
+        previous,
+        1 - state.blend,
+        state.breathScale,
+        state.mirror,
+        state.previousDisplayScale || 1,
+      );
+    }
+    drawNaturalLayer(
+      current,
+      previous ? state.blend : 1,
+      state.breathScale,
+      state.mirror,
+      state.displayScale || 1,
+    );
     lastDrawnNaturalUrl = state.url;
     lastDrawnNaturalMirror = Boolean(state.mirror);
+    lastDrawnNaturalScale = state.displayScale || 1;
     return true;
   }
 
@@ -247,6 +263,7 @@
         activateNaturalPose("sit", now);
         if (naturalMotionPlayer && lastDrawnNaturalUrl && !lastDrawnNaturalMirror) {
           naturalMotionPlayer.previousUrl = lastDrawnNaturalUrl;
+          naturalMotionPlayer.previousDisplayScale = lastDrawnNaturalScale;
           naturalMotionPlayer.transitionStartedAt = now;
         }
       } else {
@@ -473,6 +490,7 @@
       ? new motionCore.NaturalCyclePlayer(motion, {
         now,
         previousUrl: lastDrawnNaturalUrl || naturalMotionPlayer?.currentUrl || null,
+        previousDisplayScale: lastDrawnNaturalScale,
       })
       : null;
   }
@@ -482,6 +500,7 @@
     naturalImages.clear();
     lastDrawnNaturalUrl = null;
     lastDrawnNaturalMirror = false;
+    lastDrawnNaturalScale = 1;
     naturalMotionByPose.clear();
     naturalTransitionByKey.clear();
     naturalLocomotionByGait.clear();

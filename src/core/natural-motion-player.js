@@ -26,6 +26,11 @@
     return items.at(-1);
   }
 
+  function easeInOut(value) {
+    const progress = clamp(value, 0, 1);
+    return progress * progress * (3 - 2 * progress);
+  }
+
   class NaturalMotionPlayer {
     constructor(motion, options = {}) {
       this.rng = options.rng ?? Math.random;
@@ -37,6 +42,8 @@
       this.frameEndsAt = 0;
       this.currentUrl = null;
       this.previousUrl = null;
+      this.currentDisplayScale = 1;
+      this.previousDisplayScale = 1;
       this.transitionStartedAt = 0;
       this.setMotion(motion, options.now ?? 0);
     }
@@ -52,6 +59,8 @@
       this.frameIndex = -1;
       this.currentUrl = this.neutralUrl;
       this.previousUrl = null;
+      this.currentDisplayScale = Number(motion?.displayScale) || 1;
+      this.previousDisplayScale = 1;
       this.transitionStartedAt = now;
       this.scheduleNext(now);
     }
@@ -103,9 +112,12 @@
     enterFrame(index, now) {
       const frame = this.frames[index];
       const nextUrl = frame?.url || this.neutralUrl;
+      const nextDisplayScale = Number(frame?.displayScale) || Number(this.motion?.displayScale) || 1;
       if (nextUrl && nextUrl !== this.currentUrl) {
         this.previousUrl = this.currentUrl;
+        this.previousDisplayScale = this.currentDisplayScale;
         this.currentUrl = nextUrl;
+        this.currentDisplayScale = nextDisplayScale;
         this.transitionStartedAt = now;
       }
       this.frameIndex = index;
@@ -122,7 +134,9 @@
       this.frameIndex = -1;
       if (this.currentUrl !== this.neutralUrl) {
         this.previousUrl = this.currentUrl;
+        this.previousDisplayScale = this.currentDisplayScale;
         this.currentUrl = this.neutralUrl;
+        this.currentDisplayScale = Number(this.motion?.displayScale) || 1;
         this.transitionStartedAt = now;
       }
       this.scheduleNext(now);
@@ -134,6 +148,8 @@
       this.frameIndex = -1;
       this.currentUrl = this.neutralUrl;
       this.previousUrl = null;
+      this.currentDisplayScale = Number(this.motion?.displayScale) || 1;
+      this.previousDisplayScale = 1;
       this.transitionStartedAt = now;
       this.scheduleNext(now);
     }
@@ -156,9 +172,10 @@
         this.enterFrame(nextIndex, this.frameEndsAt);
       }
 
-      const blend = this.previousUrl
+      const linearBlend = this.previousUrl
         ? clamp((now - this.transitionStartedAt) / Math.max(1, this.transitionMs), 0, 1)
         : 1;
+      const blend = easeInOut(linearBlend);
       if (blend >= 1) this.previousUrl = null;
       const breathPhase = (now % 3600) / 3600 * Math.PI * 2;
 
@@ -169,6 +186,8 @@
         variantId: this.variant?.id || null,
         frameIndex: this.frameIndex,
         breathScale: 1 + Math.sin(breathPhase) * 0.0055,
+        displayScale: this.currentDisplayScale,
+        previousDisplayScale: this.previousDisplayScale,
       };
     }
   }
@@ -187,6 +206,8 @@
       this.frameIndex = 0;
       this.currentUrl = this.frames[0]?.url || motion?.neutralFrameUrl || null;
       this.previousUrl = null;
+      this.currentDisplayScale = Number(this.frames[0]?.displayScale) || Number(motion?.displayScale) || 1;
+      this.previousDisplayScale = 1;
       this.transitionStartedAt = options.now ?? 0;
       this.frameEndsAt = (options.now ?? 0) + (this.frames[0]?.sampledDurationMs || 1);
       this.complete = this.frames.length === 0;
@@ -195,9 +216,12 @@
     enterFrame(index, now) {
       const frame = this.frames[index];
       const nextUrl = frame?.url || this.currentUrl;
+      const nextDisplayScale = Number(frame?.displayScale) || Number(this.motion?.displayScale) || 1;
       if (nextUrl && nextUrl !== this.currentUrl) {
         this.previousUrl = this.currentUrl;
+        this.previousDisplayScale = this.currentDisplayScale;
         this.currentUrl = nextUrl;
+        this.currentDisplayScale = nextDisplayScale;
         this.transitionStartedAt = now;
       }
       this.frameIndex = index;
@@ -215,9 +239,10 @@
         }
         this.enterFrame(nextIndex, this.frameEndsAt);
       }
-      const blend = this.previousUrl
+      const linearBlend = this.previousUrl
         ? clamp((now - this.transitionStartedAt) / Math.max(1, this.transitionMs), 0, 1)
         : 1;
+      const blend = easeInOut(linearBlend);
       if (blend >= 1) this.previousUrl = null;
       return {
         url: this.currentUrl,
@@ -225,6 +250,8 @@
         blend,
         frameIndex: this.frameIndex,
         breathScale: 1,
+        displayScale: this.currentDisplayScale,
+        previousDisplayScale: this.previousDisplayScale,
         complete: this.complete,
       };
     }
@@ -243,6 +270,8 @@
       this.frameIndex = 0;
       this.currentUrl = this.frames[0]?.url || motion?.neutralFrameUrl || null;
       this.previousUrl = options.previousUrl || null;
+      this.currentDisplayScale = Number(this.frames[0]?.displayScale) || 1;
+      this.previousDisplayScale = Number(options.previousDisplayScale) || 1;
       this.transitionStartedAt = options.now ?? 0;
       this.phaseMs = 0;
       this.lastTickAt = options.now ?? 0;
@@ -268,13 +297,16 @@
       const nextUrl = frame?.url || this.currentUrl;
       if (nextUrl && nextUrl !== this.currentUrl) {
         this.previousUrl = this.currentUrl;
+        this.previousDisplayScale = this.currentDisplayScale;
         this.currentUrl = nextUrl;
+        this.currentDisplayScale = Number(frame?.displayScale) || 1;
         this.transitionStartedAt = now;
       }
       this.frameIndex = index;
-      const blend = this.previousUrl
+      const linearBlend = this.previousUrl
         ? clamp((now - this.transitionStartedAt) / Math.max(1, this.transitionMs), 0, 1)
         : 1;
+      const blend = easeInOut(linearBlend);
       if (blend >= 1) this.previousUrl = null;
       return {
         url: this.currentUrl,
@@ -282,6 +314,8 @@
         blend,
         frameIndex: this.frameIndex,
         breathScale: 1,
+        displayScale: this.currentDisplayScale,
+        previousDisplayScale: this.previousDisplayScale,
       };
     }
   }

@@ -32,7 +32,7 @@ globalThis.XIAODAI_PET_CATALOG = [
         800,
         3200
       ],
-      "transitionMs": 135,
+      "transitionMs": 180,
       "interruptible": true,
       "runtimeNotes": {
         "breathing": "Apply a subtle 0.4–0.8% vertical chest/body scale in the renderer; do not generate a separate high-amplitude breathing frame.",
@@ -55,20 +55,20 @@ globalThis.XIAODAI_PET_CATALOG = [
             },
             {
               "file": "frames/frame-010-half-blink.webp",
-              "durationMs": 170,
+              "durationMs": 230,
               "url": "../../assets/pets/%E5%B0%8F%E5%91%86/generated/motions/sit-idle-v1/frames/frame-010-half-blink.webp"
             },
             {
               "file": "frames/frame-020-eyes-closed.webp",
               "durationMs": [
-                110,
-                180
+                150,
+                220
               ],
               "url": "../../assets/pets/%E5%B0%8F%E5%91%86/generated/motions/sit-idle-v1/frames/frame-020-eyes-closed.webp"
             },
             {
               "file": "frames/frame-010-half-blink.webp",
-              "durationMs": 190,
+              "durationMs": 250,
               "url": "../../assets/pets/%E5%B0%8F%E5%91%86/generated/motions/sit-idle-v1/frames/frame-010-half-blink.webp"
             },
             {
@@ -226,7 +226,7 @@ globalThis.XIAODAI_PET_CATALOG = [
           800,
           3200
         ],
-        "transitionMs": 135,
+        "transitionMs": 180,
         "interruptible": true,
         "runtimeNotes": {
           "breathing": "Apply a subtle 0.4–0.8% vertical chest/body scale in the renderer; do not generate a separate high-amplitude breathing frame.",
@@ -249,20 +249,20 @@ globalThis.XIAODAI_PET_CATALOG = [
               },
               {
                 "file": "frames/frame-010-half-blink.webp",
-                "durationMs": 170,
+                "durationMs": 230,
                 "url": "../../assets/pets/%E5%B0%8F%E5%91%86/generated/motions/sit-idle-v1/frames/frame-010-half-blink.webp"
               },
               {
                 "file": "frames/frame-020-eyes-closed.webp",
                 "durationMs": [
-                  110,
-                  180
+                  150,
+                  220
                 ],
                 "url": "../../assets/pets/%E5%B0%8F%E5%91%86/generated/motions/sit-idle-v1/frames/frame-020-eyes-closed.webp"
               },
               {
                 "file": "frames/frame-010-half-blink.webp",
-                "durationMs": 190,
+                "durationMs": 250,
                 "url": "../../assets/pets/%E5%B0%8F%E5%91%86/generated/motions/sit-idle-v1/frames/frame-010-half-blink.webp"
               },
               {
@@ -419,7 +419,7 @@ globalThis.XIAODAI_PET_CATALOG = [
           1200,
           4200
         ],
-        "transitionMs": 150,
+        "transitionMs": 180,
         "interruptible": true,
         "neutralFrameUrl": "../../assets/pets/%E5%B0%8F%E5%91%86/generated/motions/lie-idle-v1/frames/frame-000-neutral.webp",
         "variants": [
@@ -439,8 +439,8 @@ globalThis.XIAODAI_PET_CATALOG = [
               {
                 "file": "frames/frame-010-half-blink.webp",
                 "durationMs": [
-                  180,
-                  260
+                  240,
+                  340
                 ],
                 "url": "../../assets/pets/%E5%B0%8F%E5%91%86/generated/motions/lie-idle-v1/frames/frame-010-half-blink.webp"
               },
@@ -455,8 +455,8 @@ globalThis.XIAODAI_PET_CATALOG = [
               {
                 "file": "frames/frame-010-half-blink.webp",
                 "durationMs": [
-                  200,
-                  300
+                  260,
+                  360
                 ],
                 "url": "../../assets/pets/%E5%B0%8F%E5%91%86/generated/motions/lie-idle-v1/frames/frame-010-half-blink.webp"
               },
@@ -629,21 +629,25 @@ globalThis.XIAODAI_PET_CATALOG = [
               {
                 "file": "frames/frame-000-contact.webp",
                 "durationMs": 180,
+                "displayScale": 0.894,
                 "url": "../../assets/pets/%E5%B0%8F%E5%91%86/generated/motions/walk-cycle-v1/frames/frame-000-contact.webp"
               },
               {
                 "file": "frames/frame-010-down.webp",
                 "durationMs": 150,
+                "displayScale": 0.901,
                 "url": "../../assets/pets/%E5%B0%8F%E5%91%86/generated/motions/walk-cycle-v1/frames/frame-010-down.webp"
               },
               {
                 "file": "frames/frame-020-opposite-contact.webp",
                 "durationMs": 180,
+                "displayScale": 0.891,
                 "url": "../../assets/pets/%E5%B0%8F%E5%91%86/generated/motions/walk-cycle-v1/frames/frame-020-opposite-contact.webp"
               },
               {
                 "file": "frames/frame-030-up.webp",
                 "durationMs": 150,
+                "displayScale": 0.924,
                 "url": "../../assets/pets/%E5%B0%8F%E5%91%86/generated/motions/walk-cycle-v1/frames/frame-030-up.webp"
               }
             ]
@@ -680,21 +684,25 @@ globalThis.XIAODAI_PET_CATALOG = [
               {
                 "file": "frames/frame-000-extension.webp",
                 "durationMs": 110,
+                "displayScale": 0.859,
                 "url": "../../assets/pets/%E5%B0%8F%E5%91%86/generated/motions/run-cycle-v1/frames/frame-000-extension.webp"
               },
               {
                 "file": "frames/frame-010-front-landing.webp",
                 "durationMs": 90,
+                "displayScale": 0.883,
                 "url": "../../assets/pets/%E5%B0%8F%E5%91%86/generated/motions/run-cycle-v1/frames/frame-010-front-landing.webp"
               },
               {
                 "file": "frames/frame-020-gathered.webp",
                 "durationMs": 105,
+                "displayScale": 0.909,
                 "url": "../../assets/pets/%E5%B0%8F%E5%91%86/generated/motions/run-cycle-v1/frames/frame-020-gathered.webp"
               },
               {
                 "file": "frames/frame-030-propulsion.webp",
                 "durationMs": 95,
+                "displayScale": 0.88,
                 "url": "../../assets/pets/%E5%B0%8F%E5%91%86/generated/motions/run-cycle-v1/frames/frame-030-propulsion.webp"
               }
             ]

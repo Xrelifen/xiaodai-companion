@@ -15,7 +15,7 @@
     800,
     3200
   ],
-  "transitionMs": 135,
+  "transitionMs": 180,
   "interruptible": true,
   "variants": [
     {
@@ -32,18 +32,18 @@
         },
         {
           "file": "frames/frame-010-half-blink.webp",
-          "durationMs": 170
+          "durationMs": 230
         },
         {
           "file": "frames/frame-020-eyes-closed.webp",
           "durationMs": [
-            110,
-            180
+            150,
+            220
           ]
         },
         {
           "file": "frames/frame-010-half-blink.webp",
-          "durationMs": 190
+          "durationMs": 250
         },
         {
           "file": "frames/frame-000-neutral.webp",
