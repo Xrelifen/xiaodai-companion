@@ -12,7 +12,8 @@ test("sandboxed desktop bridge uses a CommonJS preload", async () => {
   const preload = await readFile(new URL("../src/desktop/preload.cjs", import.meta.url), "utf8");
   assert.match(main, /preload\.cjs/);
   assert.match(preload, /contextBridge\.exposeInMainWorld\("xiaodaiDesktop"/);
-  assert.match(preload, /xiaodai:drag-move/);
+  assert.match(main, /screen\.getCursorScreenPoint\(\)/);
+  assert.match(preload, /xiaodai:drag-sample/);
   assert.match(preload, /xiaodai:roam/);
 });
 

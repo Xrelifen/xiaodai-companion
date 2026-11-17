@@ -326,7 +326,7 @@
     pet.dragDistance = 0;
     pet.lastInteractionAt = performance.now();
     canvas.setPointerCapture(event.pointerId);
-    globalThis.xiaodaiDesktop?.beginDrag?.({ screenX: event.screenX, screenY: event.screenY });
+    globalThis.xiaodaiDesktop?.beginDrag?.();
   });
 
   canvas.addEventListener("pointermove", (event) => {
@@ -338,22 +338,28 @@
     pet.pointerInside = true;
 
     if (!pet.dragging || event.pointerId !== pet.pointerId) return;
-    const current = { ...point, screenX: event.screenX, screenY: event.screenY, time: now };
-    const velocity = core.pointerVelocity(current, pet.lastPointer);
-    pet.dragDistance += Math.hypot(velocity.dx, velocity.dy);
-    pet.dragDirection = core.stableDragDirection(pet.dragDirection, velocity.dx);
-    const dragState = engine.setDragState(pet.dragDirection, velocity.speed, now);
-    pet.gait = dragState.gait;
-
-    if (isDesktop) {
-      globalThis.xiaodaiDesktop?.updateDrag?.({ screenX: event.screenX, screenY: event.screenY });
-    } else {
+    if (!isDesktop) {
+      const current = { ...point, time: now };
+      const velocity = core.pointerVelocity(current, pet.lastPointer);
+      pet.dragDistance += Math.hypot(velocity.dx, velocity.dy);
+      pet.dragDirection = core.stableDragDirection(pet.dragDirection, velocity.dx);
+      const dragState = engine.setDragState(pet.dragDirection, velocity.speed, now);
+      pet.gait = dragState.gait;
       const dx = current.x - pet.lastPointer.x;
       const dy = current.y - pet.lastPointer.y;
       pet.x = core.clamp(pet.x + dx, pet.width / 2, canvas.width - pet.width / 2);
       pet.y = core.clamp(pet.y + dy, pet.height / 2, canvas.height - pet.height / 2);
+      pet.lastPointer = current;
     }
-    pet.lastPointer = current;
+  });
+
+  globalThis.xiaodaiDesktop?.onDragSample?.((sample) => {
+    if (!pet.dragging) return;
+    const now = performance.now();
+    pet.dragDistance += Math.hypot(sample.dx, sample.dy);
+    pet.dragDirection = core.stableDragDirection(pet.dragDirection, sample.dx);
+    const dragState = engine.setDragState(pet.dragDirection, sample.speed, now);
+    pet.gait = dragState.gait;
   });
 
   function finishDrag(event) {

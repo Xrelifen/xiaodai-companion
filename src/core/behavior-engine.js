@@ -7,8 +7,9 @@
     lookSmoothing: 0.11,
     drag: {
       walkThreshold: 80,
-      runThreshold: 350,
-      runExitThreshold: 280,
+      runThreshold: 500,
+      runExitThreshold: 200,
+      gaitMinimumHoldMs: 1000,
       maximumPlaybackRate: 1.8,
     },
     desktop: {
@@ -179,6 +180,7 @@
       this.nextIdleActionAt = 0;
       this.history = [];
       this.dragGait = "walk";
+      this.dragGaitChangedAt = Number.NEGATIVE_INFINITY;
       this.scheduleNextIdle(options.now ?? 0);
     }
 
@@ -262,10 +264,15 @@
         runThreshold,
         Number(this.config.drag.runExitThreshold) || runThreshold * 0.8,
       );
+      const gaitMinimumHoldMs = Math.max(0, Number(this.config.drag.gaitMinimumHoldMs) || 0);
       const normalizedSpeed = Math.max(0, speed);
-      this.dragGait = this.dragGait === "run"
+      const nextGait = this.dragGait === "run"
         ? (normalizedSpeed < runExitThreshold ? "walk" : "run")
         : (normalizedSpeed >= runThreshold ? "run" : "walk");
+      if (nextGait !== this.dragGait && now - this.dragGaitChangedAt >= gaitMinimumHoldMs) {
+        this.dragGait = nextGait;
+        this.dragGaitChangedAt = now;
+      }
       const playbackRate = normalizedSpeed < walkThreshold
         ? 0.65
         : clamp(0.78 + normalizedSpeed / Math.max(1, runThreshold) * 0.55, 0.78, maximumPlaybackRate);
@@ -280,6 +287,7 @@
 
     releaseDrag(now) {
       this.dragGait = "walk";
+      this.dragGaitChangedAt = Number.NEGATIVE_INFINITY;
       this.trigger("idle", now, { reason: "drag-release" });
       this.scheduleNextIdle(now);
     }

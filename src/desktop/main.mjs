@@ -1,6 +1,7 @@
 import { app, BrowserWindow, ipcMain, screen } from "electron";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import { createNativeDragState, sampleNativeDrag } from "./drag-controller.mjs";
 import { planRoam } from "./roam-planner.mjs";
 
 const here = path.dirname(fileURLToPath(import.meta.url));
@@ -8,6 +9,7 @@ const compactSize = { width: 360, height: 390 };
 const expandedSize = { width: 440, height: 620 };
 let companionWindow;
 let dragState = null;
+let dragTimer = null;
 let roamTimer = null;
 
 function clamp(value, min, max) {
@@ -26,6 +28,12 @@ function clampToDisplay(bounds, x, y) {
 function stopRoam() {
   if (roamTimer) clearInterval(roamTimer);
   roamTimer = null;
+}
+
+function stopDrag() {
+  if (dragTimer) clearInterval(dragTimer);
+  dragTimer = null;
+  dragState = null;
 }
 
 function createWindow() {
@@ -56,27 +64,43 @@ function createWindow() {
   });
   companionWindow.once("ready-to-show", () => companionWindow.show());
   companionWindow.on("closed", () => {
+    stopDrag();
     stopRoam();
     companionWindow = null;
   });
 }
 
-ipcMain.on("xiaodai:drag-start", (_event, point) => {
-  if (!companionWindow || !point) return;
+ipcMain.on("xiaodai:drag-start", () => {
+  if (!companionWindow) return;
   stopRoam();
-  dragState = { point, bounds: companionWindow.getBounds() };
-});
-
-ipcMain.on("xiaodai:drag-move", (_event, point) => {
-  if (!companionWindow || !dragState || !point) return;
-  const x = dragState.bounds.x + point.screenX - dragState.point.screenX;
-  const y = dragState.bounds.y + point.screenY - dragState.point.screenY;
-  const next = clampToDisplay(dragState.bounds, x, y);
-  companionWindow.setPosition(next.x, next.y, false);
+  stopDrag();
+  const now = Date.now();
+  dragState = createNativeDragState(
+    companionWindow.getBounds(),
+    screen.getCursorScreenPoint(),
+    now,
+  );
+  dragTimer = setInterval(() => {
+    if (!companionWindow || !dragState) {
+      stopDrag();
+      return;
+    }
+    const sample = sampleNativeDrag(dragState, screen.getCursorScreenPoint(), Date.now());
+    const next = clampToDisplay(dragState.bounds, sample.x, sample.y);
+    const [currentX, currentY] = companionWindow.getPosition();
+    if (next.x !== currentX || next.y !== currentY) {
+      companionWindow.setPosition(next.x, next.y, false);
+    }
+    companionWindow.webContents.send("xiaodai:drag-sample", {
+      ...sample,
+      x: next.x,
+      y: next.y,
+    });
+  }, 16);
 });
 
 ipcMain.on("xiaodai:drag-end", () => {
-  dragState = null;
+  stopDrag();
 });
 
 ipcMain.on("xiaodai:set-expanded", (_event, expanded) => {
