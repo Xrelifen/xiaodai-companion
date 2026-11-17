@@ -7,9 +7,12 @@
   "fromPose": "stand",
   "toPose": "stand",
   "facing": "left",
-  "canvas": { "width": 1536, "height": 1024 },
+  "canvas": {
+    "width": 1536,
+    "height": 1024
+  },
   "identityBase": "../../concepts/identity-stand-profile-v1.png",
-  "neutralFrame": "frames/frame-000-extension.png",
+  "neutralFrame": "frames/frame-000-extension.webp",
   "transitionMs": 58,
   "interruptible": true,
   "variants": [
@@ -17,10 +20,22 @@
       "id": "natural-run",
       "weight": 1,
       "frames": [
-        { "file": "frames/frame-000-extension.png", "durationMs": 110 },
-        { "file": "frames/frame-010-front-landing.png", "durationMs": 90 },
-        { "file": "frames/frame-020-gathered.png", "durationMs": 105 },
-        { "file": "frames/frame-030-propulsion.png", "durationMs": 95 }
+        {
+          "file": "frames/frame-000-extension.webp",
+          "durationMs": 110
+        },
+        {
+          "file": "frames/frame-010-front-landing.webp",
+          "durationMs": 90
+        },
+        {
+          "file": "frames/frame-020-gathered.webp",
+          "durationMs": 105
+        },
+        {
+          "file": "frames/frame-030-propulsion.webp",
+          "durationMs": 95
+        }
       ]
     }
   ],

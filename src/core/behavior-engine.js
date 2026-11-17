@@ -12,7 +12,7 @@
       maximumPlaybackRate: 1.8,
     },
     desktop: {
-      roamEnabled: false,
+      roamEnabled: true,
       roamMinDelayMs: 18000,
       roamMaxDelayMs: 42000,
     },
@@ -21,7 +21,6 @@
       { id: "lie-down", label: "趴著休息", weight: 24, cooldownMs: 12000, sequence: "lieDown" },
       { id: "stand-turn-sit", label: "站起來轉一圈", weight: 14, cooldownMs: 18000, sequence: "standTurnSit" },
       { id: "wave", label: "揮揮手", weight: 12, cooldownMs: 14000, sequence: "wave" },
-      { id: "small-jump", label: "開心跳一下", weight: 8, cooldownMs: 22000, sequence: "jump" },
       { id: "focused", label: "專心觀察", weight: 8, cooldownMs: 16000, sequence: "focused" },
     ],
   };

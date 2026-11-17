@@ -5,9 +5,12 @@
   "intent": "transition",
   "fromPose": "sit",
   "toPose": "lie",
-  "canvas": { "width": 1536, "height": 1354 },
+  "canvas": {
+    "width": 1536,
+    "height": 1354
+  },
   "identityBase": "../../concepts/identity-sit-v1.png",
-  "neutralFrame": "../sit-idle-v1/frames/frame-000-neutral.png",
+  "neutralFrame": "../sit-idle-v1/frames/frame-000-neutral.webp",
   "transitionMs": 170,
   "interruptible": false,
   "variants": [
@@ -15,10 +18,22 @@
       "id": "sit-to-lie",
       "weight": 1,
       "frames": [
-        { "file": "../sit-idle-v1/frames/frame-000-neutral.png", "durationMs": 720 },
-        { "file": "frames/frame-010-lean-forward.png", "durationMs": 560 },
-        { "file": "frames/frame-020-chest-lowered.png", "durationMs": 760 },
-        { "file": "../lie-idle-v1/frames/frame-000-neutral.png", "durationMs": 1440 }
+        {
+          "file": "../sit-idle-v1/frames/frame-000-neutral.webp",
+          "durationMs": 720
+        },
+        {
+          "file": "frames/frame-010-lean-forward.webp",
+          "durationMs": 560
+        },
+        {
+          "file": "frames/frame-020-chest-lowered.webp",
+          "durationMs": 760
+        },
+        {
+          "file": "../lie-idle-v1/frames/frame-000-neutral.webp",
+          "durationMs": 1440
+        }
       ]
     }
   ],

@@ -5,7 +5,7 @@
   if (!core) throw new Error("XiaodaiCore is unavailable");
   const motionCore = globalThis.XiaodaiMotion;
 
-  const STORAGE_KEY = "xiaodai-companion:settings:v1";
+  const STORAGE_KEY = "xiaodai-companion:settings:v2";
   const AFFECTION_KEY = "xiaodai-companion:affection:v1";
   const ACTIVE_PET_KEY = "xiaodai-companion:active-pet:v1";
   const catalog = Array.isArray(globalThis.XIAODAI_PET_CATALOG) ? globalThis.XIAODAI_PET_CATALOG : [];
@@ -24,7 +24,9 @@
   const affectionLabel = document.querySelector("#affection");
   const desktopRoamRow = document.querySelector(".desktop-setting");
   const closeCompanion = document.querySelector("#close-companion");
+  const settingsCloseApp = document.querySelector("#settings-close-app");
   const petSelect = document.querySelector("#pet-select");
+  const settingsPetSelect = document.querySelector("#settings-pet-select");
 
   desktopRoamRow.hidden = !isDesktop;
   closeCompanion.hidden = !isDesktop;
@@ -301,6 +303,7 @@
   }
 
   canvas.addEventListener("pointerdown", (event) => {
+    if (event.button !== 0) return;
     const point = canvasPoint(event);
     pet.dragging = true;
     pet.pointerId = event.pointerId;
@@ -349,8 +352,6 @@
     pet.gait = "walk";
     if (wasClick) {
       addAffection(1);
-      engine.trigger(affection % 4 === 0 ? "jump" : "wave", performance.now(), { reason: "pet" });
-      showReaction(affection % 4 === 0 ? "♡ 好開心" : "♡ 呼嚕");
     }
   }
 
@@ -368,13 +369,23 @@
     if (!pet.dragging) pet.pointerInside = false;
   });
 
+  canvas.addEventListener("contextmenu", (event) => {
+    if (!isDesktop) return;
+    event.preventDefault();
+    toggleSettings(true);
+  });
+
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape" && !settingsPanel.hidden) toggleSettings(false);
+  });
+
   document.querySelector("[data-action='pet']").addEventListener("click", () => {
     addAffection(1);
     engine.trigger("wave", performance.now(), { reason: "button:pet" });
     showReaction("♡ 呼嚕呼嚕");
   });
   document.querySelector("[data-action='call']").addEventListener("click", () => {
-    engine.trigger("jump", performance.now(), { reason: "button:call" });
+    engine.trigger("lookAround", performance.now(), { reason: "button:call" });
     showReaction("喵？");
   });
   document.querySelector("[data-action='rest']").addEventListener("click", () => {
@@ -392,6 +403,7 @@
   settingsToggle.addEventListener("click", () => toggleSettings());
   settingsClose.addEventListener("click", () => toggleSettings(false));
   closeCompanion.addEventListener("click", () => globalThis.xiaodaiDesktop?.close?.());
+  settingsCloseApp.addEventListener("click", () => globalThis.xiaodaiDesktop?.close?.());
 
   const inputs = {
     idleMin: document.querySelector("#idle-min"),
@@ -528,13 +540,19 @@
     option.value = item.id;
     option.textContent = item.name;
     petSelect.append(option);
+    settingsPetSelect.append(option.cloneNode(true));
   }
   petSelect.value = activePet.id;
-  petSelect.addEventListener("change", () => {
-    loadPet(petSelect.value);
+  settingsPetSelect.value = activePet.id;
+  function changePet(petId) {
+    loadPet(petId);
+    petSelect.value = activePet.id;
+    settingsPetSelect.value = activePet.id;
     engine.trigger("idle", performance.now(), { reason: "pet-change" });
     showReaction(`${activePet.name}來了`);
-  });
+  }
+  petSelect.addEventListener("change", () => changePet(petSelect.value));
+  settingsPetSelect.addEventListener("change", () => changePet(settingsPetSelect.value));
 
   function scheduleDesktopRoam(now) {
     pet.nextRoamAt = now + core.randomBetween(

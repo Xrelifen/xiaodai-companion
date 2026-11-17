@@ -1,6 +1,8 @@
 import assert from "node:assert/strict";
 import { access, readFile } from "node:fs/promises";
+import { fileURLToPath } from "node:url";
 import test from "node:test";
+import sharp from "sharp";
 
 const motionUrl = new URL("../assets/pets/%E5%B0%8F%E5%91%86/generated/motions/sit-idle-v1/motion.json", import.meta.url);
 const lieMotionUrl = new URL("../assets/pets/%E5%B0%8F%E5%91%86/generated/motions/lie-idle-v1/motion.json", import.meta.url);
@@ -8,17 +10,14 @@ const transitionMotionUrl = new URL("../assets/pets/%E5%B0%8F%E5%91%86/generated
 const walkMotionUrl = new URL("../assets/pets/%E5%B0%8F%E5%91%86/generated/motions/walk-cycle-v1/motion.json", import.meta.url);
 const runMotionUrl = new URL("../assets/pets/%E5%B0%8F%E5%91%86/generated/motions/run-cycle-v1/motion.json", import.meta.url);
 
-function pngMetadata(buffer) {
-  const signature = "89504e470d0a1a0a";
-  assert.equal(buffer.subarray(0, 8).toString("hex"), signature);
-  return {
-    width: buffer.readUInt32BE(16),
-    height: buffer.readUInt32BE(20),
-    colorType: buffer[25],
-  };
+async function frameMetadata(url) {
+  const metadata = await sharp(fileURLToPath(url)).metadata();
+  assert.equal(metadata.format, "webp");
+  assert.equal(metadata.hasAlpha, true);
+  return metadata;
 }
 
-test("sit idle motion references valid transparent PNG frames", async () => {
+test("sit idle motion references valid transparent WebP frames", async () => {
   const motion = JSON.parse(await readFile(motionUrl, "utf8"));
   assert.equal(motion.fromPose, "sit");
   assert.equal(motion.toPose, "sit");
@@ -33,17 +32,16 @@ test("sit idle motion references valid transparent PNG frames", async () => {
   for (const file of files) {
     const url = new URL(file, motionUrl);
     await access(url);
-    const metadata = pngMetadata(await readFile(url));
+    const metadata = await frameMetadata(url);
     assert.deepEqual(
       { width: metadata.width, height: metadata.height },
       motion.canvas,
       `${file} must match the motion canvas`,
     );
-    assert.ok([4, 6].includes(metadata.colorType), `${file} must contain an alpha channel`);
   }
 });
 
-test("lying idle motion references valid transparent PNG frames", async () => {
+test("lying idle motion references valid transparent WebP frames", async () => {
   const motion = JSON.parse(await readFile(lieMotionUrl, "utf8"));
   assert.equal(motion.fromPose, "lie");
   assert.equal(motion.toPose, "lie");
@@ -54,9 +52,8 @@ test("lying idle motion references valid transparent PNG frames", async () => {
   for (const file of files) {
     const url = new URL(file, lieMotionUrl);
     await access(url);
-    const metadata = pngMetadata(await readFile(url));
+    const metadata = await frameMetadata(url);
     assert.deepEqual({ width: metadata.width, height: metadata.height }, motion.canvas);
-    assert.ok([4, 6].includes(metadata.colorType), `${file} must contain an alpha channel`);
   }
 });
 
@@ -72,9 +69,8 @@ test("sit-to-lie transition connects the approved endpoints with transparent fra
   for (const file of files) {
     const url = new URL(file, transitionMotionUrl);
     await access(url);
-    const metadata = pngMetadata(await readFile(url));
+    const metadata = await frameMetadata(url);
     assert.ok(metadata.width > 0 && metadata.height > 0);
-    assert.ok([4, 6].includes(metadata.colorType), `${file} must contain an alpha channel`);
   }
 });
 
@@ -89,9 +85,8 @@ for (const [gait, motionUrl] of [["walk", walkMotionUrl], ["run", runMotionUrl]]
     for (const file of files) {
       const url = new URL(file, motionUrl);
       await access(url);
-      const metadata = pngMetadata(await readFile(url));
+      const metadata = await frameMetadata(url);
       assert.deepEqual({ width: metadata.width, height: metadata.height }, motion.canvas);
-      assert.ok([4, 6].includes(metadata.colorType), `${file} must contain an alpha channel`);
     }
   });
 }

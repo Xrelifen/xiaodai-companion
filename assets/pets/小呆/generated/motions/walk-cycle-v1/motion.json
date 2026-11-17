@@ -7,9 +7,12 @@
   "fromPose": "stand",
   "toPose": "stand",
   "facing": "left",
-  "canvas": { "width": 1536, "height": 1024 },
+  "canvas": {
+    "width": 1536,
+    "height": 1024
+  },
   "identityBase": "../../concepts/identity-stand-profile-v1.png",
-  "neutralFrame": "frames/frame-000-contact.png",
+  "neutralFrame": "frames/frame-000-contact.webp",
   "transitionMs": 72,
   "interruptible": true,
   "variants": [
@@ -17,10 +20,22 @@
       "id": "natural-walk",
       "weight": 1,
       "frames": [
-        { "file": "frames/frame-000-contact.png", "durationMs": 180 },
-        { "file": "frames/frame-010-down.png", "durationMs": 150 },
-        { "file": "frames/frame-020-opposite-contact.png", "durationMs": 180 },
-        { "file": "frames/frame-030-up.png", "durationMs": 150 }
+        {
+          "file": "frames/frame-000-contact.webp",
+          "durationMs": 180
+        },
+        {
+          "file": "frames/frame-010-down.webp",
+          "durationMs": 150
+        },
+        {
+          "file": "frames/frame-020-opposite-contact.webp",
+          "durationMs": 180
+        },
+        {
+          "file": "frames/frame-030-up.webp",
+          "durationMs": 150
+        }
       ]
     }
   ],

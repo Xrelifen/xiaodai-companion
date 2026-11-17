@@ -5,10 +5,16 @@
   "intent": "idle",
   "fromPose": "lie",
   "toPose": "lie",
-  "canvas": { "width": 1536, "height": 1024 },
+  "canvas": {
+    "width": 1536,
+    "height": 1024
+  },
   "identityBase": "../../concepts/identity-lie-v1.png",
-  "neutralFrame": "frames/frame-000-neutral.png",
-  "idleGapMs": [1200, 4200],
+  "neutralFrame": "frames/frame-000-neutral.webp",
+  "idleGapMs": [
+    1200,
+    4200
+  ],
   "transitionMs": 150,
   "interruptible": true,
   "variants": [
@@ -17,11 +23,41 @@
       "weight": 5,
       "cooldownMs": 5000,
       "frames": [
-        { "file": "frames/frame-000-neutral.png", "durationMs": [1100, 3200] },
-        { "file": "frames/frame-010-half-blink.png", "durationMs": [180, 260] },
-        { "file": "frames/frame-020-eyes-closed.png", "durationMs": [180, 320] },
-        { "file": "frames/frame-010-half-blink.png", "durationMs": [200, 300] },
-        { "file": "frames/frame-000-neutral.png", "durationMs": [1000, 3000] }
+        {
+          "file": "frames/frame-000-neutral.webp",
+          "durationMs": [
+            1100,
+            3200
+          ]
+        },
+        {
+          "file": "frames/frame-010-half-blink.webp",
+          "durationMs": [
+            180,
+            260
+          ]
+        },
+        {
+          "file": "frames/frame-020-eyes-closed.webp",
+          "durationMs": [
+            180,
+            320
+          ]
+        },
+        {
+          "file": "frames/frame-010-half-blink.webp",
+          "durationMs": [
+            200,
+            300
+          ]
+        },
+        {
+          "file": "frames/frame-000-neutral.webp",
+          "durationMs": [
+            1000,
+            3000
+          ]
+        }
       ]
     },
     {
@@ -29,9 +65,27 @@
       "weight": 2.2,
       "cooldownMs": 7000,
       "frames": [
-        { "file": "frames/frame-000-neutral.png", "durationMs": [900, 2400] },
-        { "file": "frames/frame-050-ear-listen.png", "durationMs": [550, 1100] },
-        { "file": "frames/frame-000-neutral.png", "durationMs": [1200, 3200] }
+        {
+          "file": "frames/frame-000-neutral.webp",
+          "durationMs": [
+            900,
+            2400
+          ]
+        },
+        {
+          "file": "frames/frame-050-ear-listen.webp",
+          "durationMs": [
+            550,
+            1100
+          ]
+        },
+        {
+          "file": "frames/frame-000-neutral.webp",
+          "durationMs": [
+            1200,
+            3200
+          ]
+        }
       ]
     },
     {
@@ -39,11 +93,41 @@
       "weight": 0.9,
       "cooldownMs": 24000,
       "frames": [
-        { "file": "frames/frame-000-neutral.png", "durationMs": [1200, 2800] },
-        { "file": "frames/frame-030-head-lowered.png", "durationMs": [420, 680] },
-        { "file": "frames/frame-040-head-resting.png", "durationMs": [5000, 16000] },
-        { "file": "frames/frame-030-head-lowered.png", "durationMs": [480, 760] },
-        { "file": "frames/frame-000-neutral.png", "durationMs": [1800, 4200] }
+        {
+          "file": "frames/frame-000-neutral.webp",
+          "durationMs": [
+            1200,
+            2800
+          ]
+        },
+        {
+          "file": "frames/frame-030-head-lowered.webp",
+          "durationMs": [
+            420,
+            680
+          ]
+        },
+        {
+          "file": "frames/frame-040-head-resting.webp",
+          "durationMs": [
+            5000,
+            16000
+          ]
+        },
+        {
+          "file": "frames/frame-030-head-lowered.webp",
+          "durationMs": [
+            480,
+            760
+          ]
+        },
+        {
+          "file": "frames/frame-000-neutral.webp",
+          "durationMs": [
+            1800,
+            4200
+          ]
+        }
       ]
     }
   ]

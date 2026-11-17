@@ -4,10 +4,10 @@
 
 ## 影格
 
-- `../sit-idle-v1/frames/frame-000-neutral.png`：核可坐姿端點
-- `frames/frame-010-lean-forward.png`：仍坐在後腿上，前腳前移、肩膀開始下降
-- `frames/frame-020-chest-lowered.png`：胸口接近地面、後腿逐步收進趴姿
-- `../lie-idle-v1/frames/frame-000-neutral.png`：核可趴姿端點
+- `../sit-idle-v1/frames/frame-000-neutral.webp`：核可坐姿端點
+- `frames/frame-010-lean-forward.webp`：仍坐在後腿上，前腳前移、肩膀開始下降
+- `frames/frame-020-chest-lowered.webp`：胸口接近地面、後腿逐步收進趴姿
+- `../lie-idle-v1/frames/frame-000-neutral.webp`：核可趴姿端點
 
 ## 生成方式
 

@@ -39,7 +39,10 @@ function createWindow() {
     show: false,
     backgroundColor: "#00000000",
     webPreferences: {
-      preload: path.join(here, "preload.mjs"),
+      // Sandboxed Electron preload scripts must use the CommonJS loader.
+      // Using an ESM .mjs preload silently prevented the desktop bridge from
+      // loading, so animation state changed while the native window stayed put.
+      preload: path.join(here, "preload.cjs"),
       contextIsolation: true,
       nodeIntegration: false,
       sandbox: true,

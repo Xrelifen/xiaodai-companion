@@ -7,6 +7,23 @@ test("desktop package excludes reference photos", async () => {
   assert.ok(pkg.build.files.includes("!assets/pets/*/source/**/*"));
 });
 
+test("sandboxed desktop bridge uses a CommonJS preload", async () => {
+  const main = await readFile(new URL("../src/desktop/main.mjs", import.meta.url), "utf8");
+  const preload = await readFile(new URL("../src/desktop/preload.cjs", import.meta.url), "utf8");
+  assert.match(main, /preload\.cjs/);
+  assert.match(preload, /contextBridge\.exposeInMainWorld\("xiaodaiDesktop"/);
+  assert.match(preload, /xiaodai:drag-move/);
+  assert.match(preload, /xiaodai:roam/);
+});
+
+test("desktop controls stay hidden until the pet is explicitly right-clicked", async () => {
+  const app = await readFile(new URL("../src/ui/app.js", import.meta.url), "utf8");
+  const styles = await readFile(new URL("../src/ui/styles.css", import.meta.url), "utf8");
+  assert.match(app, /addEventListener\("contextmenu"/);
+  assert.match(app, /toggleSettings\(true\)/);
+  assert.match(styles, /body\.desktop-mode \.action-bar\s*\{\s*display: none;/);
+});
+
 test("release workflow does not copy the complete assets tree", async () => {
   const workflow = await readFile(new URL("../.github/workflows/release.yml", import.meta.url), "utf8");
   assert.doesNotMatch(workflow, /Copy-Item\s+skills,src,assets,/);

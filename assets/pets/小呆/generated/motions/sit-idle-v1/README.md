@@ -13,7 +13,7 @@
 - 向畫面右側觀察的半程過渡
 - 單耳聆聽反應
 
-八張皆以 `identity-sit-v1.png` 作 edit target，並搭配四張真實生活照鎖定身份。所有檔案為 1161×1354 RGBA PNG，透明四角已檢查。
+八張皆以 `identity-sit-v1.png` 作 edit target，並搭配四張真實生活照鎖定身份。執行版為 1161×1354 透明 WebP，母檔 PNG 保留供重新調整。
 
 ## 共用生成提示
 

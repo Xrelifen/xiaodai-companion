@@ -27,7 +27,7 @@ globalThis.XIAODAI_PET_CATALOG = [
         "height": 1354
       },
       "identityBase": "../../concepts/identity-sit-v1.png",
-      "neutralFrame": "frames/frame-000-neutral.png",
+      "neutralFrame": "frames/frame-000-neutral.webp",
       "idleGapMs": [
         800,
         3200
@@ -38,7 +38,7 @@ globalThis.XIAODAI_PET_CATALOG = [
         "breathing": "Apply a subtle 0.4–0.8% vertical chest/body scale in the renderer; do not generate a separate high-amplitude breathing frame.",
         "transition": "Cross-fade or interpolate over 90–160 ms where a direct head-pose change is visually abrupt."
       },
-      "neutralFrameUrl": "../../assets/pets/%E5%B0%8F%E5%91%86/generated/motions/sit-idle-v1/frames/frame-000-neutral.png",
+      "neutralFrameUrl": "../../assets/pets/%E5%B0%8F%E5%91%86/generated/motions/sit-idle-v1/frames/frame-000-neutral.webp",
       "variants": [
         {
           "id": "slow-blink",
@@ -46,38 +46,38 @@ globalThis.XIAODAI_PET_CATALOG = [
           "cooldownMs": 4500,
           "frames": [
             {
-              "file": "frames/frame-000-neutral.png",
+              "file": "frames/frame-000-neutral.webp",
               "durationMs": [
                 900,
                 2600
               ],
-              "url": "../../assets/pets/%E5%B0%8F%E5%91%86/generated/motions/sit-idle-v1/frames/frame-000-neutral.png"
+              "url": "../../assets/pets/%E5%B0%8F%E5%91%86/generated/motions/sit-idle-v1/frames/frame-000-neutral.webp"
             },
             {
-              "file": "frames/frame-010-half-blink.png",
+              "file": "frames/frame-010-half-blink.webp",
               "durationMs": 170,
-              "url": "../../assets/pets/%E5%B0%8F%E5%91%86/generated/motions/sit-idle-v1/frames/frame-010-half-blink.png"
+              "url": "../../assets/pets/%E5%B0%8F%E5%91%86/generated/motions/sit-idle-v1/frames/frame-010-half-blink.webp"
             },
             {
-              "file": "frames/frame-020-eyes-closed.png",
+              "file": "frames/frame-020-eyes-closed.webp",
               "durationMs": [
                 110,
                 180
               ],
-              "url": "../../assets/pets/%E5%B0%8F%E5%91%86/generated/motions/sit-idle-v1/frames/frame-020-eyes-closed.png"
+              "url": "../../assets/pets/%E5%B0%8F%E5%91%86/generated/motions/sit-idle-v1/frames/frame-020-eyes-closed.webp"
             },
             {
-              "file": "frames/frame-010-half-blink.png",
+              "file": "frames/frame-010-half-blink.webp",
               "durationMs": 190,
-              "url": "../../assets/pets/%E5%B0%8F%E5%91%86/generated/motions/sit-idle-v1/frames/frame-010-half-blink.png"
+              "url": "../../assets/pets/%E5%B0%8F%E5%91%86/generated/motions/sit-idle-v1/frames/frame-010-half-blink.webp"
             },
             {
-              "file": "frames/frame-000-neutral.png",
+              "file": "frames/frame-000-neutral.webp",
               "durationMs": [
                 800,
                 2200
               ],
-              "url": "../../assets/pets/%E5%B0%8F%E5%91%86/generated/motions/sit-idle-v1/frames/frame-000-neutral.png"
+              "url": "../../assets/pets/%E5%B0%8F%E5%91%86/generated/motions/sit-idle-v1/frames/frame-000-neutral.webp"
             }
           ]
         },
@@ -87,44 +87,44 @@ globalThis.XIAODAI_PET_CATALOG = [
           "cooldownMs": 7000,
           "frames": [
             {
-              "file": "frames/frame-000-neutral.png",
+              "file": "frames/frame-000-neutral.webp",
               "durationMs": [
                 700,
                 1800
               ],
-              "url": "../../assets/pets/%E5%B0%8F%E5%91%86/generated/motions/sit-idle-v1/frames/frame-000-neutral.png"
+              "url": "../../assets/pets/%E5%B0%8F%E5%91%86/generated/motions/sit-idle-v1/frames/frame-000-neutral.webp"
             },
             {
-              "file": "frames/frame-025-look-viewer-left-half.png",
+              "file": "frames/frame-025-look-viewer-left-half.webp",
               "durationMs": [
                 180,
                 270
               ],
-              "url": "../../assets/pets/%E5%B0%8F%E5%91%86/generated/motions/sit-idle-v1/frames/frame-025-look-viewer-left-half.png"
+              "url": "../../assets/pets/%E5%B0%8F%E5%91%86/generated/motions/sit-idle-v1/frames/frame-025-look-viewer-left-half.webp"
             },
             {
-              "file": "frames/frame-030-look-viewer-left.png",
+              "file": "frames/frame-030-look-viewer-left.webp",
               "durationMs": [
                 900,
                 2200
               ],
-              "url": "../../assets/pets/%E5%B0%8F%E5%91%86/generated/motions/sit-idle-v1/frames/frame-030-look-viewer-left.png"
+              "url": "../../assets/pets/%E5%B0%8F%E5%91%86/generated/motions/sit-idle-v1/frames/frame-030-look-viewer-left.webp"
             },
             {
-              "file": "frames/frame-025-look-viewer-left-half.png",
+              "file": "frames/frame-025-look-viewer-left-half.webp",
               "durationMs": [
                 210,
                 320
               ],
-              "url": "../../assets/pets/%E5%B0%8F%E5%91%86/generated/motions/sit-idle-v1/frames/frame-025-look-viewer-left-half.png"
+              "url": "../../assets/pets/%E5%B0%8F%E5%91%86/generated/motions/sit-idle-v1/frames/frame-025-look-viewer-left-half.webp"
             },
             {
-              "file": "frames/frame-000-neutral.png",
+              "file": "frames/frame-000-neutral.webp",
               "durationMs": [
                 900,
                 2400
               ],
-              "url": "../../assets/pets/%E5%B0%8F%E5%91%86/generated/motions/sit-idle-v1/frames/frame-000-neutral.png"
+              "url": "../../assets/pets/%E5%B0%8F%E5%91%86/generated/motions/sit-idle-v1/frames/frame-000-neutral.webp"
             }
           ]
         },
@@ -134,44 +134,44 @@ globalThis.XIAODAI_PET_CATALOG = [
           "cooldownMs": 7000,
           "frames": [
             {
-              "file": "frames/frame-000-neutral.png",
+              "file": "frames/frame-000-neutral.webp",
               "durationMs": [
                 700,
                 1800
               ],
-              "url": "../../assets/pets/%E5%B0%8F%E5%91%86/generated/motions/sit-idle-v1/frames/frame-000-neutral.png"
+              "url": "../../assets/pets/%E5%B0%8F%E5%91%86/generated/motions/sit-idle-v1/frames/frame-000-neutral.webp"
             },
             {
-              "file": "frames/frame-035-look-viewer-right-half.png",
+              "file": "frames/frame-035-look-viewer-right-half.webp",
               "durationMs": [
                 180,
                 270
               ],
-              "url": "../../assets/pets/%E5%B0%8F%E5%91%86/generated/motions/sit-idle-v1/frames/frame-035-look-viewer-right-half.png"
+              "url": "../../assets/pets/%E5%B0%8F%E5%91%86/generated/motions/sit-idle-v1/frames/frame-035-look-viewer-right-half.webp"
             },
             {
-              "file": "frames/frame-040-look-viewer-right.png",
+              "file": "frames/frame-040-look-viewer-right.webp",
               "durationMs": [
                 900,
                 2200
               ],
-              "url": "../../assets/pets/%E5%B0%8F%E5%91%86/generated/motions/sit-idle-v1/frames/frame-040-look-viewer-right.png"
+              "url": "../../assets/pets/%E5%B0%8F%E5%91%86/generated/motions/sit-idle-v1/frames/frame-040-look-viewer-right.webp"
             },
             {
-              "file": "frames/frame-035-look-viewer-right-half.png",
+              "file": "frames/frame-035-look-viewer-right-half.webp",
               "durationMs": [
                 210,
                 320
               ],
-              "url": "../../assets/pets/%E5%B0%8F%E5%91%86/generated/motions/sit-idle-v1/frames/frame-035-look-viewer-right-half.png"
+              "url": "../../assets/pets/%E5%B0%8F%E5%91%86/generated/motions/sit-idle-v1/frames/frame-035-look-viewer-right-half.webp"
             },
             {
-              "file": "frames/frame-000-neutral.png",
+              "file": "frames/frame-000-neutral.webp",
               "durationMs": [
                 900,
                 2400
               ],
-              "url": "../../assets/pets/%E5%B0%8F%E5%91%86/generated/motions/sit-idle-v1/frames/frame-000-neutral.png"
+              "url": "../../assets/pets/%E5%B0%8F%E5%91%86/generated/motions/sit-idle-v1/frames/frame-000-neutral.webp"
             }
           ]
         },
@@ -181,28 +181,28 @@ globalThis.XIAODAI_PET_CATALOG = [
           "cooldownMs": 6500,
           "frames": [
             {
-              "file": "frames/frame-000-neutral.png",
+              "file": "frames/frame-000-neutral.webp",
               "durationMs": [
                 600,
                 1600
               ],
-              "url": "../../assets/pets/%E5%B0%8F%E5%91%86/generated/motions/sit-idle-v1/frames/frame-000-neutral.png"
+              "url": "../../assets/pets/%E5%B0%8F%E5%91%86/generated/motions/sit-idle-v1/frames/frame-000-neutral.webp"
             },
             {
-              "file": "frames/frame-050-ear-listen.png",
+              "file": "frames/frame-050-ear-listen.webp",
               "durationMs": [
                 420,
                 760
               ],
-              "url": "../../assets/pets/%E5%B0%8F%E5%91%86/generated/motions/sit-idle-v1/frames/frame-050-ear-listen.png"
+              "url": "../../assets/pets/%E5%B0%8F%E5%91%86/generated/motions/sit-idle-v1/frames/frame-050-ear-listen.webp"
             },
             {
-              "file": "frames/frame-000-neutral.png",
+              "file": "frames/frame-000-neutral.webp",
               "durationMs": [
                 1000,
                 2600
               ],
-              "url": "../../assets/pets/%E5%B0%8F%E5%91%86/generated/motions/sit-idle-v1/frames/frame-000-neutral.png"
+              "url": "../../assets/pets/%E5%B0%8F%E5%91%86/generated/motions/sit-idle-v1/frames/frame-000-neutral.webp"
             }
           ]
         }
@@ -221,7 +221,7 @@ globalThis.XIAODAI_PET_CATALOG = [
           "height": 1354
         },
         "identityBase": "../../concepts/identity-sit-v1.png",
-        "neutralFrame": "frames/frame-000-neutral.png",
+        "neutralFrame": "frames/frame-000-neutral.webp",
         "idleGapMs": [
           800,
           3200
@@ -232,7 +232,7 @@ globalThis.XIAODAI_PET_CATALOG = [
           "breathing": "Apply a subtle 0.4–0.8% vertical chest/body scale in the renderer; do not generate a separate high-amplitude breathing frame.",
           "transition": "Cross-fade or interpolate over 90–160 ms where a direct head-pose change is visually abrupt."
         },
-        "neutralFrameUrl": "../../assets/pets/%E5%B0%8F%E5%91%86/generated/motions/sit-idle-v1/frames/frame-000-neutral.png",
+        "neutralFrameUrl": "../../assets/pets/%E5%B0%8F%E5%91%86/generated/motions/sit-idle-v1/frames/frame-000-neutral.webp",
         "variants": [
           {
             "id": "slow-blink",
@@ -240,38 +240,38 @@ globalThis.XIAODAI_PET_CATALOG = [
             "cooldownMs": 4500,
             "frames": [
               {
-                "file": "frames/frame-000-neutral.png",
+                "file": "frames/frame-000-neutral.webp",
                 "durationMs": [
                   900,
                   2600
                 ],
-                "url": "../../assets/pets/%E5%B0%8F%E5%91%86/generated/motions/sit-idle-v1/frames/frame-000-neutral.png"
+                "url": "../../assets/pets/%E5%B0%8F%E5%91%86/generated/motions/sit-idle-v1/frames/frame-000-neutral.webp"
               },
               {
-                "file": "frames/frame-010-half-blink.png",
+                "file": "frames/frame-010-half-blink.webp",
                 "durationMs": 170,
-                "url": "../../assets/pets/%E5%B0%8F%E5%91%86/generated/motions/sit-idle-v1/frames/frame-010-half-blink.png"
+                "url": "../../assets/pets/%E5%B0%8F%E5%91%86/generated/motions/sit-idle-v1/frames/frame-010-half-blink.webp"
               },
               {
-                "file": "frames/frame-020-eyes-closed.png",
+                "file": "frames/frame-020-eyes-closed.webp",
                 "durationMs": [
                   110,
                   180
                 ],
-                "url": "../../assets/pets/%E5%B0%8F%E5%91%86/generated/motions/sit-idle-v1/frames/frame-020-eyes-closed.png"
+                "url": "../../assets/pets/%E5%B0%8F%E5%91%86/generated/motions/sit-idle-v1/frames/frame-020-eyes-closed.webp"
               },
               {
-                "file": "frames/frame-010-half-blink.png",
+                "file": "frames/frame-010-half-blink.webp",
                 "durationMs": 190,
-                "url": "../../assets/pets/%E5%B0%8F%E5%91%86/generated/motions/sit-idle-v1/frames/frame-010-half-blink.png"
+                "url": "../../assets/pets/%E5%B0%8F%E5%91%86/generated/motions/sit-idle-v1/frames/frame-010-half-blink.webp"
               },
               {
-                "file": "frames/frame-000-neutral.png",
+                "file": "frames/frame-000-neutral.webp",
                 "durationMs": [
                   800,
                   2200
                 ],
-                "url": "../../assets/pets/%E5%B0%8F%E5%91%86/generated/motions/sit-idle-v1/frames/frame-000-neutral.png"
+                "url": "../../assets/pets/%E5%B0%8F%E5%91%86/generated/motions/sit-idle-v1/frames/frame-000-neutral.webp"
               }
             ]
           },
@@ -281,44 +281,44 @@ globalThis.XIAODAI_PET_CATALOG = [
             "cooldownMs": 7000,
             "frames": [
               {
-                "file": "frames/frame-000-neutral.png",
+                "file": "frames/frame-000-neutral.webp",
                 "durationMs": [
                   700,
                   1800
                 ],
-                "url": "../../assets/pets/%E5%B0%8F%E5%91%86/generated/motions/sit-idle-v1/frames/frame-000-neutral.png"
+                "url": "../../assets/pets/%E5%B0%8F%E5%91%86/generated/motions/sit-idle-v1/frames/frame-000-neutral.webp"
               },
               {
-                "file": "frames/frame-025-look-viewer-left-half.png",
+                "file": "frames/frame-025-look-viewer-left-half.webp",
                 "durationMs": [
                   180,
                   270
                 ],
-                "url": "../../assets/pets/%E5%B0%8F%E5%91%86/generated/motions/sit-idle-v1/frames/frame-025-look-viewer-left-half.png"
+                "url": "../../assets/pets/%E5%B0%8F%E5%91%86/generated/motions/sit-idle-v1/frames/frame-025-look-viewer-left-half.webp"
               },
               {
-                "file": "frames/frame-030-look-viewer-left.png",
+                "file": "frames/frame-030-look-viewer-left.webp",
                 "durationMs": [
                   900,
                   2200
                 ],
-                "url": "../../assets/pets/%E5%B0%8F%E5%91%86/generated/motions/sit-idle-v1/frames/frame-030-look-viewer-left.png"
+                "url": "../../assets/pets/%E5%B0%8F%E5%91%86/generated/motions/sit-idle-v1/frames/frame-030-look-viewer-left.webp"
               },
               {
-                "file": "frames/frame-025-look-viewer-left-half.png",
+                "file": "frames/frame-025-look-viewer-left-half.webp",
                 "durationMs": [
                   210,
                   320
                 ],
-                "url": "../../assets/pets/%E5%B0%8F%E5%91%86/generated/motions/sit-idle-v1/frames/frame-025-look-viewer-left-half.png"
+                "url": "../../assets/pets/%E5%B0%8F%E5%91%86/generated/motions/sit-idle-v1/frames/frame-025-look-viewer-left-half.webp"
               },
               {
-                "file": "frames/frame-000-neutral.png",
+                "file": "frames/frame-000-neutral.webp",
                 "durationMs": [
                   900,
                   2400
                 ],
-                "url": "../../assets/pets/%E5%B0%8F%E5%91%86/generated/motions/sit-idle-v1/frames/frame-000-neutral.png"
+                "url": "../../assets/pets/%E5%B0%8F%E5%91%86/generated/motions/sit-idle-v1/frames/frame-000-neutral.webp"
               }
             ]
           },
@@ -328,44 +328,44 @@ globalThis.XIAODAI_PET_CATALOG = [
             "cooldownMs": 7000,
             "frames": [
               {
-                "file": "frames/frame-000-neutral.png",
+                "file": "frames/frame-000-neutral.webp",
                 "durationMs": [
                   700,
                   1800
                 ],
-                "url": "../../assets/pets/%E5%B0%8F%E5%91%86/generated/motions/sit-idle-v1/frames/frame-000-neutral.png"
+                "url": "../../assets/pets/%E5%B0%8F%E5%91%86/generated/motions/sit-idle-v1/frames/frame-000-neutral.webp"
               },
               {
-                "file": "frames/frame-035-look-viewer-right-half.png",
+                "file": "frames/frame-035-look-viewer-right-half.webp",
                 "durationMs": [
                   180,
                   270
                 ],
-                "url": "../../assets/pets/%E5%B0%8F%E5%91%86/generated/motions/sit-idle-v1/frames/frame-035-look-viewer-right-half.png"
+                "url": "../../assets/pets/%E5%B0%8F%E5%91%86/generated/motions/sit-idle-v1/frames/frame-035-look-viewer-right-half.webp"
               },
               {
-                "file": "frames/frame-040-look-viewer-right.png",
+                "file": "frames/frame-040-look-viewer-right.webp",
                 "durationMs": [
                   900,
                   2200
                 ],
-                "url": "../../assets/pets/%E5%B0%8F%E5%91%86/generated/motions/sit-idle-v1/frames/frame-040-look-viewer-right.png"
+                "url": "../../assets/pets/%E5%B0%8F%E5%91%86/generated/motions/sit-idle-v1/frames/frame-040-look-viewer-right.webp"
               },
               {
-                "file": "frames/frame-035-look-viewer-right-half.png",
+                "file": "frames/frame-035-look-viewer-right-half.webp",
                 "durationMs": [
                   210,
                   320
                 ],
-                "url": "../../assets/pets/%E5%B0%8F%E5%91%86/generated/motions/sit-idle-v1/frames/frame-035-look-viewer-right-half.png"
+                "url": "../../assets/pets/%E5%B0%8F%E5%91%86/generated/motions/sit-idle-v1/frames/frame-035-look-viewer-right-half.webp"
               },
               {
-                "file": "frames/frame-000-neutral.png",
+                "file": "frames/frame-000-neutral.webp",
                 "durationMs": [
                   900,
                   2400
                 ],
-                "url": "../../assets/pets/%E5%B0%8F%E5%91%86/generated/motions/sit-idle-v1/frames/frame-000-neutral.png"
+                "url": "../../assets/pets/%E5%B0%8F%E5%91%86/generated/motions/sit-idle-v1/frames/frame-000-neutral.webp"
               }
             ]
           },
@@ -375,28 +375,28 @@ globalThis.XIAODAI_PET_CATALOG = [
             "cooldownMs": 6500,
             "frames": [
               {
-                "file": "frames/frame-000-neutral.png",
+                "file": "frames/frame-000-neutral.webp",
                 "durationMs": [
                   600,
                   1600
                 ],
-                "url": "../../assets/pets/%E5%B0%8F%E5%91%86/generated/motions/sit-idle-v1/frames/frame-000-neutral.png"
+                "url": "../../assets/pets/%E5%B0%8F%E5%91%86/generated/motions/sit-idle-v1/frames/frame-000-neutral.webp"
               },
               {
-                "file": "frames/frame-050-ear-listen.png",
+                "file": "frames/frame-050-ear-listen.webp",
                 "durationMs": [
                   420,
                   760
                 ],
-                "url": "../../assets/pets/%E5%B0%8F%E5%91%86/generated/motions/sit-idle-v1/frames/frame-050-ear-listen.png"
+                "url": "../../assets/pets/%E5%B0%8F%E5%91%86/generated/motions/sit-idle-v1/frames/frame-050-ear-listen.webp"
               },
               {
-                "file": "frames/frame-000-neutral.png",
+                "file": "frames/frame-000-neutral.webp",
                 "durationMs": [
                   1000,
                   2600
                 ],
-                "url": "../../assets/pets/%E5%B0%8F%E5%91%86/generated/motions/sit-idle-v1/frames/frame-000-neutral.png"
+                "url": "../../assets/pets/%E5%B0%8F%E5%91%86/generated/motions/sit-idle-v1/frames/frame-000-neutral.webp"
               }
             ]
           }
@@ -414,14 +414,14 @@ globalThis.XIAODAI_PET_CATALOG = [
           "height": 1024
         },
         "identityBase": "../../concepts/identity-lie-v1.png",
-        "neutralFrame": "frames/frame-000-neutral.png",
+        "neutralFrame": "frames/frame-000-neutral.webp",
         "idleGapMs": [
           1200,
           4200
         ],
         "transitionMs": 150,
         "interruptible": true,
-        "neutralFrameUrl": "../../assets/pets/%E5%B0%8F%E5%91%86/generated/motions/lie-idle-v1/frames/frame-000-neutral.png",
+        "neutralFrameUrl": "../../assets/pets/%E5%B0%8F%E5%91%86/generated/motions/lie-idle-v1/frames/frame-000-neutral.webp",
         "variants": [
           {
             "id": "lie-slow-blink",
@@ -429,44 +429,44 @@ globalThis.XIAODAI_PET_CATALOG = [
             "cooldownMs": 5000,
             "frames": [
               {
-                "file": "frames/frame-000-neutral.png",
+                "file": "frames/frame-000-neutral.webp",
                 "durationMs": [
                   1100,
                   3200
                 ],
-                "url": "../../assets/pets/%E5%B0%8F%E5%91%86/generated/motions/lie-idle-v1/frames/frame-000-neutral.png"
+                "url": "../../assets/pets/%E5%B0%8F%E5%91%86/generated/motions/lie-idle-v1/frames/frame-000-neutral.webp"
               },
               {
-                "file": "frames/frame-010-half-blink.png",
+                "file": "frames/frame-010-half-blink.webp",
                 "durationMs": [
                   180,
                   260
                 ],
-                "url": "../../assets/pets/%E5%B0%8F%E5%91%86/generated/motions/lie-idle-v1/frames/frame-010-half-blink.png"
+                "url": "../../assets/pets/%E5%B0%8F%E5%91%86/generated/motions/lie-idle-v1/frames/frame-010-half-blink.webp"
               },
               {
-                "file": "frames/frame-020-eyes-closed.png",
+                "file": "frames/frame-020-eyes-closed.webp",
                 "durationMs": [
                   180,
                   320
                 ],
-                "url": "../../assets/pets/%E5%B0%8F%E5%91%86/generated/motions/lie-idle-v1/frames/frame-020-eyes-closed.png"
+                "url": "../../assets/pets/%E5%B0%8F%E5%91%86/generated/motions/lie-idle-v1/frames/frame-020-eyes-closed.webp"
               },
               {
-                "file": "frames/frame-010-half-blink.png",
+                "file": "frames/frame-010-half-blink.webp",
                 "durationMs": [
                   200,
                   300
                 ],
-                "url": "../../assets/pets/%E5%B0%8F%E5%91%86/generated/motions/lie-idle-v1/frames/frame-010-half-blink.png"
+                "url": "../../assets/pets/%E5%B0%8F%E5%91%86/generated/motions/lie-idle-v1/frames/frame-010-half-blink.webp"
               },
               {
-                "file": "frames/frame-000-neutral.png",
+                "file": "frames/frame-000-neutral.webp",
                 "durationMs": [
                   1000,
                   3000
                 ],
-                "url": "../../assets/pets/%E5%B0%8F%E5%91%86/generated/motions/lie-idle-v1/frames/frame-000-neutral.png"
+                "url": "../../assets/pets/%E5%B0%8F%E5%91%86/generated/motions/lie-idle-v1/frames/frame-000-neutral.webp"
               }
             ]
           },
@@ -476,28 +476,28 @@ globalThis.XIAODAI_PET_CATALOG = [
             "cooldownMs": 7000,
             "frames": [
               {
-                "file": "frames/frame-000-neutral.png",
+                "file": "frames/frame-000-neutral.webp",
                 "durationMs": [
                   900,
                   2400
                 ],
-                "url": "../../assets/pets/%E5%B0%8F%E5%91%86/generated/motions/lie-idle-v1/frames/frame-000-neutral.png"
+                "url": "../../assets/pets/%E5%B0%8F%E5%91%86/generated/motions/lie-idle-v1/frames/frame-000-neutral.webp"
               },
               {
-                "file": "frames/frame-050-ear-listen.png",
+                "file": "frames/frame-050-ear-listen.webp",
                 "durationMs": [
                   550,
                   1100
                 ],
-                "url": "../../assets/pets/%E5%B0%8F%E5%91%86/generated/motions/lie-idle-v1/frames/frame-050-ear-listen.png"
+                "url": "../../assets/pets/%E5%B0%8F%E5%91%86/generated/motions/lie-idle-v1/frames/frame-050-ear-listen.webp"
               },
               {
-                "file": "frames/frame-000-neutral.png",
+                "file": "frames/frame-000-neutral.webp",
                 "durationMs": [
                   1200,
                   3200
                 ],
-                "url": "../../assets/pets/%E5%B0%8F%E5%91%86/generated/motions/lie-idle-v1/frames/frame-000-neutral.png"
+                "url": "../../assets/pets/%E5%B0%8F%E5%91%86/generated/motions/lie-idle-v1/frames/frame-000-neutral.webp"
               }
             ]
           },
@@ -507,44 +507,44 @@ globalThis.XIAODAI_PET_CATALOG = [
             "cooldownMs": 24000,
             "frames": [
               {
-                "file": "frames/frame-000-neutral.png",
+                "file": "frames/frame-000-neutral.webp",
                 "durationMs": [
                   1200,
                   2800
                 ],
-                "url": "../../assets/pets/%E5%B0%8F%E5%91%86/generated/motions/lie-idle-v1/frames/frame-000-neutral.png"
+                "url": "../../assets/pets/%E5%B0%8F%E5%91%86/generated/motions/lie-idle-v1/frames/frame-000-neutral.webp"
               },
               {
-                "file": "frames/frame-030-head-lowered.png",
+                "file": "frames/frame-030-head-lowered.webp",
                 "durationMs": [
                   420,
                   680
                 ],
-                "url": "../../assets/pets/%E5%B0%8F%E5%91%86/generated/motions/lie-idle-v1/frames/frame-030-head-lowered.png"
+                "url": "../../assets/pets/%E5%B0%8F%E5%91%86/generated/motions/lie-idle-v1/frames/frame-030-head-lowered.webp"
               },
               {
-                "file": "frames/frame-040-head-resting.png",
+                "file": "frames/frame-040-head-resting.webp",
                 "durationMs": [
                   5000,
                   16000
                 ],
-                "url": "../../assets/pets/%E5%B0%8F%E5%91%86/generated/motions/lie-idle-v1/frames/frame-040-head-resting.png"
+                "url": "../../assets/pets/%E5%B0%8F%E5%91%86/generated/motions/lie-idle-v1/frames/frame-040-head-resting.webp"
               },
               {
-                "file": "frames/frame-030-head-lowered.png",
+                "file": "frames/frame-030-head-lowered.webp",
                 "durationMs": [
                   480,
                   760
                 ],
-                "url": "../../assets/pets/%E5%B0%8F%E5%91%86/generated/motions/lie-idle-v1/frames/frame-030-head-lowered.png"
+                "url": "../../assets/pets/%E5%B0%8F%E5%91%86/generated/motions/lie-idle-v1/frames/frame-030-head-lowered.webp"
               },
               {
-                "file": "frames/frame-000-neutral.png",
+                "file": "frames/frame-000-neutral.webp",
                 "durationMs": [
                   1800,
                   4200
                 ],
-                "url": "../../assets/pets/%E5%B0%8F%E5%91%86/generated/motions/lie-idle-v1/frames/frame-000-neutral.png"
+                "url": "../../assets/pets/%E5%B0%8F%E5%91%86/generated/motions/lie-idle-v1/frames/frame-000-neutral.webp"
               }
             ]
           }
@@ -562,38 +562,38 @@ globalThis.XIAODAI_PET_CATALOG = [
           "height": 1354
         },
         "identityBase": "../../concepts/identity-sit-v1.png",
-        "neutralFrame": "../sit-idle-v1/frames/frame-000-neutral.png",
+        "neutralFrame": "../sit-idle-v1/frames/frame-000-neutral.webp",
         "transitionMs": 170,
         "interruptible": false,
         "runtimeNotes": {
           "reverse": "The same sequence is played in reverse for lie-to-sit so identity and timing stay consistent.",
           "grounding": "Keep every frame bottom-aligned; use a short cross-fade because the source aspect ratios differ."
         },
-        "neutralFrameUrl": "../../assets/pets/%E5%B0%8F%E5%91%86/generated/motions/sit-idle-v1/frames/frame-000-neutral.png",
+        "neutralFrameUrl": "../../assets/pets/%E5%B0%8F%E5%91%86/generated/motions/sit-idle-v1/frames/frame-000-neutral.webp",
         "variants": [
           {
             "id": "sit-to-lie",
             "weight": 1,
             "frames": [
               {
-                "file": "../sit-idle-v1/frames/frame-000-neutral.png",
+                "file": "../sit-idle-v1/frames/frame-000-neutral.webp",
                 "durationMs": 720,
-                "url": "../../assets/pets/%E5%B0%8F%E5%91%86/generated/motions/sit-idle-v1/frames/frame-000-neutral.png"
+                "url": "../../assets/pets/%E5%B0%8F%E5%91%86/generated/motions/sit-idle-v1/frames/frame-000-neutral.webp"
               },
               {
-                "file": "frames/frame-010-lean-forward.png",
+                "file": "frames/frame-010-lean-forward.webp",
                 "durationMs": 560,
-                "url": "../../assets/pets/%E5%B0%8F%E5%91%86/generated/motions/sit-to-lie-v1/frames/frame-010-lean-forward.png"
+                "url": "../../assets/pets/%E5%B0%8F%E5%91%86/generated/motions/sit-to-lie-v1/frames/frame-010-lean-forward.webp"
               },
               {
-                "file": "frames/frame-020-chest-lowered.png",
+                "file": "frames/frame-020-chest-lowered.webp",
                 "durationMs": 760,
-                "url": "../../assets/pets/%E5%B0%8F%E5%91%86/generated/motions/sit-to-lie-v1/frames/frame-020-chest-lowered.png"
+                "url": "../../assets/pets/%E5%B0%8F%E5%91%86/generated/motions/sit-to-lie-v1/frames/frame-020-chest-lowered.webp"
               },
               {
-                "file": "../lie-idle-v1/frames/frame-000-neutral.png",
+                "file": "../lie-idle-v1/frames/frame-000-neutral.webp",
                 "durationMs": 1440,
-                "url": "../../assets/pets/%E5%B0%8F%E5%91%86/generated/motions/lie-idle-v1/frames/frame-000-neutral.png"
+                "url": "../../assets/pets/%E5%B0%8F%E5%91%86/generated/motions/lie-idle-v1/frames/frame-000-neutral.webp"
               }
             ]
           }
@@ -613,38 +613,38 @@ globalThis.XIAODAI_PET_CATALOG = [
           "height": 1024
         },
         "identityBase": "../../concepts/identity-stand-profile-v1.png",
-        "neutralFrame": "frames/frame-000-contact.png",
+        "neutralFrame": "frames/frame-000-contact.webp",
         "transitionMs": 72,
         "interruptible": true,
         "runtimeNotes": {
           "direction": "Source frames face left; mirror the rendered canvas for rightward travel.",
           "speed": "Scale the cycle with smoothed drag velocity; do not exceed the configured playback-rate cap."
         },
-        "neutralFrameUrl": "../../assets/pets/%E5%B0%8F%E5%91%86/generated/motions/walk-cycle-v1/frames/frame-000-contact.png",
+        "neutralFrameUrl": "../../assets/pets/%E5%B0%8F%E5%91%86/generated/motions/walk-cycle-v1/frames/frame-000-contact.webp",
         "variants": [
           {
             "id": "natural-walk",
             "weight": 1,
             "frames": [
               {
-                "file": "frames/frame-000-contact.png",
+                "file": "frames/frame-000-contact.webp",
                 "durationMs": 180,
-                "url": "../../assets/pets/%E5%B0%8F%E5%91%86/generated/motions/walk-cycle-v1/frames/frame-000-contact.png"
+                "url": "../../assets/pets/%E5%B0%8F%E5%91%86/generated/motions/walk-cycle-v1/frames/frame-000-contact.webp"
               },
               {
-                "file": "frames/frame-010-down.png",
+                "file": "frames/frame-010-down.webp",
                 "durationMs": 150,
-                "url": "../../assets/pets/%E5%B0%8F%E5%91%86/generated/motions/walk-cycle-v1/frames/frame-010-down.png"
+                "url": "../../assets/pets/%E5%B0%8F%E5%91%86/generated/motions/walk-cycle-v1/frames/frame-010-down.webp"
               },
               {
-                "file": "frames/frame-020-opposite-contact.png",
+                "file": "frames/frame-020-opposite-contact.webp",
                 "durationMs": 180,
-                "url": "../../assets/pets/%E5%B0%8F%E5%91%86/generated/motions/walk-cycle-v1/frames/frame-020-opposite-contact.png"
+                "url": "../../assets/pets/%E5%B0%8F%E5%91%86/generated/motions/walk-cycle-v1/frames/frame-020-opposite-contact.webp"
               },
               {
-                "file": "frames/frame-030-up.png",
+                "file": "frames/frame-030-up.webp",
                 "durationMs": 150,
-                "url": "../../assets/pets/%E5%B0%8F%E5%91%86/generated/motions/walk-cycle-v1/frames/frame-030-up.png"
+                "url": "../../assets/pets/%E5%B0%8F%E5%91%86/generated/motions/walk-cycle-v1/frames/frame-030-up.webp"
               }
             ]
           }
@@ -664,38 +664,38 @@ globalThis.XIAODAI_PET_CATALOG = [
           "height": 1024
         },
         "identityBase": "../../concepts/identity-stand-profile-v1.png",
-        "neutralFrame": "frames/frame-000-extension.png",
+        "neutralFrame": "frames/frame-000-extension.webp",
         "transitionMs": 58,
         "interruptible": true,
         "runtimeNotes": {
           "direction": "Source frames face left; mirror the rendered canvas for rightward travel.",
           "gaitSwitch": "Enter at runThreshold and exit below runExitThreshold to prevent flicker near the boundary."
         },
-        "neutralFrameUrl": "../../assets/pets/%E5%B0%8F%E5%91%86/generated/motions/run-cycle-v1/frames/frame-000-extension.png",
+        "neutralFrameUrl": "../../assets/pets/%E5%B0%8F%E5%91%86/generated/motions/run-cycle-v1/frames/frame-000-extension.webp",
         "variants": [
           {
             "id": "natural-run",
             "weight": 1,
             "frames": [
               {
-                "file": "frames/frame-000-extension.png",
+                "file": "frames/frame-000-extension.webp",
                 "durationMs": 110,
-                "url": "../../assets/pets/%E5%B0%8F%E5%91%86/generated/motions/run-cycle-v1/frames/frame-000-extension.png"
+                "url": "../../assets/pets/%E5%B0%8F%E5%91%86/generated/motions/run-cycle-v1/frames/frame-000-extension.webp"
               },
               {
-                "file": "frames/frame-010-front-landing.png",
+                "file": "frames/frame-010-front-landing.webp",
                 "durationMs": 90,
-                "url": "../../assets/pets/%E5%B0%8F%E5%91%86/generated/motions/run-cycle-v1/frames/frame-010-front-landing.png"
+                "url": "../../assets/pets/%E5%B0%8F%E5%91%86/generated/motions/run-cycle-v1/frames/frame-010-front-landing.webp"
               },
               {
-                "file": "frames/frame-020-gathered.png",
+                "file": "frames/frame-020-gathered.webp",
                 "durationMs": 105,
-                "url": "../../assets/pets/%E5%B0%8F%E5%91%86/generated/motions/run-cycle-v1/frames/frame-020-gathered.png"
+                "url": "../../assets/pets/%E5%B0%8F%E5%91%86/generated/motions/run-cycle-v1/frames/frame-020-gathered.webp"
               },
               {
-                "file": "frames/frame-030-propulsion.png",
+                "file": "frames/frame-030-propulsion.webp",
                 "durationMs": 95,
-                "url": "../../assets/pets/%E5%B0%8F%E5%91%86/generated/motions/run-cycle-v1/frames/frame-030-propulsion.png"
+                "url": "../../assets/pets/%E5%B0%8F%E5%91%86/generated/motions/run-cycle-v1/frames/frame-030-propulsion.webp"
               }
             ]
           }
