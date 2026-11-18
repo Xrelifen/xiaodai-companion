@@ -2,6 +2,7 @@ const { app, BrowserWindow } = require('electron');
 const path = require('path');
 const assert = require('assert/strict');
 const pause = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+const randomValue = Number(process.env.XIAODAI_TEST_RANDOM ?? 0.99);
 
 app.whenReady().then(async () => {
   const window = new BrowserWindow({ width: 360, height: 390, show: false, webPreferences: {
@@ -14,7 +15,7 @@ app.whenReady().then(async () => {
   await pause(4000);
   console.log('Turn pack:', await window.webContents.executeJavaScript(`XIAODAI_PET_CATALOG[0].naturalMotions.filter(m => m.intent === 'turn').map(m => ({id:m.id, count:m.variants[0].frames.length}))`));
   await window.webContents.executeJavaScript(`(() => {
-    Math.random = () => 0.99;
+    Math.random = () => ${JSON.stringify(randomValue)};
     window.__drawnFrames = [];
     window.__pointerEvents = [];
     for (const name of ['pointerdown', 'pointerup']) document.addEventListener(name, event => window.__pointerEvents.push({name, target: event.target.id}), true);
@@ -56,8 +57,11 @@ app.whenReady().then(async () => {
   const walkIndex = frames.findIndex((f, i) => i > firstStepIndex && f.url.includes('walk-cycle-v1/frames/frame-000-contact'));
   assert.ok(turnIndex >= 0 && firstStepIndex > turnIndex && walkIndex > firstStepIndex, 'turn must lead through first-step into walk contact');
   assert.ok(frames.some(f => f.url.includes('stand-settle-v1')), 'release did not enter standing sequence');
-  assert.ok(frames.some(f => f.url.includes('frame-030-tail-relax')), 'tail did not settle after standing');
-  assert.ok(frames.some(f => f.url.includes('frame-040-ear-relax')), 'ear did not settle after the tail');
+  assert.ok(frames.some(f => f.url.includes('frame-020-look-front')), 'settling did not reach the front-facing pose');
+  if (randomValue >= 3 / 9) assert.ok(frames.some(f => f.url.includes('frame-030-tail-relax')), 'tail did not settle after standing');
+  else assert.ok(!frames.some(f => f.url.includes('frame-030-tail-relax')), 'quiet settling unexpectedly included the tail motion');
+  if (randomValue >= 7 / 9) assert.ok(frames.some(f => f.url.includes('frame-040-ear-relax')), 'ear did not settle after the tail');
+  else assert.ok(!frames.some(f => f.url.includes('frame-040-ear-relax')), 'short settling unexpectedly included the ear motion');
   assert.ok(frames.some(f => f.url.includes('frame-010-rising')), 'stopping did not use the lowering pose');
   assert.ok(frames.some(f => f.url.includes('frame-015-halfway')), 'sitting skipped the intermediate posture');
   await window.webContents.executeJavaScript('window.__drawnFrames = []');
