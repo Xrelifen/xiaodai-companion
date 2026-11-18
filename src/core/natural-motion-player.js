@@ -357,9 +357,10 @@
       const { frame, index, offsetMs = 0 } = this.frameAtPhase();
       const nextUrl = frame?.url || this.currentUrl;
       if (nextUrl && nextUrl !== this.currentUrl) {
-        const previousFrame = this.frames[(index - 1 + this.frames.length) % this.frames.length];
-        this.previousUrl = previousFrame?.url || this.currentUrl;
-        this.previousDisplayScale = Number(previousFrame?.displayScale) || Number(this.motion?.displayScale) || 1;
+        // A delayed render can skip several frames. Blend from what was actually
+        // displayed, rather than briefly introducing an unseen intermediate pose.
+        this.previousUrl = this.currentUrl;
+        this.previousDisplayScale = this.currentDisplayScale;
         this.currentUrl = nextUrl;
         this.currentDisplayScale = Number(frame?.displayScale) || Number(this.motion?.displayScale) || 1;
         this.transitionStartedAt = now - offsetMs / playbackRate;

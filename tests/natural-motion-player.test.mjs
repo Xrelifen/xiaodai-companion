@@ -166,14 +166,15 @@ test("fast short steps finish fading while the current frame is still visible", 
   assert.equal(midpoint.previousUrl, null);
 });
 
-test("a late animation tick uses the current phase instead of restarting its fade", () => {
+test("a delayed tick blends from the last displayed pose, skipping unseen frames", () => {
   const motion = { transitionMs: 40, variants: [{ frames: [
-    { url: "a", durationMs: 100 }, { url: "b", durationMs: 100 }, { url: "c", durationMs: 100 },
+    { url: "a", durationMs: 100, displayScale: 1.2 }, { url: "b", durationMs: 100, displayScale: 1.1 }, { url: "c", durationMs: 100 },
   ] }] };
   const player = new NaturalCyclePlayer(motion, { now: 0 });
   const late = player.tick(220);
   assert.equal(late.url, "c");
-  assert.equal(late.previousUrl, "b");
+  assert.equal(late.previousUrl, "a");
+  assert.equal(late.previousDisplayScale, 1.2);
   assert.ok(late.blend > 0.45 && late.blend < 0.55);
   assert.equal(player.tick(240).blend, 1);
 });
