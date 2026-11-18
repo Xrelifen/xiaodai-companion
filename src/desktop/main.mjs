@@ -11,6 +11,7 @@ let companionWindow;
 let dragState = null;
 let dragTimer = null;
 let roamTimer = null;
+let resolveRoam = null;
 let expanded = false;
 
 function clamp(value, min, max) {
@@ -37,9 +38,12 @@ function moveWithFixedSize(x, y) {
   companionWindow.setBounds({ ...position, ...size }, false);
 }
 
-function stopRoam() {
+function stopRoam(completed = false) {
   if (roamTimer) clearInterval(roamTimer);
   roamTimer = null;
+  const resolve = resolveRoam;
+  resolveRoam = null;
+  resolve?.(completed);
 }
 
 function stopDrag() {
@@ -140,14 +144,14 @@ ipcMain.handle("xiaodai:roam", async (_event, request = {}) => {
   const [x, y] = companionWindow.getPosition();
   const start = { x, y, ...intendedSize() };
   const targetPoint = clampToDisplay(start, start.x + Number(request.dx || 0), start.y);
-  const duration = clamp(Number(request.duration || 3000), 500, 12000);
+  const duration = clamp(Number(request.duration || 3000), 500, 20000);
   const startedAt = Date.now();
 
-  await new Promise((resolve) => {
+  return await new Promise((resolve) => {
+    resolveRoam = resolve;
     roamTimer = setInterval(() => {
       if (!companionWindow) {
         stopRoam();
-        resolve();
         return;
       }
       const progress = clamp((Date.now() - startedAt) / duration, 0, 1);
@@ -159,12 +163,10 @@ ipcMain.handle("xiaodai:roam", async (_event, request = {}) => {
         start.y,
       );
       if (progress >= 1) {
-        stopRoam();
-        resolve();
+        stopRoam(true);
       }
     }, 16);
   });
-  return true;
 });
 
 ipcMain.handle("xiaodai:plan-roam", (_event, request = {}) => {

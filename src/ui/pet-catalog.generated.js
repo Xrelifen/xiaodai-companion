@@ -563,7 +563,7 @@ globalThis.XIAODAI_PET_CATALOG = [
         },
         "identityBase": "../../concepts/identity-sit-v1.png",
         "neutralFrame": "../sit-idle-v1/frames/frame-000-neutral.webp",
-        "transitionMs": 260,
+        "transitionMs": 140,
         "interruptible": false,
         "runtimeNotes": {
           "reverse": "The same sequence is played in reverse for lie-to-sit so identity and timing stay consistent.",
@@ -582,8 +582,13 @@ globalThis.XIAODAI_PET_CATALOG = [
               },
               {
                 "file": "frames/frame-010-lean-forward.webp",
-                "durationMs": 560,
+                "durationMs": 300,
                 "url": "../../assets/pets/%E5%B0%8F%E5%91%86/generated/motions/sit-to-lie-v1/frames/frame-010-lean-forward.webp"
+              },
+              {
+                "file": "frames/frame-015-lowering.webp",
+                "durationMs": 260,
+                "url": "../../assets/pets/%E5%B0%8F%E5%91%86/generated/motions/sit-to-lie-v1/frames/frame-015-lowering.webp"
               },
               {
                 "file": "frames/frame-020-chest-lowered.webp",
@@ -594,6 +599,275 @@ globalThis.XIAODAI_PET_CATALOG = [
                 "file": "../lie-idle-v1/frames/frame-000-neutral.webp",
                 "durationMs": 1440,
                 "url": "../../assets/pets/%E5%B0%8F%E5%91%86/generated/motions/lie-idle-v1/frames/frame-000-neutral.webp"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "schemaVersion": 1,
+        "id": "stand-settle-v1",
+        "petId": "xiaodai",
+        "intent": "settle",
+        "fromPose": "stand",
+        "toPose": "stand",
+        "canvas": {
+          "width": 1280,
+          "height": 1354
+        },
+        "neutralFrame": "frames/frame-000-standing.webp",
+        "displayScale": 1.45,
+        "transitionMs": 180,
+        "neutralFrameUrl": "../../assets/pets/%E5%B0%8F%E5%91%86/generated/motions/stand-settle-v1/frames/frame-000-standing.webp",
+        "variants": [
+          {
+            "id": "quiet",
+            "weight": 3,
+            "frames": [
+              {
+                "file": "frames/frame-000-standing.webp",
+                "durationMs": [
+                  360,
+                  460
+                ],
+                "url": "../../assets/pets/%E5%B0%8F%E5%91%86/generated/motions/stand-settle-v1/frames/frame-000-standing.webp"
+              },
+              {
+                "file": "frames/frame-010-look-half.webp",
+                "durationMs": [
+                  320,
+                  410
+                ],
+                "url": "../../assets/pets/%E5%B0%8F%E5%91%86/generated/motions/stand-settle-v1/frames/frame-010-look-half.webp"
+              },
+              {
+                "file": "frames/frame-020-look-front.webp",
+                "durationMs": [
+                  320,
+                  410
+                ],
+                "url": "../../assets/pets/%E5%B0%8F%E5%91%86/generated/motions/stand-settle-v1/frames/frame-020-look-front.webp"
+              }
+            ]
+          },
+          {
+            "id": "tail-relax",
+            "weight": 4,
+            "frames": [
+              {
+                "file": "frames/frame-000-standing.webp",
+                "durationMs": [
+                  360,
+                  460
+                ],
+                "url": "../../assets/pets/%E5%B0%8F%E5%91%86/generated/motions/stand-settle-v1/frames/frame-000-standing.webp"
+              },
+              {
+                "file": "frames/frame-010-look-half.webp",
+                "durationMs": [
+                  320,
+                  410
+                ],
+                "url": "../../assets/pets/%E5%B0%8F%E5%91%86/generated/motions/stand-settle-v1/frames/frame-010-look-half.webp"
+              },
+              {
+                "file": "frames/frame-020-look-front.webp",
+                "durationMs": [
+                  320,
+                  410
+                ],
+                "url": "../../assets/pets/%E5%B0%8F%E5%91%86/generated/motions/stand-settle-v1/frames/frame-020-look-front.webp"
+              },
+              {
+                "file": "frames/frame-030-tail-relax.webp",
+                "durationMs": [
+                  320,
+                  420
+                ],
+                "url": "../../assets/pets/%E5%B0%8F%E5%91%86/generated/motions/stand-settle-v1/frames/frame-030-tail-relax.webp"
+              }
+            ]
+          },
+          {
+            "id": "tail-and-ear",
+            "weight": 2,
+            "frames": [
+              {
+                "file": "frames/frame-000-standing.webp",
+                "durationMs": [
+                  360,
+                  460
+                ],
+                "url": "../../assets/pets/%E5%B0%8F%E5%91%86/generated/motions/stand-settle-v1/frames/frame-000-standing.webp"
+              },
+              {
+                "file": "frames/frame-010-look-half.webp",
+                "durationMs": [
+                  320,
+                  410
+                ],
+                "url": "../../assets/pets/%E5%B0%8F%E5%91%86/generated/motions/stand-settle-v1/frames/frame-010-look-half.webp"
+              },
+              {
+                "file": "frames/frame-020-look-front.webp",
+                "durationMs": [
+                  320,
+                  410
+                ],
+                "url": "../../assets/pets/%E5%B0%8F%E5%91%86/generated/motions/stand-settle-v1/frames/frame-020-look-front.webp"
+              },
+              {
+                "file": "frames/frame-030-tail-relax.webp",
+                "durationMs": [
+                  320,
+                  420
+                ],
+                "url": "../../assets/pets/%E5%B0%8F%E5%91%86/generated/motions/stand-settle-v1/frames/frame-030-tail-relax.webp"
+              },
+              {
+                "file": "frames/frame-040-ear-relax.webp",
+                "durationMs": [
+                  280,
+                  350
+                ],
+                "url": "../../assets/pets/%E5%B0%8F%E5%91%86/generated/motions/stand-settle-v1/frames/frame-040-ear-relax.webp"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "schemaVersion": 1,
+        "id": "turn-v1",
+        "petId": "xiaodai",
+        "intent": "turn",
+        "canvas": {
+          "width": 1280,
+          "height": 1354
+        },
+        "transitionMs": 55,
+        "neutralFrame": "frames/frame-020-front.webp",
+        "neutralFrameUrl": "../../assets/pets/%E5%B0%8F%E5%91%86/generated/motions/turn-v1/frames/frame-020-front.webp",
+        "variants": [
+          {
+            "id": "side-to-front",
+            "frames": [
+              {
+                "file": "../stand-settle-v1/frames/frame-020-look-front.webp",
+                "durationMs": 110,
+                "displayScale": 1.45,
+                "anchorX": 0.12,
+                "url": "../../assets/pets/%E5%B0%8F%E5%91%86/generated/motions/stand-settle-v1/frames/frame-020-look-front.webp"
+              },
+              {
+                "file": "../sit-stand-v1/frames/frame-020-rising-turn.webp",
+                "durationMs": 110,
+                "displayScale": 1,
+                "anchorX": 0.16,
+                "url": "../../assets/pets/%E5%B0%8F%E5%91%86/generated/motions/sit-stand-v1/frames/frame-020-rising-turn.webp"
+              },
+              {
+                "file": "frames/frame-010-quarter.webp",
+                "durationMs": 110,
+                "displayScale": 1,
+                "anchorX": 0.3,
+                "url": "../../assets/pets/%E5%B0%8F%E5%91%86/generated/motions/turn-v1/frames/frame-010-quarter.webp"
+              },
+              {
+                "file": "frames/frame-020-front.webp",
+                "durationMs": 130,
+                "displayScale": 1,
+                "anchorX": 0.49,
+                "url": "../../assets/pets/%E5%B0%8F%E5%91%86/generated/motions/turn-v1/frames/frame-020-front.webp"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "schemaVersion": 1,
+        "id": "sit-stand-v1",
+        "petId": "xiaodai",
+        "intent": "posture",
+        "canvas": {
+          "width": 1280,
+          "height": 1354
+        },
+        "transitionMs": 65,
+        "neutralFrame": "frames/frame-010-rising.webp",
+        "neutralFrameUrl": "../../assets/pets/%E5%B0%8F%E5%91%86/generated/motions/sit-stand-v1/frames/frame-010-rising.webp",
+        "variants": [
+          {
+            "id": "rise-to-stand",
+            "frames": [
+              {
+                "file": "frames/frame-010-rising.webp",
+                "durationMs": 160,
+                "displayScale": 1,
+                "anchorX": 0.79,
+                "url": "../../assets/pets/%E5%B0%8F%E5%91%86/generated/motions/sit-stand-v1/frames/frame-010-rising.webp"
+              },
+              {
+                "file": "frames/frame-015-halfway.webp",
+                "durationMs": 140,
+                "displayScale": 1,
+                "anchorX": 0.7,
+                "url": "../../assets/pets/%E5%B0%8F%E5%91%86/generated/motions/sit-stand-v1/frames/frame-015-halfway.webp"
+              },
+              {
+                "file": "../turn-v1/frames/frame-020-front.webp",
+                "durationMs": 150,
+                "displayScale": 1,
+                "anchorX": 0.49,
+                "url": "../../assets/pets/%E5%B0%8F%E5%91%86/generated/motions/turn-v1/frames/frame-020-front.webp"
+              },
+              {
+                "file": "../turn-v1/frames/frame-010-quarter.webp",
+                "durationMs": 150,
+                "displayScale": 1,
+                "anchorX": 0.3,
+                "url": "../../assets/pets/%E5%B0%8F%E5%91%86/generated/motions/turn-v1/frames/frame-010-quarter.webp"
+              },
+              {
+                "file": "frames/frame-020-rising-turn.webp",
+                "durationMs": 150,
+                "displayScale": 1,
+                "anchorX": 0.16,
+                "url": "../../assets/pets/%E5%B0%8F%E5%91%86/generated/motions/sit-stand-v1/frames/frame-020-rising-turn.webp"
+              },
+              {
+                "file": "../stand-settle-v1/frames/frame-020-look-front.webp",
+                "durationMs": 150,
+                "displayScale": 1.45,
+                "anchorX": 0.12,
+                "url": "../../assets/pets/%E5%B0%8F%E5%91%86/generated/motions/stand-settle-v1/frames/frame-020-look-front.webp"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "schemaVersion": 1,
+        "id": "start-step-v1",
+        "petId": "xiaodai",
+        "intent": "startStep",
+        "canvas": {
+          "width": 1280,
+          "height": 1354
+        },
+        "transitionMs": 55,
+        "neutralFrame": "frames/frame-010-lift.webp",
+        "displayScale": 1.45,
+        "neutralFrameUrl": "../../assets/pets/%E5%B0%8F%E5%91%86/generated/motions/start-step-v1/frames/frame-010-lift.webp",
+        "variants": [
+          {
+            "id": "first-step",
+            "frames": [
+              {
+                "file": "frames/frame-010-lift.webp",
+                "durationMs": 160,
+                "anchorX": 0.12,
+                "url": "../../assets/pets/%E5%B0%8F%E5%91%86/generated/motions/start-step-v1/frames/frame-010-lift.webp"
               }
             ]
           }
@@ -614,8 +888,17 @@ globalThis.XIAODAI_PET_CATALOG = [
         },
         "identityBase": "../../concepts/identity-stand-profile-v1.png",
         "neutralFrame": "frames/frame-000-contact.webp",
-        "displayScale": 0.89,
+        "displayScale": 1.45,
         "transitionMs": 76,
+        "gaitSwitchFrames": [
+          0,
+          4
+        ],
+        "gaitEntryFrame": 0,
+        "gaitEntryFrames": [
+          0,
+          4
+        ],
         "interruptible": true,
         "runtimeNotes": {
           "direction": "Source frames face left; mirror the rendered canvas for rightward travel.",
@@ -629,23 +912,43 @@ globalThis.XIAODAI_PET_CATALOG = [
             "frames": [
               {
                 "file": "frames/frame-000-contact.webp",
-                "durationMs": 180,
+                "durationMs": 120,
                 "url": "../../assets/pets/%E5%B0%8F%E5%91%86/generated/motions/walk-cycle-v1/frames/frame-000-contact.webp"
               },
               {
+                "file": "frames/frame-005-transfer.webp",
+                "durationMs": 60,
+                "url": "../../assets/pets/%E5%B0%8F%E5%91%86/generated/motions/walk-cycle-v1/frames/frame-005-transfer.webp"
+              },
+              {
                 "file": "frames/frame-010-down.webp",
-                "durationMs": 150,
+                "durationMs": 75,
                 "url": "../../assets/pets/%E5%B0%8F%E5%91%86/generated/motions/walk-cycle-v1/frames/frame-010-down.webp"
               },
               {
+                "file": "frames/frame-015-passing.webp",
+                "durationMs": 75,
+                "url": "../../assets/pets/%E5%B0%8F%E5%91%86/generated/motions/walk-cycle-v1/frames/frame-015-passing.webp"
+              },
+              {
                 "file": "frames/frame-020-opposite-contact.webp",
-                "durationMs": 180,
+                "durationMs": 120,
                 "url": "../../assets/pets/%E5%B0%8F%E5%91%86/generated/motions/walk-cycle-v1/frames/frame-020-opposite-contact.webp"
               },
               {
+                "file": "frames/frame-025-lift.webp",
+                "durationMs": 60,
+                "url": "../../assets/pets/%E5%B0%8F%E5%91%86/generated/motions/walk-cycle-v1/frames/frame-025-lift.webp"
+              },
+              {
                 "file": "frames/frame-030-up.webp",
-                "durationMs": 150,
+                "durationMs": 75,
                 "url": "../../assets/pets/%E5%B0%8F%E5%91%86/generated/motions/walk-cycle-v1/frames/frame-030-up.webp"
+              },
+              {
+                "file": "frames/frame-035-reach.webp",
+                "durationMs": 75,
+                "url": "../../assets/pets/%E5%B0%8F%E5%91%86/generated/motions/walk-cycle-v1/frames/frame-035-reach.webp"
               }
             ]
           }
@@ -666,8 +969,12 @@ globalThis.XIAODAI_PET_CATALOG = [
         },
         "identityBase": "../../concepts/identity-stand-profile-v1.png",
         "neutralFrame": "frames/frame-000-extension.webp",
-        "displayScale": 0.89,
+        "displayScale": 1.45,
         "transitionMs": 68,
+        "gaitSwitchFrames": [
+          2
+        ],
+        "gaitEntryFrame": 2,
         "interruptible": true,
         "runtimeNotes": {
           "direction": "Source frames face left; mirror the rendered canvas for rightward travel.",
@@ -681,23 +988,43 @@ globalThis.XIAODAI_PET_CATALOG = [
             "frames": [
               {
                 "file": "frames/frame-000-extension.webp",
-                "durationMs": 110,
+                "durationMs": 70,
                 "url": "../../assets/pets/%E5%B0%8F%E5%91%86/generated/motions/run-cycle-v1/frames/frame-000-extension.webp"
               },
               {
+                "file": "frames/frame-005-descent.webp",
+                "durationMs": 40,
+                "url": "../../assets/pets/%E5%B0%8F%E5%91%86/generated/motions/run-cycle-v1/frames/frame-005-descent.webp"
+              },
+              {
                 "file": "frames/frame-010-front-landing.webp",
-                "durationMs": 90,
+                "durationMs": 45,
                 "url": "../../assets/pets/%E5%B0%8F%E5%91%86/generated/motions/run-cycle-v1/frames/frame-010-front-landing.webp"
               },
               {
+                "file": "frames/frame-015-gathering.webp",
+                "durationMs": 45,
+                "url": "../../assets/pets/%E5%B0%8F%E5%91%86/generated/motions/run-cycle-v1/frames/frame-015-gathering.webp"
+              },
+              {
                 "file": "frames/frame-020-gathered.webp",
-                "durationMs": 105,
+                "durationMs": 55,
                 "url": "../../assets/pets/%E5%B0%8F%E5%91%86/generated/motions/run-cycle-v1/frames/frame-020-gathered.webp"
               },
               {
+                "file": "frames/frame-025-pushing.webp",
+                "durationMs": 50,
+                "url": "../../assets/pets/%E5%B0%8F%E5%91%86/generated/motions/run-cycle-v1/frames/frame-025-pushing.webp"
+              },
+              {
                 "file": "frames/frame-030-propulsion.webp",
-                "durationMs": 95,
+                "durationMs": 55,
                 "url": "../../assets/pets/%E5%B0%8F%E5%91%86/generated/motions/run-cycle-v1/frames/frame-030-propulsion.webp"
+              },
+              {
+                "file": "frames/frame-035-takeoff.webp",
+                "durationMs": 40,
+                "url": "../../assets/pets/%E5%B0%8F%E5%91%86/generated/motions/run-cycle-v1/frames/frame-035-takeoff.webp"
               }
             ]
           }

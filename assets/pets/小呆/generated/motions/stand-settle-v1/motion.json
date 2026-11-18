@@ -1,0 +1,47 @@
+{
+  "schemaVersion": 1,
+  "id": "stand-settle-v1",
+  "petId": "xiaodai",
+  "intent": "settle",
+  "fromPose": "stand",
+  "toPose": "stand",
+  "canvas": {
+    "width": 1280,
+    "height": 1354
+  },
+  "neutralFrame": "frames/frame-000-standing.webp",
+  "displayScale": 1.45,
+  "transitionMs": 180,
+  "variants": [
+    {
+      "id": "quiet",
+      "weight": 3,
+      "frames": [
+        { "file": "frames/frame-000-standing.webp", "durationMs": [360, 460] },
+        { "file": "frames/frame-010-look-half.webp", "durationMs": [320, 410] },
+        { "file": "frames/frame-020-look-front.webp", "durationMs": [320, 410] }
+      ]
+    },
+    {
+      "id": "tail-relax",
+      "weight": 4,
+      "frames": [
+        { "file": "frames/frame-000-standing.webp", "durationMs": [360, 460] },
+        { "file": "frames/frame-010-look-half.webp", "durationMs": [320, 410] },
+        { "file": "frames/frame-020-look-front.webp", "durationMs": [320, 410] },
+        { "file": "frames/frame-030-tail-relax.webp", "durationMs": [320, 420] }
+      ]
+    },
+    {
+      "id": "tail-and-ear",
+      "weight": 2,
+      "frames": [
+        { "file": "frames/frame-000-standing.webp", "durationMs": [360, 460] },
+        { "file": "frames/frame-010-look-half.webp", "durationMs": [320, 410] },
+        { "file": "frames/frame-020-look-front.webp", "durationMs": [320, 410] },
+        { "file": "frames/frame-030-tail-relax.webp", "durationMs": [320, 420] },
+        { "file": "frames/frame-040-ear-relax.webp", "durationMs": [280, 350] }
+      ]
+    }
+  ]
+}

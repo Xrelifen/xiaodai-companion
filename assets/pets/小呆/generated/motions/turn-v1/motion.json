@@ -1,0 +1,18 @@
+{
+  "schemaVersion": 1,
+  "id": "turn-v1",
+  "petId": "xiaodai",
+  "intent": "turn",
+  "canvas": { "width": 1280, "height": 1354 },
+  "transitionMs": 55,
+  "neutralFrame": "frames/frame-020-front.webp",
+  "variants": [{
+    "id": "side-to-front",
+    "frames": [
+      { "file": "../stand-settle-v1/frames/frame-020-look-front.webp", "durationMs": 110, "displayScale": 1.45, "anchorX": 0.12 },
+      { "file": "../sit-stand-v1/frames/frame-020-rising-turn.webp", "durationMs": 110, "displayScale": 1, "anchorX": 0.16 },
+      { "file": "frames/frame-010-quarter.webp", "durationMs": 110, "displayScale": 1, "anchorX": 0.30 },
+      { "file": "frames/frame-020-front.webp", "durationMs": 130, "displayScale": 1, "anchorX": 0.49 }
+    ]
+  }]
+}

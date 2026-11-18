@@ -8,9 +8,21 @@ const {
   frameAt,
   lookFrameForAngle,
   pointerVelocity,
+  roamPlaybackRate,
   smoothAngle,
   stableDragDirection,
 } = globalThis.XiaodaiCore;
+
+test("roaming foot speed rises and falls with the window's eased motion", () => {
+  const distance = 600, duration = 10_000;
+  const start = roamPlaybackRate(distance, duration, 0);
+  const quarter = roamPlaybackRate(distance, duration, 2500);
+  const middle = roamPlaybackRate(distance, duration, 5000);
+  const end = roamPlaybackRate(distance, duration, 10000);
+  assert.ok(start < quarter && quarter < middle);
+  assert.equal(roamPlaybackRate(distance, duration, 7500), quarter);
+  assert.equal(start, end);
+});
 
 test("per-frame timing keeps slow head turns visible", () => {
   const sequence = SEQUENCES.lookAround;
@@ -63,5 +75,14 @@ test("getting up reverses the lying transition before returning to idle", () => 
   const engine = new BehaviorEngine({ now: 0 });
   engine.trigger("getUp", 0);
   engine.tick(10_000);
+  assert.equal(engine.current.name, "idle");
+});
+
+test("a longer natural pose transition can finish before returning to idle", () => {
+  const engine = new BehaviorEngine({ now: 0 });
+  engine.trigger("lieDown", 0);
+  engine.tick(5000, { holdSequence: true });
+  assert.equal(engine.current.name, "lieDown");
+  engine.tick(6000, { holdSequence: false });
   assert.equal(engine.current.name, "idle");
 });

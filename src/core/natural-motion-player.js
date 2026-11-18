@@ -31,6 +31,12 @@
     return progress * progress * (3 - 2 * progress);
   }
 
+  function chooseSequenceVariant(motion, lastId, rng = Math.random) {
+    const usable = (motion?.variants || []).filter((variant) => variant?.frames?.length);
+    const alternatives = usable.filter((variant) => variant.id !== lastId);
+    return weightedChoice(alternatives.length ? alternatives : usable, rng);
+  }
+
   class NaturalMotionPlayer {
     constructor(motion, options = {}) {
       this.rng = options.rng ?? Math.random;
@@ -42,6 +48,7 @@
       this.frameEndsAt = 0;
       this.currentUrl = null;
       this.previousUrl = null;
+      this.previousMirror = false;
       this.currentDisplayScale = 1;
       this.previousDisplayScale = 1;
       this.transitionStartedAt = 0;
@@ -59,6 +66,7 @@
       this.frameIndex = -1;
       this.currentUrl = this.neutralUrl;
       this.previousUrl = null;
+      this.previousMirror = false;
       this.currentDisplayScale = Number(motion?.displayScale) || 1;
       this.previousDisplayScale = 1;
       this.transitionStartedAt = now;
@@ -115,6 +123,7 @@
       const nextDisplayScale = Number(frame?.displayScale) || Number(this.motion?.displayScale) || 1;
       if (nextUrl && nextUrl !== this.currentUrl) {
         this.previousUrl = this.currentUrl;
+        this.previousMirror = false;
         this.previousDisplayScale = this.currentDisplayScale;
         this.currentUrl = nextUrl;
         this.currentDisplayScale = nextDisplayScale;
@@ -134,6 +143,7 @@
       this.frameIndex = -1;
       if (this.currentUrl !== this.neutralUrl) {
         this.previousUrl = this.currentUrl;
+        this.previousMirror = false;
         this.previousDisplayScale = this.currentDisplayScale;
         this.currentUrl = this.neutralUrl;
         this.currentDisplayScale = Number(this.motion?.displayScale) || 1;
@@ -182,6 +192,7 @@
       return {
         url: this.currentUrl || this.neutralUrl,
         previousUrl: this.previousUrl,
+        previousMirror: this.previousMirror,
         blend,
         variantId: this.variant?.id || null,
         frameIndex: this.frameIndex,
@@ -205,9 +216,13 @@
       }));
       this.frameIndex = 0;
       this.currentUrl = this.frames[0]?.url || motion?.neutralFrameUrl || null;
-      this.previousUrl = null;
+      this.previousUrl = options.previousUrl || null;
+      this.currentMirror = Boolean(this.frames[0]?.mirror);
+      this.previousMirror = Boolean(options.previousMirror);
+      this.currentAnchorX = this.frames[0]?.anchorX;
+      this.previousAnchorX = options.previousAnchorX;
       this.currentDisplayScale = Number(this.frames[0]?.displayScale) || Number(motion?.displayScale) || 1;
-      this.previousDisplayScale = 1;
+      this.previousDisplayScale = Number(options.previousDisplayScale) || 1;
       this.transitionStartedAt = options.now ?? 0;
       this.frameEndsAt = (options.now ?? 0) + (this.frames[0]?.sampledDurationMs || 1);
       this.complete = this.frames.length === 0;
@@ -217,10 +232,14 @@
       const frame = this.frames[index];
       const nextUrl = frame?.url || this.currentUrl;
       const nextDisplayScale = Number(frame?.displayScale) || Number(this.motion?.displayScale) || 1;
-      if (nextUrl && nextUrl !== this.currentUrl) {
+      if (nextUrl && (nextUrl !== this.currentUrl || Boolean(frame?.mirror) !== this.currentMirror || nextDisplayScale !== this.currentDisplayScale)) {
         this.previousUrl = this.currentUrl;
+        this.previousMirror = this.currentMirror;
+        this.previousAnchorX = this.currentAnchorX;
         this.previousDisplayScale = this.currentDisplayScale;
         this.currentUrl = nextUrl;
+        this.currentMirror = Boolean(frame?.mirror);
+        this.currentAnchorX = frame?.anchorX;
         this.currentDisplayScale = nextDisplayScale;
         this.transitionStartedAt = now;
       }
@@ -247,6 +266,10 @@
       return {
         url: this.currentUrl,
         previousUrl: this.previousUrl,
+        mirror: this.currentMirror,
+        previousMirror: this.previousMirror,
+        anchorX: this.currentAnchorX,
+        previousAnchorX: this.previousAnchorX,
         blend,
         frameIndex: this.frameIndex,
         breathScale: 1,
@@ -273,8 +296,41 @@
       this.currentDisplayScale = Number(this.frames[0]?.displayScale) || Number(motion?.displayScale) || 1;
       this.previousDisplayScale = Number(options.previousDisplayScale) || 1;
       this.transitionStartedAt = options.now ?? 0;
-      this.phaseMs = 0;
+      // Preserve the relative position in a gait cycle when changing speed.
+      const phase = clamp(Number(options.initialPhase) || 0, 0, 0.999999);
+      const allowedEntries = (options.entryFrames || []).filter((index) => Number.isInteger(index) && index >= 0 && index < this.frames.length);
+      let nearestEntry = null;
+      let nearestDistance = Infinity;
+      for (const index of allowedEntries) {
+        const candidate = this.frames.slice(0, index).reduce((sum, frame) => sum + frame.sampledDurationMs, 0) / this.totalDurationMs;
+        const difference = Math.abs(candidate - phase);
+        const distance = Math.min(difference, 1 - difference);
+        if (distance < nearestDistance) {
+          nearestEntry = index;
+          nearestDistance = distance;
+        }
+      }
+      const requestedEntry = Number(nearestEntry ?? options.entryFrame);
+      const hasEntry = (nearestEntry != null || options.entryFrame != null) && Number.isInteger(requestedEntry) && requestedEntry >= 0 && requestedEntry < this.frames.length;
+      this.phaseMs = hasEntry
+        ? this.frames.slice(0, requestedEntry).reduce((sum, frame) => sum + frame.sampledDurationMs, 0)
+        : phase * this.totalDurationMs;
       this.lastTickAt = options.now ?? 0;
+      const initial = this.frameAtPhase();
+      if (initial.frame) {
+        this.frameIndex = initial.index;
+        this.currentUrl = initial.frame.url || this.currentUrl;
+        this.currentDisplayScale = Number(initial.frame.displayScale) || Number(this.motion?.displayScale) || 1;
+      }
+    }
+
+    getPhase() {
+      return this.totalDurationMs > 0 ? (this.phaseMs % this.totalDurationMs) / this.totalDurationMs : 0;
+    }
+
+    canSwitchGait() {
+      const frames = this.motion?.gaitSwitchFrames;
+      return !Array.isArray(frames) || frames.length === 0 || frames.includes(this.frameIndex);
     }
 
     frameAtPhase() {
@@ -282,7 +338,7 @@
       let cursor = this.phaseMs % this.totalDurationMs;
       for (let index = 0; index < this.frames.length; index += 1) {
         const frame = this.frames[index];
-        if (cursor < frame.sampledDurationMs) return { frame, index };
+        if (cursor < frame.sampledDurationMs) return { frame, index, offsetMs: cursor };
         cursor -= frame.sampledDurationMs;
       }
       return { frame: this.frames.at(-1), index: this.frames.length - 1 };
@@ -298,18 +354,21 @@
         this.previousDisplayScale = this.currentDisplayScale;
         this.transitionStartedAt = now;
       }
-      const { frame, index } = this.frameAtPhase();
+      const { frame, index, offsetMs = 0 } = this.frameAtPhase();
       const nextUrl = frame?.url || this.currentUrl;
       if (nextUrl && nextUrl !== this.currentUrl) {
-        this.previousUrl = this.currentUrl;
-        this.previousDisplayScale = this.currentDisplayScale;
+        const previousFrame = this.frames[(index - 1 + this.frames.length) % this.frames.length];
+        this.previousUrl = previousFrame?.url || this.currentUrl;
+        this.previousDisplayScale = Number(previousFrame?.displayScale) || Number(this.motion?.displayScale) || 1;
         this.currentUrl = nextUrl;
         this.currentDisplayScale = Number(frame?.displayScale) || Number(this.motion?.displayScale) || 1;
-        this.transitionStartedAt = now;
+        this.transitionStartedAt = now - offsetMs / playbackRate;
       }
       this.frameIndex = index;
+      // Keep part of even a short frame fully visible at the current speed.
+      const blendDuration = Math.min(this.transitionMs, (frame?.sampledDurationMs || this.transitionMs) / playbackRate * 0.5);
       const linearBlend = this.previousUrl
-        ? clamp((now - this.transitionStartedAt) / Math.max(1, this.transitionMs), 0, 1)
+        ? clamp((now - this.transitionStartedAt) / Math.max(1, blendDuration), 0, 1)
         : 1;
       const blend = easeInOut(linearBlend);
       if (blend >= 1) this.previousUrl = null;
@@ -325,13 +384,36 @@
     }
   }
 
+  class NaturalStopPlayer {
+    constructor(cycle, now, options = {}) {
+      this.cycle = cycle;
+      this.startedAt = now;
+      this.minimumMs = options.minimumMs ?? 60;
+      this.maximumMs = options.maximumMs ?? 300;
+      this.initialRate = clamp(Number(options.playbackRate) || 1, 0.2, 1.8);
+    }
+
+    tick(now) {
+      const elapsed = Math.max(0, now - this.startedAt);
+      const progress = clamp(elapsed / Math.max(1, this.maximumMs), 0, 1);
+      const playbackRate = Math.max(0.2, this.initialRate * (1 - 0.7 * easeInOut(progress)));
+      const state = this.cycle.tick(now, { playbackRate });
+      return {
+        ...state,
+        complete: elapsed >= this.maximumMs || (elapsed >= this.minimumMs && this.cycle.canSwitchGait() && state.blend >= 0.9),
+      };
+    }
+  }
+
   const api = {
     NaturalMotionPlayer,
     NaturalSequencePlayer,
     NaturalCyclePlayer,
+    NaturalStopPlayer,
     clamp,
     sampleDuration,
     weightedChoice,
+    chooseSequenceVariant,
   };
   global.XiaodaiMotion = api;
   if (typeof module !== "undefined" && module.exports) module.exports = api;

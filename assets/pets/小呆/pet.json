@@ -10,6 +10,10 @@
     "generated/motions/sit-idle-v1/motion.json",
     "generated/motions/lie-idle-v1/motion.json",
     "generated/motions/sit-to-lie-v1/motion.json",
+    "generated/motions/stand-settle-v1/motion.json",
+    "generated/motions/turn-v1/motion.json",
+    "generated/motions/sit-stand-v1/motion.json",
+    "generated/motions/start-step-v1/motion.json",
     "generated/motions/walk-cycle-v1/motion.json",
     "generated/motions/run-cycle-v1/motion.json"
   ],

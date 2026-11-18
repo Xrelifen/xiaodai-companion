@@ -13,8 +13,12 @@
   },
   "identityBase": "../../concepts/identity-stand-profile-v1.png",
   "neutralFrame": "frames/frame-000-extension.webp",
-  "displayScale": 0.89,
+  "displayScale": 1.45,
   "transitionMs": 68,
+  "gaitSwitchFrames": [
+    2
+  ],
+  "gaitEntryFrame": 2,
   "interruptible": true,
   "variants": [
     {
@@ -23,19 +27,35 @@
       "frames": [
         {
           "file": "frames/frame-000-extension.webp",
-          "durationMs": 110
+          "durationMs": 70
+        },
+        {
+          "file": "frames/frame-005-descent.webp",
+          "durationMs": 40
         },
         {
           "file": "frames/frame-010-front-landing.webp",
-          "durationMs": 90
+          "durationMs": 45
+        },
+        {
+          "file": "frames/frame-015-gathering.webp",
+          "durationMs": 45
         },
         {
           "file": "frames/frame-020-gathered.webp",
-          "durationMs": 105
+          "durationMs": 55
+        },
+        {
+          "file": "frames/frame-025-pushing.webp",
+          "durationMs": 50
         },
         {
           "file": "frames/frame-030-propulsion.webp",
-          "durationMs": 95
+          "durationMs": 55
+        },
+        {
+          "file": "frames/frame-035-takeoff.webp",
+          "durationMs": 40
         }
       ]
     }

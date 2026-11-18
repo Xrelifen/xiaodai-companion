@@ -79,7 +79,21 @@
   const naturalLocomotionByGait = new Map();
   let naturalTransitionPlayer = null;
   let naturalLocomotionPlayer = null;
+  let naturalSettleMotion = null;
+  let lastSettleVariant = null;
+  let naturalSettle = null;
+  let naturalStop = null;
+  let naturalTurnMotion = null;
+  let naturalTurn = null;
+  let naturalPostureMotion = null;
+  let naturalStepMotion = null;
+  let naturalStep = null;
+  let naturalStart = null;
+  let naturalSitDown = null;
+  let locomotionMirror = null;
+  let turnCandidateAt = 0;
   let activeNaturalGait = null;
+  let gaitSwitchAfter = 0;
   let lastDrawnNaturalUrl = null;
   let lastDrawnNaturalMirror = false;
   let lastDrawnNaturalScale = 1;
@@ -103,6 +117,7 @@
     lastInteractionAt: performance.now(),
     nextRoamAt: 0,
     roamUntil: 0,
+    roamMotion: null,
     gait: "walk",
     dragDirection: "right",
     dragLastMovedAt: 0,
@@ -174,14 +189,14 @@
     context.drawImage(sprite, sourceX, sourceY, frameWidth, frameHeight, drawX, drawY, drawWidth, drawHeight);
   }
 
-  function drawNaturalLayer(image, alpha, breathScale, mirror = false, displayScale = 1) {
+  function drawNaturalLayer(image, alpha, breathScale, mirror = false, displayScale = 1, offsetX = 0) {
     if (!image?.complete || !image.naturalWidth || alpha <= 0) return;
     const scale = Math.min(pet.width / image.naturalWidth, pet.height / image.naturalHeight) * displayScale;
     const drawWidth = image.naturalWidth * scale;
     const baseHeight = image.naturalHeight * scale;
     const drawHeight = baseHeight * breathScale;
     const groundY = pet.y + pet.height / 2;
-    const drawX = pet.x - drawWidth / 2;
+    const drawX = pet.x - drawWidth / 2 + offsetX;
     const drawY = groundY - drawHeight;
     context.save();
     context.globalAlpha = alpha;
@@ -200,21 +215,24 @@
     if (!current) return false;
     context.clearRect(0, 0, canvas.width, canvas.height);
     const previous = naturalImages.get(state.previousUrl);
-    if (previous) {
-      drawNaturalLayer(
-        previous,
-        1 - state.blend,
-        state.breathScale,
-        state.mirror,
-        state.previousDisplayScale || 1,
-      );
-    }
-    drawNaturalLayer(
-      current,
-      previous ? state.blend : 1,
-      state.breathScale,
-      state.mirror,
-      state.displayScale || 1,
+    const previousMirror = state.previousMirror ?? state.mirror;
+    const anchorPosition = (image, anchor, mirror, scale) => {
+      if (!image?.naturalWidth || !Number.isFinite(anchor)) return undefined;
+      const width = image.naturalWidth * Math.min(pet.width / image.naturalWidth, pet.height / image.naturalHeight) * scale;
+      return pet.x + width * ((mirror ? 1 - anchor : anchor) - 0.5);
+    };
+    const offsets = globalThis.XiaodaiCrossfade.anchorOffsets(
+      anchorPosition(previous, state.previousAnchorX, previousMirror, state.previousDisplayScale || 1),
+      anchorPosition(current, state.anchorX, state.mirror, state.displayScale || 1),
+      state.blend,
+    );
+    globalThis.XiaodaiCrossfade.drawCrossfade(
+      context,
+      previous ? (alpha) => drawNaturalLayer(previous, alpha, state.breathScale,
+        previousMirror, state.previousDisplayScale || 1, offsets.previous) : null,
+      (alpha) => drawNaturalLayer(current, alpha, state.breathScale,
+        state.mirror, state.displayScale || 1, offsets.current),
+      state.blend,
     );
     lastDrawnNaturalUrl = state.url;
     lastDrawnNaturalMirror = Boolean(state.mirror);
@@ -248,6 +266,13 @@
   }
 
   function render(now) {
+    if (naturalSettle && engine.current.name !== "idle") naturalSettle = null;
+    if (naturalStop && engine.current.name !== "idle") naturalStop = null;
+    if (naturalSitDown && engine.current.name !== "idle") naturalSitDown = null;
+    if (pet.roamMotion && !pet.dragging && engine.current.reason === "desktop-roam") {
+      const roam = pet.roamMotion;
+      engine.current.playbackRate = core.roamPlaybackRate(roam.distance, roam.duration, now - roam.startedAt);
+    }
     if (naturalPose === "lie" && engine.current.name === "idle") {
       if (now >= naturalPoseUntil) {
         engine.trigger("getUp", now, { reason: "natural-pose-change" });
@@ -256,7 +281,9 @@
       }
     }
     const sequenceBeforeTick = engine.current.name;
-    const frame = engine.tick(now);
+    const transitionActive = naturalTransitionPlayer && ["lieDown", "getUp"].includes(sequenceBeforeTick);
+    const holdSequence = transitionActive && !naturalTransitionPlayer.tick(now).complete;
+    const frame = engine.tick(now, { holdSequence });
     if (sequenceBeforeTick !== engine.current.name && engine.current.name === "idle") {
       if (sequenceBeforeTick === "lieDown" && naturalMotionByPose.has("lie")) {
         activateNaturalPose("lie", now);
@@ -269,14 +296,19 @@
     }
     if (engine.current.name !== lastEngineSequence) {
       const previousEngineSequence = lastEngineSequence;
+      if (["walkLeft", "walkRight"].includes(engine.current.name)
+          && previousEngineSequence === "idle" && naturalPose === "sit" && naturalMotionReady) {
+        startNaturalPosture("rise", engine.current.name === "walkRight", now);
+      }
       if (engine.current.name === "lieDown") {
         activateNaturalTransition("sit", "lie", false, now);
       } else if (engine.current.name === "getUp") {
         activateNaturalTransition("sit", "lie", true, now);
       } else if (engine.current.name === "idle" && ["walkLeft", "walkRight"].includes(previousEngineSequence)) {
         activateNaturalPose("sit", now);
-        if (naturalMotionPlayer && lastDrawnNaturalUrl && !lastDrawnNaturalMirror) {
+        if (naturalMotionPlayer && lastDrawnNaturalUrl && !naturalSettle) {
           naturalMotionPlayer.previousUrl = lastDrawnNaturalUrl;
+          naturalMotionPlayer.previousMirror = lastDrawnNaturalMirror;
           naturalMotionPlayer.previousDisplayScale = lastDrawnNaturalScale;
           naturalMotionPlayer.transitionStartedAt = now;
         }
@@ -289,12 +321,28 @@
       ? "left"
       : (engine.current.name === "walkRight" ? "right" : null);
     if (locomotionDirection) {
-      if (!naturalLocomotionPlayer || activeNaturalGait !== pet.gait) {
+      const desiredMirror = locomotionDirection === "right";
+      if (locomotionMirror == null) locomotionMirror = desiredMirror;
+      if (!naturalTurnMotion) locomotionMirror = desiredMirror;
+      if (!naturalTurn && !naturalStart && !naturalStep && desiredMirror === locomotionMirror) turnCandidateAt = 0;
+      else if (!naturalTurn && !naturalStart && !naturalStep && naturalTurnMotion && desiredMirror !== locomotionMirror) {
+        if (!turnCandidateAt) turnCandidateAt = now;
+        if (now - turnCandidateAt >= 120) {
+          startNaturalTurn(locomotionMirror, desiredMirror, now);
+          turnCandidateAt = 0;
+        }
+      }
+      if (!naturalLocomotionPlayer || (!naturalStep && now >= gaitSwitchAfter && activeNaturalGait !== pet.gait && naturalLocomotionPlayer.canSwitchGait())) {
         activateNaturalLocomotion(pet.gait, now);
       }
     } else {
       naturalLocomotionPlayer = null;
       activeNaturalGait = null;
+      naturalTurn = null;
+      naturalStart = null;
+      naturalStep = null;
+      locomotionMirror = null;
+      turnCandidateAt = 0;
     }
     if (pendingNaturalReaction && engine.current.name === "idle" && naturalMotionReady && naturalMotionPlayer) {
       naturalMotionPlayer.startVariantById?.(pendingNaturalReaction, now, { startIndex: 1 });
@@ -303,16 +351,83 @@
     const lookFrame = currentLookFrame(now);
     let naturalState = null;
     let drewNaturalFrame = false;
-    if (naturalMotionReady && naturalLocomotionPlayer && locomotionDirection) {
+    if (naturalMotionReady && naturalLocomotionPlayer && locomotionDirection && naturalStart) {
+      naturalLocomotionPlayer.tick(now, { paused: true });
+      naturalState = naturalStart.player.tick(now);
+      drewNaturalFrame = drawNaturalFrame(naturalState);
+      if (naturalState.complete) {
+        if (!startNaturalStep(locomotionMirror, now)) {
+          naturalLocomotionPlayer.previousUrl = naturalState.url;
+          naturalLocomotionPlayer.previousDisplayScale = naturalState.displayScale;
+          naturalLocomotionPlayer.transitionStartedAt = now;
+        }
+        naturalStart = null;
+      }
+    } else if (naturalMotionReady && naturalLocomotionPlayer && locomotionDirection && naturalTurn) {
+      naturalLocomotionPlayer.tick(now, { paused: true });
+      naturalState = naturalTurn.player.tick(now);
+      drewNaturalFrame = drawNaturalFrame(naturalState);
+      if (naturalState.complete) {
+        locomotionMirror = naturalTurn.targetMirror;
+        if (!startNaturalStep(locomotionMirror, now)) {
+          naturalLocomotionPlayer.previousUrl = naturalState.url;
+          naturalLocomotionPlayer.previousDisplayScale = naturalState.displayScale;
+          naturalLocomotionPlayer.transitionStartedAt = now;
+        }
+        naturalTurn = null;
+      }
+    } else if (naturalMotionReady && naturalLocomotionPlayer && locomotionDirection && naturalStep) {
+      naturalLocomotionPlayer.tick(now, { paused: true });
+      naturalState = naturalStep.player.tick(now);
+      drewNaturalFrame = drawNaturalFrame(naturalState);
+      if (naturalState.complete) {
+        naturalStep = null;
+        activateNaturalLocomotion("walk", now, { entryFrame: 0 });
+        gaitSwitchAfter = now + 150;
+      }
+    } else if (naturalMotionReady && naturalLocomotionPlayer && locomotionDirection) {
       naturalState = naturalLocomotionPlayer.tick(now, {
         playbackRate: engine.current.playbackRate,
-        paused: pet.dragStationary,
+        paused: pet.dragging && pet.dragStationary,
       });
-      naturalState.mirror = locomotionDirection === "right";
+      naturalState.mirror = locomotionMirror ?? (locomotionDirection === "right");
       drewNaturalFrame = drawNaturalFrame(naturalState);
     } else if (naturalMotionReady && naturalTransitionPlayer && ["lieDown", "getUp"].includes(engine.current.name)) {
       naturalState = naturalTransitionPlayer.tick(now);
       drewNaturalFrame = drawNaturalFrame(naturalState);
+    } else if (engine.current.name === "idle" && naturalMotionReady && naturalMotionPlayer && naturalStop) {
+      naturalState = naturalStop.player.tick(now);
+      naturalState.mirror = naturalStop.mirror;
+      drewNaturalFrame = drawNaturalFrame(naturalState);
+      if (naturalState.complete) {
+        naturalStop = null;
+        startNaturalSettle(now);
+      }
+    } else if (engine.current.name === "idle" && naturalMotionReady && naturalMotionPlayer && naturalSettle) {
+      naturalState = naturalSettle.player.tick(now);
+      naturalState.mirror = naturalSettle.mirror;
+      naturalState.previousMirror = naturalSettle.mirror;
+      if (!naturalState.complete) {
+        drewNaturalFrame = drawNaturalFrame(naturalState);
+      } else {
+        const settleMirror = naturalSettle.mirror;
+        naturalSettle = null;
+        if (startNaturalPosture("sit", settleMirror, now)) {
+          naturalState = naturalSitDown.player.tick(now);
+          drewNaturalFrame = drawNaturalFrame(naturalState);
+        } else {
+          naturalMotionPlayer.previousUrl = naturalState.url;
+          naturalMotionPlayer.previousMirror = settleMirror;
+          naturalMotionPlayer.previousDisplayScale = naturalState.displayScale;
+          naturalMotionPlayer.transitionStartedAt = now;
+          naturalState = naturalMotionPlayer.tick(now, { enabled: true });
+          drewNaturalFrame = drawNaturalFrame(naturalState);
+        }
+      }
+    } else if (engine.current.name === "idle" && naturalMotionReady && naturalMotionPlayer && naturalSitDown) {
+      naturalState = naturalSitDown.player.tick(now);
+      drewNaturalFrame = drawNaturalFrame(naturalState);
+      if (naturalState.complete) naturalSitDown = null;
     } else if (engine.current.name === "idle" && naturalMotionReady && naturalMotionPlayer) {
       naturalState = naturalMotionPlayer.tick(now, { enabled: true });
       drewNaturalFrame = drawNaturalFrame(naturalState);
@@ -338,6 +453,8 @@
     if (event.button !== 0) return;
     const point = canvasPoint(event);
     pet.dragging = true;
+    naturalSettle = null;
+    pet.roamMotion = null;
     pet.pointerId = event.pointerId;
     pet.lastPointer = { ...point, screenX: event.screenX, screenY: event.screenY, time: performance.now() };
     pet.dragDistance = 0;
@@ -396,6 +513,12 @@
     pet.pointerId = null;
     pet.lastPointer = null;
     globalThis.xiaodaiDesktop?.endDrag?.();
+    if (!wasClick && (naturalTurn || naturalStart || naturalStep)) {
+      naturalTurn = null;
+      naturalStart = null;
+      naturalStep = null;
+      startNaturalSettle(performance.now());
+    } else if (!wasClick) requestNaturalStop(performance.now());
     engine.releaseDrag(performance.now());
     pet.gait = "walk";
     pet.dragDirection = lastDrawnNaturalMirror ? "right" : "left";
@@ -516,16 +639,111 @@
       : null;
   }
 
-  function activateNaturalLocomotion(gait, now = performance.now()) {
+  function activateNaturalLocomotion(gait, now = performance.now(), options = {}) {
     const motion = naturalLocomotionByGait.get(gait) || naturalLocomotionByGait.get("walk");
+    const initialPhase = naturalLocomotionPlayer?.getPhase?.() ?? 0;
     activeNaturalGait = motion?.gait || gait;
     naturalLocomotionPlayer = motion && motionCore?.NaturalCyclePlayer
       ? new motionCore.NaturalCyclePlayer(motion, {
         now,
+        initialPhase,
+        entryFrame: options.entryFrame ?? (naturalLocomotionPlayer ? motion?.gaitEntryFrame : undefined),
+        entryFrames: options.entryFrame == null && naturalLocomotionPlayer ? motion?.gaitEntryFrames : undefined,
         previousUrl: lastDrawnNaturalUrl || naturalMotionPlayer?.currentUrl || null,
         previousDisplayScale: lastDrawnNaturalScale,
       })
       : null;
+  }
+
+  function startNaturalSettle(now) {
+    if (!naturalMotionReady || !naturalSettleMotion?.neutralFrameUrl || !lastDrawnNaturalUrl || !motionCore?.NaturalSequencePlayer) return;
+    const variant = motionCore.chooseSequenceVariant(naturalSettleMotion, lastSettleVariant);
+    if (!variant) return;
+    lastSettleVariant = variant.id;
+    naturalSettle = {
+      mirror: lastDrawnNaturalMirror,
+      player: new motionCore.NaturalSequencePlayer({ ...naturalSettleMotion, variants: [variant] }, {
+        now,
+        previousUrl: lastDrawnNaturalUrl,
+        previousDisplayScale: lastDrawnNaturalScale,
+      }),
+    };
+  }
+
+  function startNaturalStep(mirror, now) {
+    const source = naturalStepMotion?.variants?.[0]?.frames;
+    if (!source?.length || !motionCore?.NaturalSequencePlayer) return false;
+    const motion = { ...naturalStepMotion, variants: [{ frames: source.map((frame) => ({ ...frame, mirror })) }] };
+    naturalStep = { player: new motionCore.NaturalSequencePlayer(motion, {
+      now, previousUrl: lastDrawnNaturalUrl, previousMirror: lastDrawnNaturalMirror,
+      previousDisplayScale: lastDrawnNaturalScale, previousAnchorX: 0.12,
+    }) };
+    return true;
+  }
+
+  function startNaturalTurn(fromMirror, targetMirror, now) {
+    const frames = naturalTurnMotion?.variants?.[0]?.frames;
+    if (!frames || frames.length < 4 || !motionCore?.NaturalSequencePlayer) return;
+    const [side, nearSide, quarter, front] = frames;
+    const turnMotion = {
+      transitionMs: naturalTurnMotion.transitionMs,
+      variants: [{ frames: [
+        { ...side, mirror: fromMirror },
+        { ...nearSide, mirror: fromMirror },
+        { ...quarter, mirror: fromMirror },
+        { ...front, mirror: false },
+        { ...quarter, mirror: targetMirror },
+        { ...nearSide, mirror: targetMirror },
+        { ...side, mirror: targetMirror },
+      ] }],
+    };
+    naturalTurn = {
+      targetMirror,
+      player: new motionCore.NaturalSequencePlayer(turnMotion, {
+        now, previousUrl: lastDrawnNaturalUrl, previousMirror: lastDrawnNaturalMirror,
+        previousDisplayScale: lastDrawnNaturalScale, previousAnchorX: 0.12,
+      }),
+    };
+  }
+
+  function startNaturalPosture(kind, mirror, now) {
+    const source = naturalPostureMotion?.variants?.[0]?.frames;
+    const seated = naturalMotionByPose.get("sit")?.neutralFrameUrl;
+    if (!source || source.length < 6 || !seated || !motionCore?.NaturalSequencePlayer) return false;
+    const [rising, halfway, front, quarter, nearSide, side] = source;
+    const riseFrames = [
+      { ...rising, mirror: false },
+      { ...halfway, mirror: false },
+      { ...front, mirror: false },
+      { ...quarter, mirror },
+      { ...nearSide, mirror },
+      { ...side, mirror },
+    ];
+    const frames = kind === "rise" ? riseFrames : [
+      ...riseFrames.slice(0, -1).reverse(),
+      { url: seated, durationMs: 180, displayScale: 1, mirror: false, anchorX: 0.74 },
+    ];
+    const postureMotion = { transitionMs: naturalPostureMotion.transitionMs, variants: [{ frames }] };
+    const player = new motionCore.NaturalSequencePlayer(postureMotion, {
+      now, previousUrl: lastDrawnNaturalUrl, previousMirror: lastDrawnNaturalMirror,
+      previousDisplayScale: lastDrawnNaturalScale, previousAnchorX: kind === "rise" ? 0.74 : 0.12,
+    });
+    if (kind === "rise") naturalStart = { player };
+    else naturalSitDown = { player };
+    return true;
+  }
+
+  function requestNaturalStop(now) {
+    if (!naturalLocomotionPlayer || !motionCore?.NaturalStopPlayer) {
+      startNaturalSettle(now);
+      return;
+    }
+    naturalStop = {
+      mirror: lastDrawnNaturalMirror,
+      player: new motionCore.NaturalStopPlayer(naturalLocomotionPlayer, now, {
+        playbackRate: engine.current.playbackRate,
+      }),
+    };
   }
 
   function prepareNaturalMotions(motions) {
@@ -537,9 +755,31 @@
     naturalMotionByPose.clear();
     naturalTransitionByKey.clear();
     naturalLocomotionByGait.clear();
+    naturalSettleMotion = null;
+    lastSettleVariant = null;
+    naturalTurnMotion = null;
+    naturalPostureMotion = null;
+    naturalStepMotion = null;
+    naturalStep = null;
+    gaitSwitchAfter = 0;
+    naturalStart = null;
+    naturalSitDown = null;
+    naturalTurn = null;
+    locomotionMirror = null;
+    turnCandidateAt = 0;
+    naturalSettle = null;
+    naturalStop = null;
     naturalMotionReady = false;
     for (const motion of motions || []) {
-      if (motion?.intent === "transition" && motion?.fromPose && motion?.toPose) {
+      if (motion?.intent === "startStep") {
+        naturalStepMotion = motion;
+      } else if (motion?.intent === "posture") {
+        naturalPostureMotion = motion;
+      } else if (motion?.intent === "turn") {
+        naturalTurnMotion = motion;
+      } else if (motion?.intent === "settle") {
+        naturalSettleMotion = motion;
+      } else if (motion?.intent === "transition" && motion?.fromPose && motion?.toPose) {
         naturalTransitionByKey.set(transitionKey(motion.fromPose, motion.toPose), motion);
       } else if (motion?.intent === "locomotion" && motion?.gait) {
         naturalLocomotionByGait.set(motion.gait, motion);
@@ -619,31 +859,45 @@
     );
   }
 
+  let roamPlanning = false;
   async function maybeRoam(now) {
-    if (!isDesktop || !engine.config.desktop.roamEnabled || pet.dragging || !globalThis.xiaodaiDesktop?.roam || !globalThis.xiaodaiDesktop?.planRoam) return;
+    if (!isDesktop || !engine.config.desktop.roamEnabled || pet.dragging || roamPlanning || !globalThis.xiaodaiDesktop?.roam || !globalThis.xiaodaiDesktop?.planRoam) return;
     if (!pet.nextRoamAt) scheduleDesktopRoam(now);
     if (now < pet.nextRoamAt || now < pet.roamUntil || engine.current.name !== "idle") return;
     const preferredDirection = Math.random() < 0.5 ? "left" : "right";
-    const plan = await globalThis.xiaodaiDesktop.planRoam({
+    roamPlanning = true;
+    let plan;
+    try {
+      plan = await globalThis.xiaodaiDesktop.planRoam({
       direction: preferredDirection,
       distance: Math.round(core.randomBetween(240, 720)),
       duration: Math.round(core.randomBetween(6000, 14000)),
       minimumDistance: 36,
-    });
+      });
+    } finally {
+      roamPlanning = false;
+    }
+    if (pet.dragging || !engine.config.desktop.roamEnabled || engine.current.name !== "idle") return;
     if (!plan?.direction || !plan.duration || !plan.dx) {
       scheduleDesktopRoam(performance.now());
       return;
     }
-    pet.roamUntil = now + plan.duration;
+    const roamStartedAt = performance.now();
+    pet.roamMotion = { startedAt: roamStartedAt, duration: plan.duration, distance: Math.abs(plan.dx) };
+    pet.roamUntil = roamStartedAt + plan.duration;
     pet.gait = "walk";
-    engine.trigger(plan.direction === "left" ? "walkLeft" : "walkRight", now, {
+    engine.trigger(plan.direction === "left" ? "walkLeft" : "walkRight", roamStartedAt, {
       reason: "desktop-roam",
-      playbackRate: 0.72,
+      playbackRate: 0.2,
     });
     try {
       await globalThis.xiaodaiDesktop.roam({ dx: plan.dx, duration: plan.duration });
     } finally {
-      engine.releaseDrag(performance.now());
+      pet.roamMotion = null;
+      if (!pet.dragging && engine.current.reason === "desktop-roam") {
+        requestNaturalStop(performance.now());
+        engine.releaseDrag(performance.now());
+      }
       scheduleDesktopRoam(performance.now());
     }
   }

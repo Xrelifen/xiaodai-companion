@@ -13,7 +13,13 @@ const profiles = {
   "lie-idle-v1": { axis: "width", extent: 1210, grade: { brightness: 1.002, saturation: 0.957, hue: -0.9 } },
   "walk-cycle-v1": { axis: "width", extent: 1190, grade: { brightness: 1.006, saturation: 0.967, hue: -1.45 } },
   "run-cycle-v1": { axis: "width", extent: 1190, grade: { brightness: 1.012, saturation: 0.951, hue: -1.1 } },
+  "stand-settle-v1": { axis: "width", extent: 1190, grade: { brightness: 1.006, saturation: 0.967, hue: -1.45 } },
+  "start-step-v1": { axis: "width", extent: 1190, grade: { brightness: 1.006, saturation: 0.967, hue: -1.45 } },
+  "sit-stand-v1": { axis: "height", extent: 1260, grade: { brightness: 1, saturation: 1, hue: 0 } },
+  "turn-v1/frames/frame-020-front": { axis: "height", extent: 1260, offsetX: 110, grade: { brightness: 1, saturation: 1, hue: 0 } },
+  "turn-v1": { axis: "height", extent: 1260, grade: { brightness: 1, saturation: 1, hue: 0 } },
   "sit-to-lie-v1/frames/frame-010": { axis: "height", extent: 1190, grade: { brightness: 1.01, saturation: 0.981, hue: -0.5 } },
+  "sit-to-lie-v1/frames/frame-015": { axis: "width", extent: 1195, grade: { brightness: 1.01, saturation: 0.981, hue: -0.5 } },
   "sit-to-lie-v1/frames/frame-020": { axis: "width", extent: 1195, grade: { brightness: 1.01, saturation: 0.981, hue: -0.5 } },
 };
 
@@ -133,7 +139,7 @@ async function normalizeFrame(filePath, reference) {
   const fitScale = Math.min(1, (canvas.width - 28) / targetWidth, (canvas.groundY - 20) / targetHeight);
   targetWidth = Math.max(1, Math.round(targetWidth * fitScale));
   targetHeight = Math.max(1, Math.round(targetHeight * fitScale));
-  const left = Math.round((canvas.width - targetWidth) / 2);
+  const left = Math.round(clamp((canvas.width - targetWidth) / 2 + (profile.offsetX || 0), 0, canvas.width - targetWidth));
   const top = canvas.groundY - targetHeight;
 
   const subject = await sharp(filePath)
@@ -173,11 +179,18 @@ async function normalizeFrame(filePath, reference) {
 }
 
 const reference = await furStats(referencePath);
-const frames = (await listPngFrames(motionsRoot)).sort();
+// Optional relative path lets newly generated frames be normalized without
+// regenerating already approved playback assets.
+const requestedFrame = process.argv[2]?.replaceAll("\\", "/");
+const allFrames = (await listPngFrames(motionsRoot)).sort();
+const frames = requestedFrame
+  ? allFrames.filter((file) => path.relative(motionsRoot, file).replaceAll("\\", "/") === requestedFrame)
+  : allFrames;
+if (requestedFrame && frames.length !== 1) throw new Error(`Motion frame not found: ${requestedFrame}`);
 const report = [];
 for (const frame of frames) report.push(await normalizeFrame(frame, reference));
 
-for (const motionName of await fs.readdir(motionsRoot)) {
+for (const motionName of requestedFrame ? [] : await fs.readdir(motionsRoot)) {
   const manifestPath = path.join(motionsRoot, motionName, "motion.json");
   try {
     const motion = JSON.parse(await fs.readFile(manifestPath, "utf8"));

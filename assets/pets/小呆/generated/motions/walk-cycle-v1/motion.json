@@ -13,8 +13,14 @@
   },
   "identityBase": "../../concepts/identity-stand-profile-v1.png",
   "neutralFrame": "frames/frame-000-contact.webp",
-  "displayScale": 0.89,
+  "displayScale": 1.45,
   "transitionMs": 76,
+  "gaitSwitchFrames": [
+    0,
+    4
+  ],
+  "gaitEntryFrame": 0,
+  "gaitEntryFrames": [0, 4],
   "interruptible": true,
   "variants": [
     {
@@ -23,19 +29,35 @@
       "frames": [
         {
           "file": "frames/frame-000-contact.webp",
-          "durationMs": 180
+          "durationMs": 120
+        },
+        {
+          "file": "frames/frame-005-transfer.webp",
+          "durationMs": 60
         },
         {
           "file": "frames/frame-010-down.webp",
-          "durationMs": 150
+          "durationMs": 75
+        },
+        {
+          "file": "frames/frame-015-passing.webp",
+          "durationMs": 75
         },
         {
           "file": "frames/frame-020-opposite-contact.webp",
-          "durationMs": 180
+          "durationMs": 120
+        },
+        {
+          "file": "frames/frame-025-lift.webp",
+          "durationMs": 60
         },
         {
           "file": "frames/frame-030-up.webp",
-          "durationMs": 150
+          "durationMs": 75
+        },
+        {
+          "file": "frames/frame-035-reach.webp",
+          "durationMs": 75
         }
       ]
     }

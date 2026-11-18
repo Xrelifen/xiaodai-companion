@@ -1,0 +1,13 @@
+{
+  "schemaVersion": 1,
+  "id": "start-step-v1",
+  "petId": "xiaodai",
+  "intent": "startStep",
+  "canvas": { "width": 1280, "height": 1354 },
+  "transitionMs": 55,
+  "neutralFrame": "frames/frame-010-lift.webp",
+  "displayScale": 1.45,
+  "variants": [{ "id": "first-step", "frames": [
+    { "file": "frames/frame-010-lift.webp", "durationMs": 160, "anchorX": 0.12 }
+  ] }]
+}

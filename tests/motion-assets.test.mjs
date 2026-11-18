@@ -65,7 +65,10 @@ test("sit-to-lie transition connects the approved endpoints with transparent fra
   const files = motion.variants[0].frames.map((frame) => frame.file);
   assert.match(files[0], /sit-idle-v1/);
   assert.match(files.at(-1), /lie-idle-v1/);
-  assert.ok(files.length >= 4);
+  assert.ok(files.length >= 5);
+  const intermediate = motion.variants[0].frames.find((frame) => frame.file.includes("frame-015-lowering"));
+  assert.ok(intermediate, "the chest-lowering transition must include the middle pose");
+  assert.ok(intermediate.durationMs > motion.transitionMs, "the middle pose must be visible after its fade completes");
   for (const file of files) {
     const url = new URL(file, transitionMotionUrl);
     await access(url);
@@ -75,16 +78,24 @@ test("sit-to-lie transition connects the approved endpoints with transparent fra
 });
 
 for (const [gait, motionUrl] of [["walk", walkMotionUrl], ["run", runMotionUrl]]) {
-  test(`${gait} locomotion cycle has four consistent transparent frames`, async () => {
+  test(`${gait} locomotion cycle has consistent transparent frames`, async () => {
     const motion = JSON.parse(await readFile(motionUrl, "utf8"));
     assert.equal(motion.intent, "locomotion");
     assert.equal(motion.gait, gait);
     assert.equal(motion.facing, "left");
     const frames = motion.variants[0].frames;
     const files = frames.map((frame) => frame.file);
-    assert.equal(files.length, 4);
-    assert.equal(motion.displayScale, 0.89);
+    assert.ok(files.length >= 8, `${gait} needs at least eight distinct poses`);
+    assert.equal(new Set(files).size, files.length, `${gait} frames must reference distinct images`);
+    assert.ok(frames.every((frame) => Number(frame.durationMs) > 0));
+    // Keep the enlarged landscape frame within the 576-pixel drawing canvas.
+    assert.ok(motion.displayScale >= 1 && 320 * motion.displayScale <= 576);
     assert.ok(frames.every((frame) => frame.displayScale === undefined));
+    for (const index of [...(motion.gaitSwitchFrames || []), ...(motion.gaitEntryFrames || []), motion.gaitEntryFrame]) {
+      if (index == null) continue;
+      assert.ok(Number.isInteger(index) && index >= 0 && index < frames.length, `invalid gait contact index ${index}`);
+      assert.match(frames[index].file, /contact|landing/, `gait contact must point to a landing frame: ${frames[index].file}`);
+    }
     for (const file of files) {
       const url = new URL(file, motionUrl);
       await access(url);

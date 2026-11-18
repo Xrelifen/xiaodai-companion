@@ -4,8 +4,9 @@ release/
 Thumbs.db
 *.log
 coverage/
+tmp/
 
-# 原始生活照預設不推上公開 repo；只保留空資料夾。
+# 排除尚未追蹤的原始生活照；已追蹤的檔案不受此規則影響。
 assets/pets/*/source/*
 !assets/pets/*/source/.gitkeep
 

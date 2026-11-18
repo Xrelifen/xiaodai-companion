@@ -11,7 +11,7 @@
   },
   "identityBase": "../../concepts/identity-sit-v1.png",
   "neutralFrame": "../sit-idle-v1/frames/frame-000-neutral.webp",
-  "transitionMs": 260,
+  "transitionMs": 140,
   "interruptible": false,
   "variants": [
     {
@@ -24,7 +24,11 @@
         },
         {
           "file": "frames/frame-010-lean-forward.webp",
-          "durationMs": 560
+          "durationMs": 300
+        },
+        {
+          "file": "frames/frame-015-lowering.webp",
+          "durationMs": 260
         },
         {
           "file": "frames/frame-020-chest-lowered.webp",

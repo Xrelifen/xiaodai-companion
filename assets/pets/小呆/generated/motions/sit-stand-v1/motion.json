@@ -1,0 +1,20 @@
+{
+  "schemaVersion": 1,
+  "id": "sit-stand-v1",
+  "petId": "xiaodai",
+  "intent": "posture",
+  "canvas": { "width": 1280, "height": 1354 },
+  "transitionMs": 65,
+  "neutralFrame": "frames/frame-010-rising.webp",
+  "variants": [{
+    "id": "rise-to-stand",
+    "frames": [
+      { "file": "frames/frame-010-rising.webp", "durationMs": 160, "displayScale": 1, "anchorX": 0.79 },
+      { "file": "frames/frame-015-halfway.webp", "durationMs": 140, "displayScale": 1, "anchorX": 0.70 },
+      { "file": "../turn-v1/frames/frame-020-front.webp", "durationMs": 150, "displayScale": 1, "anchorX": 0.49 },
+      { "file": "../turn-v1/frames/frame-010-quarter.webp", "durationMs": 150, "displayScale": 1, "anchorX": 0.30 },
+      { "file": "frames/frame-020-rising-turn.webp", "durationMs": 150, "displayScale": 1, "anchorX": 0.16 },
+      { "file": "../stand-settle-v1/frames/frame-020-look-front.webp", "durationMs": 150, "displayScale": 1.45, "anchorX": 0.12 }
+    ]
+  }]
+}

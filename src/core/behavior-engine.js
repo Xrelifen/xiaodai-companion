@@ -84,6 +84,15 @@
     return Math.min(max, Math.max(min, value));
   }
 
+  // Match the derivative of the desktop window's ease-in/ease-out path.
+  function roamPlaybackRate(distance, durationMs, elapsedMs, stridePixels = 100, cycleMs = 660) {
+    const duration = Math.max(1, Number(durationMs) || 1);
+    const progress = clamp((Number(elapsedMs) || 0) / duration, 0, 1);
+    const derivative = progress < 0.5 ? 4 * progress : 4 * (1 - progress);
+    const speed = Math.abs(Number(distance) || 0) / duration * 1000 * derivative;
+    return clamp(speed * cycleMs / 1000 / Math.max(1, stridePixels), 0.2, 1.8);
+  }
+
   function randomBetween(min, max, rng = Math.random) {
     return min + (max - min) * rng();
   }
@@ -237,10 +246,10 @@
       return action;
     }
 
-    tick(now) {
+    tick(now, options = {}) {
       const sequence = this.sequences[this.current.name];
       const duration = sequenceDuration(sequence) / Math.max(0.05, this.current.playbackRate);
-      if (!sequence.loop && now - this.current.startedAt >= duration) {
+      if (!sequence.loop && !options.holdSequence && now - this.current.startedAt >= duration) {
         this.trigger("idle", now, { reason: "sequence-complete" });
         this.scheduleNextIdle(now);
       } else if (this.current.name === "idle" && now >= this.nextIdleActionAt) {
@@ -305,6 +314,7 @@
     normalizeSequence,
     pointerVelocity,
     randomBetween,
+    roamPlaybackRate,
     sequenceDuration,
     smoothAngle,
     stableDragDirection,
