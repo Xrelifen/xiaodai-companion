@@ -19,6 +19,7 @@ const profiles = {
   "turn-v1/frames/frame-020-front": { axis: "height", extent: 1260, offsetX: 110, grade: { brightness: 1, saturation: 1, hue: 0 } },
   "turn-v1": { axis: "height", extent: 1260, grade: { brightness: 1, saturation: 1, hue: 0 } },
   "sit-to-lie-v1/frames/frame-010": { axis: "height", extent: 1190, grade: { brightness: 1.01, saturation: 0.981, hue: -0.5 } },
+  "sit-to-lie-v1/frames/frame-012": { axis: "width", extent: 1195, grade: { brightness: 1.01, saturation: 0.981, hue: -0.5 } },
   "sit-to-lie-v1/frames/frame-015": { axis: "width", extent: 1195, grade: { brightness: 1.01, saturation: 0.981, hue: -0.5 } },
   "sit-to-lie-v1/frames/frame-020": { axis: "width", extent: 1195, grade: { brightness: 1.01, saturation: 0.981, hue: -0.5 } },
 };

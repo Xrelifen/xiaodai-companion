@@ -586,6 +586,11 @@ globalThis.XIAODAI_PET_CATALOG = [
                 "url": "../../assets/pets/%E5%B0%8F%E5%91%86/generated/motions/sit-to-lie-v1/frames/frame-010-lean-forward.webp"
               },
               {
+                "file": "frames/frame-012-lowering.webp",
+                "durationMs": 220,
+                "url": "../../assets/pets/%E5%B0%8F%E5%91%86/generated/motions/sit-to-lie-v1/frames/frame-012-lowering.webp"
+              },
+              {
                 "file": "frames/frame-015-lowering.webp",
                 "durationMs": 260,
                 "url": "../../assets/pets/%E5%B0%8F%E5%91%86/generated/motions/sit-to-lie-v1/frames/frame-015-lowering.webp"
