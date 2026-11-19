@@ -53,6 +53,22 @@ app.whenReady().then(async () => {
   const firstStep = gettingUp.findIndex((url, i) => i > rise && url.includes('start-step-v1'));
   assert.ok(crouch >= 0 && sit > crouch && rise > sit && firstStep > rise, 'dragging a lying cat must pass through crouch, sit and stand before stepping');
   window.webContents.sendInputEvent({ type: 'mouseUp', button: 'left', clickCount: 1, ...point });
+  await pause(4000);
+  await window.webContents.executeJavaScript(`document.querySelector("[data-action='rest']").click()`);
+  await pause(1400);
+  const beforeInterrupt = await window.webContents.executeJavaScript('window.__lieFrames');
+  assert.ok(beforeInterrupt.some(url => url.includes('frame-012-lowering')), 'test did not reach the lowering transition');
+  await window.webContents.executeJavaScript('window.__lieFrames = []');
+  window.webContents.sendInputEvent({ type: 'mouseDown', button: 'left', clickCount: 1, ...point });
+  for (let i = 0; i < 40; i++) {
+    await window.webContents.executeJavaScript('xiaodaiDesktop.sampleForTest({dx: 15, dy: 0, speed: 180})');
+    await pause(80);
+  }
+  const interrupted = await window.webContents.executeJavaScript('window.__lieFrames');
+  const lean = interrupted.findIndex(url => url.includes('frame-010-lean-forward'));
+  const standing = interrupted.findIndex((url, i) => i > lean && url.includes('sit-stand-v1/frames/frame-010-rising'));
+  assert.ok(lean >= 0 && standing > lean, 'interrupting the lowering transition must recover through sitting before standing');
+  window.webContents.sendInputEvent({ type: 'mouseUp', button: 'left', clickCount: 1, ...point });
   console.log(`Lie transition rendered ${expected.length} ordered poses; captures: ${output}`);
   window.webContents.stopPainting();
   window.close();
