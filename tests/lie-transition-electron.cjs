@@ -69,6 +69,28 @@ app.whenReady().then(async () => {
   const standing = interrupted.findIndex((url, i) => i > lean && url.includes('sit-stand-v1/frames/frame-010-rising'));
   assert.ok(lean >= 0 && standing > lean, 'interrupting the lowering transition must recover through sitting before standing');
   window.webContents.sendInputEvent({ type: 'mouseUp', button: 'left', clickCount: 1, ...point });
+  await pause(4000);
+  await window.webContents.executeJavaScript(`Math.random = () => 0; document.querySelector("[data-action='rest']").click()`);
+  await pause(4300);
+  await window.webContents.executeJavaScript('window.__lieFrames = []');
+  let gettingUpNaturally = false;
+  for (let i = 0; i < 140; i++) {
+    await pause(200);
+    gettingUpNaturally = await window.webContents.executeJavaScript(`window.__lieFrames.some(url => url.includes('frame-020-chest-lowered'))`);
+    if (gettingUpNaturally) break;
+  }
+  assert.ok(gettingUpNaturally, 'test did not reach the natural get-up transition');
+  await window.webContents.executeJavaScript('window.__lieFrames = []');
+  window.webContents.sendInputEvent({ type: 'mouseDown', button: 'left', clickCount: 1, ...point });
+  for (let i = 0; i < 40; i++) {
+    await window.webContents.executeJavaScript('xiaodaiDesktop.sampleForTest({dx: 15, dy: 0, speed: 180})');
+    await pause(80);
+  }
+  const interruptedRise = await window.webContents.executeJavaScript('window.__lieFrames');
+  const leaningUp = interruptedRise.findIndex(url => url.includes('frame-010-lean-forward'));
+  const standingUp = interruptedRise.findIndex((url, i) => i > leaningUp && url.includes('sit-stand-v1/frames/frame-010-rising'));
+  assert.ok(leaningUp >= 0 && standingUp > leaningUp, 'interrupting get-up must finish recovering before standing');
+  window.webContents.sendInputEvent({ type: 'mouseUp', button: 'left', clickCount: 1, ...point });
   console.log(`Lie transition rendered ${expected.length} ordered poses; captures: ${output}`);
   window.webContents.stopPainting();
   window.close();
