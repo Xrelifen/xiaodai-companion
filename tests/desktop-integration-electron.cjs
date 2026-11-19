@@ -103,6 +103,8 @@ app.whenReady().then(async () => {
   const fastFrames = await window.webContents.executeJavaScript('window.__drawnFrames');
   assert.ok(fastFrames.some(f => f.url.includes('start-step-v1')), 'fast startup skipped the first step');
   assert.ok(fastFrames.some(f => f.url.includes('run-cycle-v1')), 'sustained fast drag never entered the running cycle');
+  assert.ok(fastFrames.some(f => f.url.includes('frame-022-unfolding')), 'running skipped the unfolding pose');
+  assert.ok(fastFrames.some(f => f.url.includes('frame-023-rising')), 'running skipped the rising pose');
   const accelerateFirst = fastFrames.findIndex(f => f.url.includes('gait-bridge-v1/frames/01-raised'));
   const accelerateSecond = fastFrames.findIndex((f, i) => i > accelerateFirst && f.url.includes('gait-bridge-v1/frames/02-lowering'));
   const runAfterBridge = fastFrames.findIndex((f, i) => i > accelerateSecond && f.url.includes('run-cycle-v1/frames/frame-010-front-landing'));

@@ -43,11 +43,19 @@
         },
         {
           "file": "frames/frame-020-gathered.webp",
-          "durationMs": 55
+          "durationMs": 35
+        },
+        {
+          "file": "frames/frame-022-unfolding.webp",
+          "durationMs": 35
+        },
+        {
+          "file": "frames/frame-023-rising.webp",
+          "durationMs": 35
         },
         {
           "file": "frames/frame-025-pushing.webp",
-          "durationMs": 50
+          "durationMs": 35
         },
         {
           "file": "frames/frame-030-propulsion.webp",

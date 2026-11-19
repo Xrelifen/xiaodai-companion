@@ -1042,12 +1042,22 @@ globalThis.XIAODAI_PET_CATALOG = [
               },
               {
                 "file": "frames/frame-020-gathered.webp",
-                "durationMs": 55,
+                "durationMs": 35,
                 "url": "../../assets/pets/%E5%B0%8F%E5%91%86/generated/motions/run-cycle-v1/frames/frame-020-gathered.webp"
               },
               {
+                "file": "frames/frame-022-unfolding.webp",
+                "durationMs": 35,
+                "url": "../../assets/pets/%E5%B0%8F%E5%91%86/generated/motions/run-cycle-v1/frames/frame-022-unfolding.webp"
+              },
+              {
+                "file": "frames/frame-023-rising.webp",
+                "durationMs": 35,
+                "url": "../../assets/pets/%E5%B0%8F%E5%91%86/generated/motions/run-cycle-v1/frames/frame-023-rising.webp"
+              },
+              {
                 "file": "frames/frame-025-pushing.webp",
-                "durationMs": 50,
+                "durationMs": 35,
                 "url": "../../assets/pets/%E5%B0%8F%E5%91%86/generated/motions/run-cycle-v1/frames/frame-025-pushing.webp"
               },
               {
