@@ -21,7 +21,7 @@ app.whenReady().then(async () => {
     for (const name of ['pointerdown', 'pointerup']) document.addEventListener(name, event => window.__pointerEvents.push({name, target: event.target.id}), true);
     const original = CanvasRenderingContext2D.prototype.drawImage;
     CanvasRenderingContext2D.prototype.drawImage = function(image, ...args) {
-      if (image?.src && image.src.includes('/motions/')) window.__drawnFrames.push({ url: image.src, mirror: this.getTransform().a < 0 });
+      if (image?.src && image.src.includes('/motions/')) window.__drawnFrames.push({ url: image.src, mirror: this.getTransform().a < 0, bottom: args[1] + args[3] });
       return original.call(this, image, ...args);
     };
   })()`);
@@ -105,6 +105,9 @@ app.whenReady().then(async () => {
   assert.ok(fastFrames.some(f => f.url.includes('run-cycle-v1')), 'sustained fast drag never entered the running cycle');
   assert.ok(fastFrames.some(f => f.url.includes('frame-022-unfolding')), 'running skipped the unfolding pose');
   assert.ok(fastFrames.some(f => f.url.includes('frame-023-rising')), 'running skipped the rising pose');
+  const airborne = fastFrames.find(f => f.url.includes('run-cycle-v1/frames/frame-000-extension'));
+  const landing = fastFrames.find(f => f.url.includes('run-cycle-v1/frames/frame-010-front-landing'));
+  assert.ok(airborne && landing && airborne.bottom < landing.bottom - 1, 'airborne run pose must appear above its landing pose');
   const accelerateFirst = fastFrames.findIndex(f => f.url.includes('gait-bridge-v1/frames/01-raised'));
   const accelerateSecond = fastFrames.findIndex((f, i) => i > accelerateFirst && f.url.includes('gait-bridge-v1/frames/02-lowering'));
   const runAfterBridge = fastFrames.findIndex((f, i) => i > accelerateSecond && f.url.includes('run-cycle-v1/frames/frame-010-front-landing'));

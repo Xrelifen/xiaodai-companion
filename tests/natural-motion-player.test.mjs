@@ -168,6 +168,26 @@ test("locomotion cycles preserve phase while playback speed changes", () => {
   assert.equal(player.tick(130, { playbackRate: 2 }).url, "a.png");
 });
 
+test("airborne offsets follow the pose without accumulating and survive a transition", () => {
+  const motion = { transitionMs: 20, variants: [{ frames: [
+    { url: "air", durationMs: 100, offsetY: -55 },
+    { url: "land", durationMs: 100, offsetY: 0 },
+  ] }] };
+  const player = new NaturalCyclePlayer(motion, { now: 0 });
+  assert.equal(player.tick(0).offsetY, -55);
+  const landing = player.tick(105);
+  assert.equal(landing.offsetY, 0);
+  assert.equal(landing.previousOffsetY, -55);
+  assert.equal(player.tick(200).offsetY, -55);
+  assert.equal(player.tick(220).offsetY, -55);
+  const paused = player.tick(300, { paused: true });
+  assert.equal(paused.offsetY, -55);
+  const settle = new NaturalSequencePlayer({ variants: [{ frames: [{ url: "stand", durationMs: 100 }] }] },
+    { now: 300, previousUrl: "air", previousOffsetY: paused.offsetY });
+  assert.equal(settle.tick(300).previousOffsetY, -55);
+  assert.equal(settle.tick(300).offsetY, 0);
+});
+
 test("fast short steps finish fading while the current frame is still visible", () => {
   const motion = { transitionMs: 76, variants: [{ frames: [
     { url: "a", durationMs: 100 }, { url: "b", durationMs: 100 },

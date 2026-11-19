@@ -27,11 +27,13 @@
       "frames": [
         {
           "file": "frames/frame-000-extension.webp",
-          "durationMs": 70
+          "durationMs": 70,
+          "offsetY": -55
         },
         {
           "file": "frames/frame-005-descent.webp",
-          "durationMs": 40
+          "durationMs": 40,
+          "offsetY": -12
         },
         {
           "file": "frames/frame-010-front-landing.webp",
@@ -63,7 +65,8 @@
         },
         {
           "file": "frames/frame-035-takeoff.webp",
-          "durationMs": 40
+          "durationMs": 40,
+          "offsetY": -30
         }
       ]
     }

@@ -223,6 +223,8 @@
       this.previousAnchorX = options.previousAnchorX;
       this.currentDisplayScale = Number(this.frames[0]?.displayScale) || Number(motion?.displayScale) || 1;
       this.previousDisplayScale = Number(options.previousDisplayScale) || 1;
+      this.currentOffsetY = Number(this.frames[0]?.offsetY) || 0;
+      this.previousOffsetY = Number(options.previousOffsetY) || 0;
       this.transitionStartedAt = options.now ?? 0;
       this.frameEndsAt = (options.now ?? 0) + (this.frames[0]?.sampledDurationMs || 1);
       this.lastTickAt = options.now ?? 0;
@@ -233,15 +235,18 @@
       const frame = this.frames[index];
       const nextUrl = frame?.url || this.currentUrl;
       const nextDisplayScale = Number(frame?.displayScale) || Number(this.motion?.displayScale) || 1;
-      if (nextUrl && (nextUrl !== this.currentUrl || Boolean(frame?.mirror) !== this.currentMirror || nextDisplayScale !== this.currentDisplayScale)) {
+      const nextOffsetY = Number(frame?.offsetY) || 0;
+      if (nextUrl && (nextUrl !== this.currentUrl || Boolean(frame?.mirror) !== this.currentMirror || nextDisplayScale !== this.currentDisplayScale || nextOffsetY !== this.currentOffsetY)) {
         this.previousUrl = this.currentUrl;
         this.previousMirror = this.currentMirror;
         this.previousAnchorX = this.currentAnchorX;
         this.previousDisplayScale = this.currentDisplayScale;
+        this.previousOffsetY = this.currentOffsetY;
         this.currentUrl = nextUrl;
         this.currentMirror = Boolean(frame?.mirror);
         this.currentAnchorX = frame?.anchorX;
         this.currentDisplayScale = nextDisplayScale;
+        this.currentOffsetY = nextOffsetY;
         this.transitionStartedAt = now;
       }
       this.frameIndex = index;
@@ -282,6 +287,8 @@
         breathScale: 1,
         displayScale: this.currentDisplayScale,
         previousDisplayScale: this.previousDisplayScale,
+        offsetY: this.currentOffsetY,
+        previousOffsetY: this.previousOffsetY,
         complete: this.complete,
       };
     }
@@ -302,6 +309,8 @@
       this.previousUrl = options.previousUrl || null;
       this.currentDisplayScale = Number(this.frames[0]?.displayScale) || Number(motion?.displayScale) || 1;
       this.previousDisplayScale = Number(options.previousDisplayScale) || 1;
+      this.currentOffsetY = Number(this.frames[0]?.offsetY) || 0;
+      this.previousOffsetY = Number(options.previousOffsetY) || 0;
       this.transitionStartedAt = options.now ?? 0;
       // Preserve the relative position in a gait cycle when changing speed.
       const phase = clamp(Number(options.initialPhase) || 0, 0, 0.999999);
@@ -328,6 +337,7 @@
         this.frameIndex = initial.index;
         this.currentUrl = initial.frame.url || this.currentUrl;
         this.currentDisplayScale = Number(initial.frame.displayScale) || Number(this.motion?.displayScale) || 1;
+        this.currentOffsetY = Number(initial.frame.offsetY) || 0;
       }
     }
 
@@ -359,17 +369,21 @@
       if (options.paused) {
         this.previousUrl = null;
         this.previousDisplayScale = this.currentDisplayScale;
+        this.previousOffsetY = this.currentOffsetY;
         this.transitionStartedAt = now;
       }
       const { frame, index, offsetMs = 0 } = this.frameAtPhase();
       const nextUrl = frame?.url || this.currentUrl;
-      if (nextUrl && nextUrl !== this.currentUrl) {
+      const nextOffsetY = Number(frame?.offsetY) || 0;
+      if (nextUrl && (nextUrl !== this.currentUrl || nextOffsetY !== this.currentOffsetY)) {
         // A delayed render can skip several frames. Blend from what was actually
         // displayed, rather than briefly introducing an unseen intermediate pose.
         this.previousUrl = this.currentUrl;
         this.previousDisplayScale = this.currentDisplayScale;
+        this.previousOffsetY = this.currentOffsetY;
         this.currentUrl = nextUrl;
         this.currentDisplayScale = Number(frame?.displayScale) || Number(this.motion?.displayScale) || 1;
+        this.currentOffsetY = nextOffsetY;
         this.transitionStartedAt = now - offsetMs / playbackRate;
       }
       this.frameIndex = index;
@@ -388,6 +402,8 @@
         breathScale: 1,
         displayScale: this.currentDisplayScale,
         previousDisplayScale: this.previousDisplayScale,
+        offsetY: this.currentOffsetY,
+        previousOffsetY: this.previousOffsetY,
       };
     }
   }

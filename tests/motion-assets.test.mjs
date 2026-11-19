@@ -101,6 +101,12 @@ for (const [gait, motionUrl] of [["walk", walkMotionUrl], ["run", runMotionUrl]]
     assert.ok(files.length >= 8, `${gait} needs at least eight distinct poses`);
     assert.equal(new Set(files).size, files.length, `${gait} frames must reference distinct images`);
     assert.ok(frames.every((frame) => Number(frame.durationMs) > 0));
+    if (gait === "run") {
+      assert.ok(frames.some((frame) => Number(frame.offsetY) < 0), 'running must include an airborne pose');
+      for (const index of motion.gaitSwitchFrames || []) {
+        assert.equal(Number(frames[index].offsetY) || 0, 0, 'landing contacts must remain on the ground');
+      }
+    }
     // Keep the enlarged landscape frame within the 576-pixel drawing canvas.
     assert.ok(motion.displayScale >= 1 && 320 * motion.displayScale <= 576);
     assert.ok(frames.every((frame) => frame.displayScale === undefined));

@@ -99,6 +99,7 @@
   let lastDrawnNaturalUrl = null;
   let lastDrawnNaturalMirror = false;
   let lastDrawnNaturalScale = 1;
+  let lastDrawnNaturalOffsetY = 0;
   let lastEngineSequence = engine.current.name;
   let naturalPose = "sit";
   let naturalPoseUntil = 0;
@@ -191,7 +192,7 @@
     context.drawImage(sprite, sourceX, sourceY, frameWidth, frameHeight, drawX, drawY, drawWidth, drawHeight);
   }
 
-  function drawNaturalLayer(image, alpha, breathScale, mirror = false, displayScale = 1, offsetX = 0) {
+  function drawNaturalLayer(image, alpha, breathScale, mirror = false, displayScale = 1, offsetX = 0, offsetY = 0) {
     if (!image?.complete || !image.naturalWidth || alpha <= 0) return;
     const scale = Math.min(pet.width / image.naturalWidth, pet.height / image.naturalHeight) * displayScale;
     const drawWidth = image.naturalWidth * scale;
@@ -199,7 +200,7 @@
     const drawHeight = baseHeight * breathScale;
     const groundY = pet.y + pet.height / 2;
     const drawX = pet.x - drawWidth / 2 + offsetX;
-    const drawY = groundY - drawHeight;
+    const drawY = groundY - drawHeight + offsetY * scale;
     context.save();
     context.globalAlpha = alpha;
     if (mirror) {
@@ -231,14 +232,15 @@
     globalThis.XiaodaiCrossfade.drawCrossfade(
       context,
       previous ? (alpha) => drawNaturalLayer(previous, alpha, state.breathScale,
-        previousMirror, state.previousDisplayScale || 1, offsets.previous) : null,
+        previousMirror, state.previousDisplayScale || 1, offsets.previous, state.previousOffsetY || 0) : null,
       (alpha) => drawNaturalLayer(current, alpha, state.breathScale,
-        state.mirror, state.displayScale || 1, offsets.current),
+        state.mirror, state.displayScale || 1, offsets.current, state.offsetY || 0),
       state.blend,
     );
     lastDrawnNaturalUrl = state.url;
     lastDrawnNaturalMirror = Boolean(state.mirror);
     lastDrawnNaturalScale = state.displayScale || 1;
+    lastDrawnNaturalOffsetY = state.offsetY || 0;
     return true;
   }
 
@@ -678,6 +680,7 @@
         entryFrames: options.entryFrame == null && naturalLocomotionPlayer ? motion?.gaitEntryFrames : undefined,
         previousUrl: lastDrawnNaturalUrl || naturalMotionPlayer?.currentUrl || null,
         previousDisplayScale: lastDrawnNaturalScale,
+        previousOffsetY: lastDrawnNaturalOffsetY,
       })
       : null;
   }
@@ -693,6 +696,7 @@
         now,
         previousUrl: lastDrawnNaturalUrl,
         previousDisplayScale: lastDrawnNaturalScale,
+        previousOffsetY: lastDrawnNaturalOffsetY,
       }),
     };
   }
@@ -703,7 +707,7 @@
     const motion = { ...naturalStepMotion, variants: [{ frames: source.map((frame) => ({ ...frame, mirror })) }] };
     naturalStep = { player: new motionCore.NaturalSequencePlayer(motion, {
       now, previousUrl: lastDrawnNaturalUrl, previousMirror: lastDrawnNaturalMirror,
-      previousDisplayScale: lastDrawnNaturalScale, previousAnchorX: 0.12,
+      previousDisplayScale: lastDrawnNaturalScale, previousOffsetY: lastDrawnNaturalOffsetY, previousAnchorX: 0.12,
     }) };
     return true;
   }
@@ -715,7 +719,7 @@
     const motion = { ...naturalGaitBridgeMotion, variants: [{ frames: ordered.map((frame) => ({ ...frame, mirror })) }] };
     naturalGaitBridge = { targetGait, player: new motionCore.NaturalSequencePlayer(motion, {
       now, previousUrl: lastDrawnNaturalUrl, previousMirror: lastDrawnNaturalMirror,
-      previousDisplayScale: lastDrawnNaturalScale,
+      previousDisplayScale: lastDrawnNaturalScale, previousOffsetY: lastDrawnNaturalOffsetY,
     }) };
     return true;
   }
@@ -740,7 +744,7 @@
       targetMirror,
       player: new motionCore.NaturalSequencePlayer(turnMotion, {
         now, previousUrl: lastDrawnNaturalUrl, previousMirror: lastDrawnNaturalMirror,
-        previousDisplayScale: lastDrawnNaturalScale, previousAnchorX: 0.12,
+        previousDisplayScale: lastDrawnNaturalScale, previousOffsetY: lastDrawnNaturalOffsetY, previousAnchorX: 0.12,
       }),
     };
   }
@@ -774,7 +778,7 @@
     const postureMotion = { transitionMs: naturalPostureMotion.transitionMs, variants: [{ frames }] };
     const player = new motionCore.NaturalSequencePlayer(postureMotion, {
       now, previousUrl: lastDrawnNaturalUrl, previousMirror: lastDrawnNaturalMirror,
-      previousDisplayScale: lastDrawnNaturalScale,
+      previousDisplayScale: lastDrawnNaturalScale, previousOffsetY: lastDrawnNaturalOffsetY,
       previousAnchorX: (options.fromLie || options.recoveryFrames) ? undefined : (kind === "rise" ? 0.74 : 0.12),
     });
     if (kind === "rise") naturalStart = { player };
@@ -806,6 +810,7 @@
     lastDrawnNaturalUrl = null;
     lastDrawnNaturalMirror = false;
     lastDrawnNaturalScale = 1;
+    lastDrawnNaturalOffsetY = 0;
     naturalMotionByPose.clear();
     naturalTransitionByKey.clear();
     naturalLocomotionByGait.clear();

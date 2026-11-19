@@ -1023,11 +1023,13 @@ globalThis.XIAODAI_PET_CATALOG = [
               {
                 "file": "frames/frame-000-extension.webp",
                 "durationMs": 70,
+                "offsetY": -55,
                 "url": "../../assets/pets/%E5%B0%8F%E5%91%86/generated/motions/run-cycle-v1/frames/frame-000-extension.webp"
               },
               {
                 "file": "frames/frame-005-descent.webp",
                 "durationMs": 40,
+                "offsetY": -12,
                 "url": "../../assets/pets/%E5%B0%8F%E5%91%86/generated/motions/run-cycle-v1/frames/frame-005-descent.webp"
               },
               {
@@ -1068,6 +1070,7 @@ globalThis.XIAODAI_PET_CATALOG = [
               {
                 "file": "frames/frame-035-takeoff.webp",
                 "durationMs": 40,
+                "offsetY": -30,
                 "url": "../../assets/pets/%E5%B0%8F%E5%91%86/generated/motions/run-cycle-v1/frames/frame-035-takeoff.webp"
               }
             ]
