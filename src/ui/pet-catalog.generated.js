@@ -563,7 +563,7 @@ globalThis.XIAODAI_PET_CATALOG = [
         },
         "identityBase": "../../concepts/identity-sit-v1.png",
         "neutralFrame": "../sit-idle-v1/frames/frame-000-neutral.webp",
-        "transitionMs": 140,
+        "transitionMs": 80,
         "interruptible": false,
         "runtimeNotes": {
           "reverse": "The same sequence is played in reverse for lie-to-sit so identity and timing stay consistent.",
