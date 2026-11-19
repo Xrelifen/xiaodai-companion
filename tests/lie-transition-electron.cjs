@@ -36,6 +36,23 @@ app.whenReady().then(async () => {
     assert.notEqual(cursor, -1, `Missing or out-of-order pose: ${name}`);
   }
   assert.deepEqual(errors, []);
+  await window.webContents.executeJavaScript('window.__lieFrames = []');
+  const point = await window.webContents.executeJavaScript(`(() => {
+    const r = document.querySelector('#pet-canvas').getBoundingClientRect();
+    return { x: Math.floor(r.left + r.width / 2), y: Math.floor(r.top + r.height / 2) };
+  })()`);
+  window.webContents.sendInputEvent({ type: 'mouseDown', button: 'left', clickCount: 1, ...point });
+  for (let i = 0; i < 50; i++) {
+    await window.webContents.executeJavaScript('xiaodaiDesktop.sampleForTest({dx: 15, dy: 0, speed: 180})');
+    await pause(80);
+  }
+  const gettingUp = await window.webContents.executeJavaScript('window.__lieFrames');
+  const crouch = gettingUp.findIndex(url => url.includes('frame-020-chest-lowered'));
+  const sit = gettingUp.findIndex((url, i) => i > crouch && url.includes('sit-idle-v1/frames/frame-000-neutral'));
+  const rise = gettingUp.findIndex((url, i) => i > sit && url.includes('sit-stand-v1/frames/frame-010-rising'));
+  const firstStep = gettingUp.findIndex((url, i) => i > rise && url.includes('start-step-v1'));
+  assert.ok(crouch >= 0 && sit > crouch && rise > sit && firstStep > rise, 'dragging a lying cat must pass through crouch, sit and stand before stepping');
+  window.webContents.sendInputEvent({ type: 'mouseUp', button: 'left', clickCount: 1, ...point });
   console.log(`Lie transition rendered ${expected.length} ordered poses; captures: ${output}`);
   window.webContents.stopPainting();
   window.close();

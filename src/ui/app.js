@@ -297,8 +297,10 @@
     if (engine.current.name !== lastEngineSequence) {
       const previousEngineSequence = lastEngineSequence;
       if (["walkLeft", "walkRight"].includes(engine.current.name)
-          && previousEngineSequence === "idle" && naturalPose === "sit" && naturalMotionReady) {
-        startNaturalPosture("rise", engine.current.name === "walkRight", now);
+          && previousEngineSequence === "idle" && naturalMotionReady) {
+        const fromLie = naturalPose === "lie";
+        startNaturalPosture("rise", engine.current.name === "walkRight", now, { fromLie });
+        if (fromLie) activateNaturalPose("sit", now);
       }
       if (engine.current.name === "lieDown") {
         activateNaturalTransition("sit", "lie", false, now);
@@ -706,7 +708,7 @@
     };
   }
 
-  function startNaturalPosture(kind, mirror, now) {
+  function startNaturalPosture(kind, mirror, now, options = {}) {
     const source = naturalPostureMotion?.variants?.[0]?.frames;
     const seated = naturalMotionByPose.get("sit")?.neutralFrameUrl;
     if (!source || source.length < 6 || !seated || !motionCore?.NaturalSequencePlayer) return false;
@@ -719,14 +721,22 @@
       { ...nearSide, mirror },
       { ...side, mirror },
     ];
-    const frames = kind === "rise" ? riseFrames : [
+    let frames = kind === "rise" ? riseFrames : [
       ...riseFrames.slice(0, -1).reverse(),
       { url: seated, durationMs: 180, displayScale: 1, mirror: false, anchorX: 0.74 },
     ];
+    if (kind === "rise" && options.fromLie) {
+      const transition = naturalTransitionByKey.get(transitionKey("sit", "lie"))?.variants?.[0]?.frames;
+      if (transition?.length > 1) {
+        const gettingUp = transition.slice(0, -1).reverse().map((frame) => ({ ...frame, durationMs: 140 }));
+        frames = [...gettingUp, ...riseFrames];
+      }
+    }
     const postureMotion = { transitionMs: naturalPostureMotion.transitionMs, variants: [{ frames }] };
     const player = new motionCore.NaturalSequencePlayer(postureMotion, {
       now, previousUrl: lastDrawnNaturalUrl, previousMirror: lastDrawnNaturalMirror,
-      previousDisplayScale: lastDrawnNaturalScale, previousAnchorX: kind === "rise" ? 0.74 : 0.12,
+      previousDisplayScale: lastDrawnNaturalScale,
+      previousAnchorX: options.fromLie ? undefined : (kind === "rise" ? 0.74 : 0.12),
     });
     if (kind === "rise") naturalStart = { player };
     else naturalSitDown = { player };
