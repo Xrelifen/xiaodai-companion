@@ -353,7 +353,7 @@
     let drewNaturalFrame = false;
     if (naturalMotionReady && naturalLocomotionPlayer && locomotionDirection && naturalStart) {
       naturalLocomotionPlayer.tick(now, { paused: true });
-      naturalState = naturalStart.player.tick(now);
+      naturalState = naturalStart.player.tick(now, { paused: isDesktop && pet.dragging && pet.dragStationary });
       drewNaturalFrame = drawNaturalFrame(naturalState);
       if (naturalState.complete) {
         if (!startNaturalStep(locomotionMirror, now)) {
@@ -365,7 +365,7 @@
       }
     } else if (naturalMotionReady && naturalLocomotionPlayer && locomotionDirection && naturalTurn) {
       naturalLocomotionPlayer.tick(now, { paused: true });
-      naturalState = naturalTurn.player.tick(now);
+      naturalState = naturalTurn.player.tick(now, { paused: isDesktop && pet.dragging && pet.dragStationary });
       drewNaturalFrame = drawNaturalFrame(naturalState);
       if (naturalState.complete) {
         locomotionMirror = naturalTurn.targetMirror;
@@ -378,7 +378,7 @@
       }
     } else if (naturalMotionReady && naturalLocomotionPlayer && locomotionDirection && naturalStep) {
       naturalLocomotionPlayer.tick(now, { paused: true });
-      naturalState = naturalStep.player.tick(now);
+      naturalState = naturalStep.player.tick(now, { paused: isDesktop && pet.dragging && pet.dragStationary });
       drewNaturalFrame = drawNaturalFrame(naturalState);
       if (naturalState.complete) {
         naturalStep = null;

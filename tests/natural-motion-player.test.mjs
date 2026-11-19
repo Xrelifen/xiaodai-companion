@@ -126,6 +126,20 @@ test("a turning sequence preserves each layer's direction, including mirrored co
   assert.ok(turning.blend > 0 && turning.blend < 1);
 });
 
+test("a paused transition holds its pose and blend until movement resumes", () => {
+  const motion = { transitionMs: 100, variants: [{ frames: [
+    { url: "first", durationMs: 200 }, { url: "second", durationMs: 200 },
+  ] }] };
+  const player = new NaturalSequencePlayer(motion, { now: 0, previousUrl: "start" });
+  const before = player.tick(50);
+  const held = player.tick(1050, { paused: true });
+  assert.equal(held.url, before.url);
+  assert.equal(held.blend, before.blend);
+  assert.equal(held.complete, false);
+  assert.equal(player.tick(1099).url, "first");
+  assert.equal(player.tick(1200).url, "second");
+});
+
 test("a posture sequence retains both image anchors while crossing frames", () => {
   const motion = { transitionMs: 60, variants: [{ frames: [
     { url: "a", anchorX: 0.7, durationMs: 100 },

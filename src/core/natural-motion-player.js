@@ -225,6 +225,7 @@
       this.previousDisplayScale = Number(options.previousDisplayScale) || 1;
       this.transitionStartedAt = options.now ?? 0;
       this.frameEndsAt = (options.now ?? 0) + (this.frames[0]?.sampledDurationMs || 1);
+      this.lastTickAt = options.now ?? 0;
       this.complete = this.frames.length === 0;
     }
 
@@ -247,7 +248,13 @@
       this.frameEndsAt = now + (frame?.sampledDurationMs || 1);
     }
 
-    tick(now) {
+    tick(now, options = {}) {
+      const elapsed = Math.max(0, now - this.lastTickAt);
+      this.lastTickAt = now;
+      if (options.paused) {
+        this.frameEndsAt += elapsed;
+        this.transitionStartedAt += elapsed;
+      }
       let safety = 0;
       while (!this.complete && now >= this.frameEndsAt && safety < 32) {
         safety += 1;
