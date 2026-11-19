@@ -341,7 +341,9 @@
           turnCandidateAt = 0;
         }
       }
-      if (!naturalLocomotionPlayer || (!naturalStep && now >= gaitSwitchAfter && activeNaturalGait !== pet.gait && naturalLocomotionPlayer.canSwitchGait())) {
+      const canChangeGait = !naturalStart && !naturalTurn && !naturalStep
+        && !(isDesktop && pet.dragging && pet.dragStationary);
+      if (!naturalLocomotionPlayer || (canChangeGait && now >= gaitSwitchAfter && activeNaturalGait !== pet.gait && naturalLocomotionPlayer.canSwitchGait())) {
         activateNaturalLocomotion(pet.gait, now);
       }
     } else {

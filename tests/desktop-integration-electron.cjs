@@ -110,6 +110,30 @@ app.whenReady().then(async () => {
   }
   const slowFrames = await window.webContents.executeJavaScript('window.__drawnFrames');
   assert.ok(slowFrames.some(f => f.url.includes('walk-cycle-v1')), 'sustained slow drag never returned to walking');
+  await window.webContents.executeJavaScript(`(() => {
+    const original = XiaodaiMotion.NaturalCyclePlayer.prototype.canSwitchGait;
+    window.__restoreGaitCheck = () => { XiaodaiMotion.NaturalCyclePlayer.prototype.canSwitchGait = original; };
+    window.__allowGaitSwitch = false;
+    XiaodaiMotion.NaturalCyclePlayer.prototype.canSwitchGait = () => window.__allowGaitSwitch;
+  })()`);
+  await window.webContents.executeJavaScript('xiaodaiDesktop.sampleForTest({dx: 40, dy: 0, speed: 700})');
+  for (let i = 0; i < 8; i++) {
+    await pause(50);
+    await window.webContents.executeJavaScript('xiaodaiDesktop.sampleForTest({dx: 0, dy: 0, speed: 0})');
+  }
+  const beforeAllowed = await window.webContents.executeJavaScript("document.querySelector('#pet-canvas').toDataURL()");
+  await window.webContents.executeJavaScript('window.__allowGaitSwitch = true');
+  await pause(300);
+  const whileHeld = await window.webContents.executeJavaScript("document.querySelector('#pet-canvas').toDataURL()");
+  assert.ok(whileHeld === beforeAllowed, 'a pending gait change must not alter a stationary held pose');
+  await window.webContents.executeJavaScript('window.__drawnFrames = []');
+  for (let i = 0; i < 8; i++) {
+    await window.webContents.executeJavaScript('xiaodaiDesktop.sampleForTest({dx: 40, dy: 0, speed: 700})');
+    await pause(80);
+  }
+  const resumedRun = await window.webContents.executeJavaScript('window.__drawnFrames');
+  assert.ok(resumedRun.some(f => f.url.includes('run-cycle-v1')), 'a pending gait change must resume after the pointer moves');
+  await window.webContents.executeJavaScript('window.__restoreGaitCheck()');
   window.webContents.sendInputEvent({ type: 'mouseUp', button: 'left', clickCount: 1, ...rect });
   assert.deepEqual(errors, []);
   console.log(`Desktop reversal and release: ${frames.length} rendered layers; no renderer errors`);
