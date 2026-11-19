@@ -88,6 +88,8 @@
   let naturalPostureMotion = null;
   let naturalStepMotion = null;
   let naturalStep = null;
+  let naturalGaitBridgeMotion = null;
+  let naturalGaitBridge = null;
   let naturalStart = null;
   let naturalSitDown = null;
   let locomotionMirror = null;
@@ -333,18 +335,20 @@
       const desiredMirror = locomotionDirection === "right";
       if (locomotionMirror == null) locomotionMirror = desiredMirror;
       if (!naturalTurnMotion) locomotionMirror = desiredMirror;
-      if (!naturalTurn && !naturalStart && !naturalStep && desiredMirror === locomotionMirror) turnCandidateAt = 0;
-      else if (!naturalTurn && !naturalStart && !naturalStep && naturalTurnMotion && desiredMirror !== locomotionMirror) {
+      if (!naturalTurn && !naturalStart && !naturalStep && !naturalGaitBridge && desiredMirror === locomotionMirror) turnCandidateAt = 0;
+      else if (!naturalTurn && !naturalStart && !naturalStep && !naturalGaitBridge && naturalTurnMotion && desiredMirror !== locomotionMirror) {
         if (!turnCandidateAt) turnCandidateAt = now;
         if (now - turnCandidateAt >= 120) {
           startNaturalTurn(locomotionMirror, desiredMirror, now);
           turnCandidateAt = 0;
         }
       }
-      const canChangeGait = !naturalStart && !naturalTurn && !naturalStep
+      const canChangeGait = !naturalStart && !naturalTurn && !naturalStep && !naturalGaitBridge
         && !(isDesktop && pet.dragging && pet.dragStationary);
-      if (!naturalLocomotionPlayer || (canChangeGait && now >= gaitSwitchAfter && activeNaturalGait !== pet.gait && naturalLocomotionPlayer.canSwitchGait())) {
+      if (!naturalLocomotionPlayer) {
         activateNaturalLocomotion(pet.gait, now);
+      } else if (canChangeGait && now >= gaitSwitchAfter && activeNaturalGait !== pet.gait && naturalLocomotionPlayer.canSwitchGait()) {
+        if (!startNaturalGaitBridge(pet.gait, locomotionMirror, now)) activateNaturalLocomotion(pet.gait, now);
       }
     } else {
       naturalLocomotionPlayer = null;
@@ -352,6 +356,7 @@
       naturalTurn = null;
       naturalStart = null;
       naturalStep = null;
+      naturalGaitBridge = null;
       locomotionMirror = null;
       turnCandidateAt = 0;
     }
@@ -394,6 +399,16 @@
       if (naturalState.complete) {
         naturalStep = null;
         activateNaturalLocomotion("walk", now, { entryFrame: 0 });
+        gaitSwitchAfter = now + 150;
+      }
+    } else if (naturalMotionReady && naturalLocomotionPlayer && locomotionDirection && naturalGaitBridge) {
+      naturalLocomotionPlayer.tick(now, { paused: true });
+      naturalState = naturalGaitBridge.player.tick(now, { paused: isDesktop && pet.dragging && pet.dragStationary });
+      drewNaturalFrame = drawNaturalFrame(naturalState);
+      if (naturalState.complete) {
+        const target = naturalGaitBridge.targetGait;
+        naturalGaitBridge = null;
+        activateNaturalLocomotion(target, now, { entryFrame: target === "run" ? 2 : 4 });
         gaitSwitchAfter = now + 150;
       }
     } else if (naturalMotionReady && naturalLocomotionPlayer && locomotionDirection) {
@@ -524,10 +539,11 @@
     pet.pointerId = null;
     pet.lastPointer = null;
     globalThis.xiaodaiDesktop?.endDrag?.();
-    if (!wasClick && (naturalTurn || naturalStart || naturalStep)) {
+    if (!wasClick && (naturalTurn || naturalStart || naturalStep || naturalGaitBridge)) {
       naturalTurn = null;
       naturalStart = null;
       naturalStep = null;
+      naturalGaitBridge = null;
       startNaturalSettle(performance.now());
     } else if (!wasClick) requestNaturalStop(performance.now());
     engine.releaseDrag(performance.now());
@@ -692,6 +708,18 @@
     return true;
   }
 
+  function startNaturalGaitBridge(targetGait, mirror, now) {
+    const frames = naturalGaitBridgeMotion?.variants?.[0]?.frames;
+    if (!frames?.length || !motionCore?.NaturalSequencePlayer || !["walk", "run"].includes(targetGait)) return false;
+    const ordered = targetGait === "run" ? frames : [...frames].reverse();
+    const motion = { ...naturalGaitBridgeMotion, variants: [{ frames: ordered.map((frame) => ({ ...frame, mirror })) }] };
+    naturalGaitBridge = { targetGait, player: new motionCore.NaturalSequencePlayer(motion, {
+      now, previousUrl: lastDrawnNaturalUrl, previousMirror: lastDrawnNaturalMirror,
+      previousDisplayScale: lastDrawnNaturalScale,
+    }) };
+    return true;
+  }
+
   function startNaturalTurn(fromMirror, targetMirror, now) {
     const frames = naturalTurnMotion?.variants?.[0]?.frames;
     if (!frames || frames.length < 4 || !motionCore?.NaturalSequencePlayer) return;
@@ -755,6 +783,11 @@
   }
 
   function requestNaturalStop(now) {
+    if (naturalGaitBridge) {
+      naturalGaitBridge = null;
+      startNaturalSettle(now);
+      return;
+    }
     if (!naturalLocomotionPlayer || !motionCore?.NaturalStopPlayer) {
       startNaturalSettle(now);
       return;
@@ -782,6 +815,8 @@
     naturalPostureMotion = null;
     naturalStepMotion = null;
     naturalStep = null;
+    naturalGaitBridgeMotion = null;
+    naturalGaitBridge = null;
     gaitSwitchAfter = 0;
     naturalStart = null;
     naturalSitDown = null;
@@ -792,7 +827,9 @@
     naturalStop = null;
     naturalMotionReady = false;
     for (const motion of motions || []) {
-      if (motion?.intent === "startStep") {
+      if (motion?.intent === "gaitBridge") {
+        naturalGaitBridgeMotion = motion;
+      } else if (motion?.intent === "startStep") {
         naturalStepMotion = motion;
       } else if (motion?.intent === "posture") {
         naturalPostureMotion = motion;

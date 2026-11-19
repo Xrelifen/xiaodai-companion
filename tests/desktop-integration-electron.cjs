@@ -103,6 +103,10 @@ app.whenReady().then(async () => {
   const fastFrames = await window.webContents.executeJavaScript('window.__drawnFrames');
   assert.ok(fastFrames.some(f => f.url.includes('start-step-v1')), 'fast startup skipped the first step');
   assert.ok(fastFrames.some(f => f.url.includes('run-cycle-v1')), 'sustained fast drag never entered the running cycle');
+  const accelerateFirst = fastFrames.findIndex(f => f.url.includes('gait-bridge-v1/frames/01-raised'));
+  const accelerateSecond = fastFrames.findIndex((f, i) => i > accelerateFirst && f.url.includes('gait-bridge-v1/frames/02-lowering'));
+  const runAfterBridge = fastFrames.findIndex((f, i) => i > accelerateSecond && f.url.includes('run-cycle-v1/frames/frame-010-front-landing'));
+  assert.ok(accelerateFirst >= 0 && accelerateSecond > accelerateFirst && runAfterBridge > accelerateSecond, 'walk to run must use the bridge before run landing');
   await window.webContents.executeJavaScript('window.__drawnFrames = []');
   for (let i = 0; i < 20; i++) {
     await window.webContents.executeJavaScript(`xiaodaiDesktop.sampleForTest({dx: 8, dy: 0, speed: 100})`);
@@ -110,6 +114,10 @@ app.whenReady().then(async () => {
   }
   const slowFrames = await window.webContents.executeJavaScript('window.__drawnFrames');
   assert.ok(slowFrames.some(f => f.url.includes('walk-cycle-v1')), 'sustained slow drag never returned to walking');
+  const decelerateFirst = slowFrames.findIndex(f => f.url.includes('gait-bridge-v1/frames/02-lowering'));
+  const decelerateSecond = slowFrames.findIndex((f, i) => i > decelerateFirst && f.url.includes('gait-bridge-v1/frames/01-raised'));
+  const walkAfterBridge = slowFrames.findIndex((f, i) => i > decelerateSecond && f.url.includes('walk-cycle-v1/frames/frame-020-opposite-contact'));
+  assert.ok(decelerateFirst >= 0 && decelerateSecond > decelerateFirst && walkAfterBridge > decelerateSecond, 'run to walk must reverse the bridge before walk contact');
   await window.webContents.executeJavaScript(`(() => {
     const original = XiaodaiMotion.NaturalCyclePlayer.prototype.canSwitchGait;
     window.__restoreGaitCheck = () => { XiaodaiMotion.NaturalCyclePlayer.prototype.canSwitchGait = original; };
@@ -134,6 +142,41 @@ app.whenReady().then(async () => {
   const resumedRun = await window.webContents.executeJavaScript('window.__drawnFrames');
   assert.ok(resumedRun.some(f => f.url.includes('run-cycle-v1')), 'a pending gait change must resume after the pointer moves');
   await window.webContents.executeJavaScript('window.__restoreGaitCheck()');
+  await pause(400);
+  await window.webContents.executeJavaScript('window.__drawnFrames = []');
+  let bridgeStarted = false;
+  for (let i = 0; i < 80; i++) {
+    await window.webContents.executeJavaScript('xiaodaiDesktop.sampleForTest({dx: 8, dy: 0, speed: 100})');
+    await pause(25);
+    bridgeStarted = await window.webContents.executeJavaScript(`window.__drawnFrames.some(f => f.url.includes('gait-bridge-v1'))`);
+    if (bridgeStarted) break;
+  }
+  assert.ok(bridgeStarted, 'release test did not reach a gait transition');
+  window.webContents.sendInputEvent({ type: 'mouseUp', button: 'left', clickCount: 1, ...rect });
+  await pause(1200);
+  const afterBridgeRelease = await window.webContents.executeJavaScript('window.__drawnFrames');
+  assert.ok(afterBridgeRelease.some(f => f.url.includes('stand-settle-v1')), 'releasing during a gait transition must settle');
+  await pause(3000);
+  window.webContents.sendInputEvent({ type: 'mouseDown', button: 'left', clickCount: 1, ...rect });
+  for (let i = 0; i < 25; i++) {
+    await window.webContents.executeJavaScript('xiaodaiDesktop.sampleForTest({dx: 40, dy: 0, speed: 700})');
+    await pause(100);
+  }
+  await window.webContents.executeJavaScript('window.__drawnFrames = []');
+  bridgeStarted = false;
+  for (let i = 0; i < 80; i++) {
+    await window.webContents.executeJavaScript('xiaodaiDesktop.sampleForTest({dx: 8, dy: 0, speed: 100})');
+    await pause(25);
+    bridgeStarted = await window.webContents.executeJavaScript(`window.__drawnFrames.some(f => f.url.includes('gait-bridge-v1'))`);
+    if (bridgeStarted) break;
+  }
+  assert.ok(bridgeStarted, 'reverse test did not reach a gait transition');
+  for (let i = 0; i < 26; i++) {
+    await window.webContents.executeJavaScript('xiaodaiDesktop.sampleForTest({dx: -15, dy: 0, speed: 180})');
+    await pause(80);
+  }
+  const afterBridgeReverse = await window.webContents.executeJavaScript('window.__drawnFrames');
+  assert.ok(afterBridgeReverse.some(f => f.url.includes('turn-v1/frames/frame-020-front')), 'reversing during a gait transition must turn');
   window.webContents.sendInputEvent({ type: 'mouseUp', button: 'left', clickCount: 1, ...rect });
   assert.deepEqual(errors, []);
   console.log(`Desktop reversal and release: ${frames.length} rendered layers; no renderer errors`);

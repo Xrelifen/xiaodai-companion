@@ -9,6 +9,7 @@ const lieMotionUrl = new URL("../assets/pets/%E5%B0%8F%E5%91%86/generated/motion
 const transitionMotionUrl = new URL("../assets/pets/%E5%B0%8F%E5%91%86/generated/motions/sit-to-lie-v1/motion.json", import.meta.url);
 const walkMotionUrl = new URL("../assets/pets/%E5%B0%8F%E5%91%86/generated/motions/walk-cycle-v1/motion.json", import.meta.url);
 const runMotionUrl = new URL("../assets/pets/%E5%B0%8F%E5%91%86/generated/motions/run-cycle-v1/motion.json", import.meta.url);
+const gaitBridgeMotionUrl = new URL("../assets/pets/%E5%B0%8F%E5%91%86/generated/motions/gait-bridge-v1/motion.json", import.meta.url);
 
 async function frameMetadata(url) {
   const metadata = await sharp(fileURLToPath(url)).metadata();
@@ -74,6 +75,18 @@ test("sit-to-lie transition connects the approved endpoints with transparent fra
     await access(url);
     const metadata = await frameMetadata(url);
     assert.ok(metadata.width > 0 && metadata.height > 0);
+  }
+});
+
+test("the walk-run bridge contains visible, transparent frames on the common canvas", async () => {
+  const motion = JSON.parse(await readFile(gaitBridgeMotionUrl, "utf8"));
+  assert.equal(motion.intent, "gaitBridge");
+  const frames = motion.variants[0].frames;
+  assert.equal(frames.length, 2);
+  for (const frame of frames) {
+    assert.ok(frame.durationMs > motion.transitionMs);
+    const metadata = await frameMetadata(new URL(frame.file, gaitBridgeMotionUrl));
+    assert.deepEqual({ width: metadata.width, height: metadata.height }, motion.canvas);
   }
 });
 

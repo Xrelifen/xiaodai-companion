@@ -16,11 +16,10 @@
   "displayScale": 1.45,
   "transitionMs": 76,
   "gaitSwitchFrames": [
-    0,
     4
   ],
   "gaitEntryFrame": 0,
-  "gaitEntryFrames": [0, 4],
+  "gaitEntryFrames": [4],
   "interruptible": true,
   "variants": [
     {

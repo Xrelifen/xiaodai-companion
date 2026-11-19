@@ -880,6 +880,37 @@ globalThis.XIAODAI_PET_CATALOG = [
       },
       {
         "schemaVersion": 1,
+        "id": "gait-bridge-v1",
+        "petId": "xiaodai",
+        "intent": "gaitBridge",
+        "canvas": {
+          "width": 1280,
+          "height": 1354
+        },
+        "displayScale": 1.45,
+        "transitionMs": 55,
+        "neutralFrame": "frames/01-raised.webp",
+        "neutralFrameUrl": "../../assets/pets/%E5%B0%8F%E5%91%86/generated/motions/gait-bridge-v1/frames/01-raised.webp",
+        "variants": [
+          {
+            "id": "walk-to-run",
+            "frames": [
+              {
+                "file": "frames/01-raised.webp",
+                "durationMs": 90,
+                "url": "../../assets/pets/%E5%B0%8F%E5%91%86/generated/motions/gait-bridge-v1/frames/01-raised.webp"
+              },
+              {
+                "file": "frames/02-lowering.webp",
+                "durationMs": 90,
+                "url": "../../assets/pets/%E5%B0%8F%E5%91%86/generated/motions/gait-bridge-v1/frames/02-lowering.webp"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "schemaVersion": 1,
         "id": "walk-cycle-v1",
         "petId": "xiaodai",
         "intent": "locomotion",
@@ -896,12 +927,10 @@ globalThis.XIAODAI_PET_CATALOG = [
         "displayScale": 1.45,
         "transitionMs": 76,
         "gaitSwitchFrames": [
-          0,
           4
         ],
         "gaitEntryFrame": 0,
         "gaitEntryFrames": [
-          0,
           4
         ],
         "interruptible": true,

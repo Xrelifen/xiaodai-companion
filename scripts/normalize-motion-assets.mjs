@@ -15,6 +15,7 @@ const profiles = {
   "run-cycle-v1": { axis: "width", extent: 1190, grade: { brightness: 1.012, saturation: 0.951, hue: -1.1 } },
   "stand-settle-v1": { axis: "width", extent: 1190, grade: { brightness: 1.006, saturation: 0.967, hue: -1.45 } },
   "start-step-v1": { axis: "width", extent: 1190, grade: { brightness: 1.006, saturation: 0.967, hue: -1.45 } },
+  "gait-bridge-v1": { axis: "width", extent: 1190, grade: { brightness: 1.012, saturation: 0.951, hue: -1.1 } },
   "sit-stand-v1": { axis: "height", extent: 1260, grade: { brightness: 1, saturation: 1, hue: 0 } },
   "turn-v1/frames/frame-020-front": { axis: "height", extent: 1260, offsetX: 110, grade: { brightness: 1, saturation: 1, hue: 0 } },
   "turn-v1": { axis: "height", extent: 1260, grade: { brightness: 1, saturation: 1, hue: 0 } },
