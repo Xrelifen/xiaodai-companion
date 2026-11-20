@@ -123,6 +123,69 @@ app.whenReady().then(async () => {
   const decelerateSecond = slowFrames.findIndex((f, i) => i > decelerateFirst && f.url.includes('gait-bridge-v1/frames/01-raised'));
   const walkAfterBridge = slowFrames.findIndex((f, i) => i > decelerateSecond && f.url.includes('walk-cycle-v1/frames/frame-020-opposite-contact'));
   assert.ok(decelerateFirst >= 0 && decelerateSecond > decelerateFirst && walkAfterBridge > decelerateSecond, 'run to walk must reverse the bridge before walk contact');
+  // If the requested gait changes during the bridge, do not show the now
+  // unwanted run cycle before returning to walking.
+  await window.webContents.executeJavaScript(`(() => {
+    const original = XiaodaiMotion.NaturalSequencePlayer.prototype.tick;
+    window.__bridgeGate = false;
+    window.__restoreBridgeTick = () => { XiaodaiMotion.NaturalSequencePlayer.prototype.tick = original; };
+    XiaodaiMotion.NaturalSequencePlayer.prototype.tick = function(...args) {
+      const state = original.apply(this, args);
+      if (this.motion?.intent === 'gaitBridge' && !window.__bridgeGate) state.complete = false;
+      return state;
+    };
+  })()`);
+  await window.webContents.executeJavaScript('window.__drawnFrames = []');
+  let startedCancelledBridge = false;
+  for (let i = 0; i < 100; i++) {
+    await window.webContents.executeJavaScript('xiaodaiDesktop.sampleForTest({dx: 40, dy: 0, speed: 700})');
+    await pause(15);
+    startedCancelledBridge = await window.webContents.executeJavaScript("window.__drawnFrames.some(f => f.url.includes('gait-bridge-v1'))");
+    if (startedCancelledBridge) break;
+  }
+  assert.ok(startedCancelledBridge, 'cancellation test did not reach a gait bridge');
+  for (let i = 0; i < 60; i++) {
+    await window.webContents.executeJavaScript('xiaodaiDesktop.sampleForTest({dx: 8, dy: 0, speed: 100})');
+    await pause(25);
+  }
+  await window.webContents.executeJavaScript('window.__bridgeGate = true');
+  for (let i = 0; i < 45; i++) {
+    await window.webContents.executeJavaScript('xiaodaiDesktop.sampleForTest({dx: 8, dy: 0, speed: 100})');
+    await pause(25);
+  }
+  const cancelledBridgeFrames = await window.webContents.executeJavaScript('window.__drawnFrames');
+  const firstBridge = cancelledBridgeFrames.findIndex(f => f.url.includes('gait-bridge-v1'));
+  assert.ok(cancelledBridgeFrames.slice(firstBridge).some(f => f.url.includes('walk-cycle-v1')), 'cancelled bridge did not return to walking');
+  assert.ok(!cancelledBridgeFrames.slice(firstBridge).some(f => f.url.includes('run-cycle-v1')), 'cancelled bridge briefly entered the unwanted running cycle');
+  // Test the reverse direction too: accelerating before a run-to-walk
+  // bridge finishes must return to running without displaying walking.
+  for (let i = 0; i < 25; i++) {
+    await window.webContents.executeJavaScript('xiaodaiDesktop.sampleForTest({dx: 40, dy: 0, speed: 700})');
+    await pause(80);
+  }
+  await window.webContents.executeJavaScript('window.__bridgeGate = false; window.__drawnFrames = []');
+  let startedReverseCancellation = false;
+  for (let i = 0; i < 120; i++) {
+    await window.webContents.executeJavaScript('xiaodaiDesktop.sampleForTest({dx: 8, dy: 0, speed: 100})');
+    await pause(20);
+    startedReverseCancellation = await window.webContents.executeJavaScript("window.__drawnFrames.some(f => f.url.includes('gait-bridge-v1'))");
+    if (startedReverseCancellation) break;
+  }
+  assert.ok(startedReverseCancellation, 'reverse cancellation test did not reach a gait bridge');
+  for (let i = 0; i < 60; i++) {
+    await window.webContents.executeJavaScript('xiaodaiDesktop.sampleForTest({dx: 40, dy: 0, speed: 700})');
+    await pause(25);
+  }
+  await window.webContents.executeJavaScript('window.__bridgeGate = true');
+  for (let i = 0; i < 45; i++) {
+    await window.webContents.executeJavaScript('xiaodaiDesktop.sampleForTest({dx: 40, dy: 0, speed: 700})');
+    await pause(25);
+  }
+  const reverseCancellationFrames = await window.webContents.executeJavaScript('window.__drawnFrames');
+  const reverseBridge = reverseCancellationFrames.findIndex(f => f.url.includes('gait-bridge-v1'));
+  assert.ok(reverseCancellationFrames.slice(reverseBridge).some(f => f.url.includes('run-cycle-v1')), 'cancelled reverse bridge did not return to running');
+  assert.ok(!reverseCancellationFrames.slice(reverseBridge).some(f => f.url.includes('walk-cycle-v1')), 'cancelled reverse bridge briefly entered the unwanted walking cycle');
+  await window.webContents.executeJavaScript('window.__restoreBridgeTick()');
   await window.webContents.executeJavaScript(`(() => {
     const original = XiaodaiMotion.NaturalCyclePlayer.prototype.canSwitchGait;
     window.__restoreGaitCheck = () => { XiaodaiMotion.NaturalCyclePlayer.prototype.canSwitchGait = original; };

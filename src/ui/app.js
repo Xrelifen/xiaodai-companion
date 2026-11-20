@@ -410,8 +410,14 @@
       if (naturalState.complete) {
         const target = naturalGaitBridge.targetGait;
         naturalGaitBridge = null;
-        activateNaturalLocomotion(target, now, { entryFrame: target === "run" ? 2 : 4 });
-        gaitSwitchAfter = now + 150;
+        // The pointer may have changed speed while the bridge was playing.
+        // Return through the bridge if its destination is no longer wanted,
+        // rather than briefly showing a full cycle of the wrong gait.
+        if (target === pet.gait || !startNaturalGaitBridge(pet.gait, locomotionMirror, now)) {
+          const destination = target === pet.gait ? target : pet.gait;
+          activateNaturalLocomotion(destination, now, { entryFrame: destination === "run" ? 2 : 4 });
+          gaitSwitchAfter = now + 150;
+        }
       }
     } else if (naturalMotionReady && naturalLocomotionPlayer && locomotionDirection) {
       naturalState = naturalLocomotionPlayer.tick(now, {
