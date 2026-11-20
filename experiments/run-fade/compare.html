@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>小呆跑步淡化比較</title>
+  <style>
+    body { font-family: system-ui, sans-serif; background: #242424; color: #eee; margin: 2rem auto; max-width: 900px; padding: 0 1rem; }
+    .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1rem; }
+    section { background: #363636; border-radius: 12px; padding: 1rem; }
+    canvas { width: 100%; height: auto; display: block; }
+    button { padding: .6rem 1rem; font: inherit; cursor: pointer; }
+    p { line-height: 1.6; }
+  </style>
+</head>
+<body>
+  <h1>跑步影格淡化比較</h1>
+  <p>兩邊使用相同的跑步影格、騰空高度與播放速度。左側沿用現有淡化設定，右側最多淡化 12 毫秒；請比較是否減少重影，以及是否因此顯得跳動。此頁是循環預覽，不包含拖曳或走跑切換。</p>
+  <button id="toggle">暫停</button>
+  <div class="grid">
+    <section><h2>目前設定</h2><canvas id="before" width="384" height="406"></canvas></section>
+    <section><h2>縮短淡化</h2><canvas id="after" width="384" height="406"></canvas></section>
+  </div>
+  <p id="status">正在載入圖片…</p>
+  <script src="../../src/core/natural-motion-player.js"></script>
+  <script src="../../src/core/crossfade.js"></script>
+  <script src="../../src/ui/pet-catalog.generated.js"></script>
+  <script>
+    const run = XIAODAI_PET_CATALOG.find(pet => pet.id === 'xiaodai')?.naturalMotions.find(motion => motion.gait === 'run');
+    const load = src => new Promise((resolve, reject) => {
+      const image = new Image(); image.onload = () => resolve([src, image]); image.onerror = () => reject(new Error(src)); image.src = src;
+    });
+    Promise.all(run.variants[0].frames.map(frame => load(frame.url))).then(loaded => {
+      const images = new Map(loaded);
+      const players = [new XiaodaiMotion.NaturalCyclePlayer(run, { now: 0 }),
+        new XiaodaiMotion.NaturalCyclePlayer({ ...run, transitionMs: 12 }, { now: 0 })];
+      const canvases = [document.querySelector('#before'), document.querySelector('#after')];
+      let running = true, last = performance.now(), elapsed = 0;
+      document.querySelector('#status').textContent = '循環預覽中';
+      document.querySelector('#toggle').onclick = event => { running = !running; event.target.textContent = running ? '暫停' : '播放'; };
+      function draw(canvas, state) {
+        const ctx = canvas.getContext('2d');
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        const layer = (url, alpha, offsetY) => {
+          const image = images.get(url); if (!image) return;
+          const scale = Math.min(canvas.width / image.naturalWidth, canvas.height / image.naturalHeight);
+          ctx.save(); ctx.globalAlpha = alpha;
+          ctx.drawImage(image, (canvas.width - image.naturalWidth * scale) / 2,
+            canvas.height - image.naturalHeight * scale + (offsetY || 0) * scale,
+            image.naturalWidth * scale, image.naturalHeight * scale);
+          ctx.restore();
+        };
+        XiaodaiCrossfade.drawCrossfade(ctx, state.previousUrl ? alpha => layer(state.previousUrl, alpha, state.previousOffsetY) : null,
+          alpha => layer(state.url, alpha, state.offsetY), state.blend);
+      }
+      function tick(now) {
+        if (running) elapsed += now - last;
+        last = now;
+        for (let i = 0; i < players.length; i++) draw(canvases[i], players[i].tick(elapsed, { playbackRate: 1.5 }));
+        requestAnimationFrame(tick);
+      }
+      requestAnimationFrame(tick);
+    }).catch(error => { document.querySelector('#status').textContent = `圖片載入失敗：${error.message}`; });
+  </script>
+</body>
+</html>
